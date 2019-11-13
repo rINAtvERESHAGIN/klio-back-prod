@@ -1,0 +1,64 @@
+version: '3.3'
+
+services:
+
+  db:
+    restart: always
+    image: mysql:5.7
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_DATABASE=database
+      - MYSQL_USER=db_user
+      - MYSQL_PASSWORD=userpass
+      - MYSQL_ROOT_PASSWORD=rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./confs/db/data1:/var/lib/mysql"
+    networks:
+      - db_network
+
+  web:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - variables.env
+    command: bash -c "gunicorn -b 0.0.0.0:8000 --workers=2 --env DJANGO_CONFIGURATION=Local --timeout=300 --log-level=DEBUG config.wsgi"
+    depends_on:
+      - db
+    volumes:
+      - ./klio:/src
+      - ./static:/static
+      - ./logs:/logs
+    expose:
+      - "8000"
+    links:
+      - db:db
+    networks:
+      - web_network
+      - db_network
+
+  nginx:
+    restart: always
+    image: nginx:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./klio:/src
+      - ./confs/nginx/klio.conf:/etc/nginx/conf.d/klio.conf
+      - ./static:/static
+      - ./logs:/logs
+    depends_on:
+      - web
+    links:
+      - web:web
+    networks:
+      - web_network
+
+networks:
+  web_network:
+    driver: bridge
+  db_network:
+    driver: bridge
