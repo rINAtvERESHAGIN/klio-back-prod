@@ -19,9 +19,17 @@ class Base(Configuration):
         'django.contrib.staticfiles',
 
         # Third Party Packages
-        'django_mysql',
+        'captcha',
+        'cities_light',
+        'ckeditor',
 
         # Own Packages
+        'basket',
+        'contacts',
+        'general',
+        'products',
+        'special',
+        'tags',
         'users',
     ]
 
@@ -108,3 +116,9 @@ class Base(Configuration):
 
     # Custom user app
     AUTH_USER_MODEL = 'users.User'
+
+    # Cities Light
+    CITIES_LIGHT_TRANSLATION_LANGUAGES = ['ru']
+    CITIES_LIGHT_INCLUDE_COUNTRIES = ['RU']
+    CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG',
+                                       'PPLL', 'PPLR', 'PPLS', 'STLMT', ]

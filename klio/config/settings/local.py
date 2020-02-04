@@ -22,7 +22,8 @@ class Local(Base):
         # 'corsheaders.middleware.CorsMiddleware',
     ] + Base.MIDDLEWARE
 
-    DATABASES = values.DatabaseURLValue('mysql://db_user:userpass@db:3306/database')
+    # DATABASES = values.DatabaseURLValue('mysql://db_user:userpass@db:3306/database')
+    DATABASES = values.DatabaseURLValue('postgres://postgres@db/postgres')
 
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': lambda request: True if values.BooleanValue(Local.DEBUG) else False,
