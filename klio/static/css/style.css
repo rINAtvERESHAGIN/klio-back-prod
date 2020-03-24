@@ -1,0 +1,10 @@
+/* == ADMIN == */
+
+.field-__str__ {
+    min-width: 250px;
+}
+
+.field-category {
+    min-width: 250px;
+    white-space: normal;
+}

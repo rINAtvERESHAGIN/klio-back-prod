@@ -19,9 +19,18 @@ class Base(Configuration):
         'django.contrib.staticfiles',
 
         # Third Party Packages
-        'django_mysql',
+        'captcha',
+        'cities_light',
+        'ckeditor',
+        'rest_framework',
 
         # Own Packages
+        'basket',
+        'contacts',
+        'general',
+        'products',
+        'sale',
+        'tags',
         'users',
     ]
 
@@ -78,7 +87,7 @@ class Base(Configuration):
 
     LANGUAGE_CODE = 'ru'
 
-    TIME_ZONE = 'UTC'
+    TIME_ZONE = 'Europe/Moscow'
 
     USE_I18N = values.BooleanValue(True)
     USE_L10N = values.BooleanValue(True)
@@ -108,3 +117,53 @@ class Base(Configuration):
 
     # Custom user app
     AUTH_USER_MODEL = 'users.User'
+
+    # CITIES LIGHT SETTINGS
+    CITIES_LIGHT_TRANSLATION_LANGUAGES = ['ru']
+    CITIES_LIGHT_INCLUDE_COUNTRIES = ['RU']
+    CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG',
+                                       'PPLL', 'PPLR', 'PPLS', 'STLMT', ]
+
+    # CKEDITOR SETTINGS
+    CKEDITOR_CONFIGS = {
+        'default': {
+            'toolbar': [
+                ['Undo', 'Redo',
+                 '-', 'Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker'
+                                                               '-', 'Link', 'Unlink', 'Anchor', 'Format',
+                 '-', 'Maximize',
+                 '-', 'Table',
+                 '-', 'Image',
+                 '-', 'Source',
+                 '-', 'NumberedList', 'BulletedList'
+                 ],
+                ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock',
+                 'Font', 'FontSize', 'TextColor',
+                 '-', 'Outdent', 'Indent',
+                 '-', 'HorizontalRule',
+                 '-', 'Blockquote'
+                 ]
+            ],
+            'height': 200,
+            'width': '100%',
+            'toolbarCanCollapse': False,
+            'forcePasteAsPlainText': True
+        },
+        'user_mode': {
+            'toolbar': [
+                ['Undo', 'Redo',
+                 '-', 'Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker'
+                                                               '-', 'Link', 'Unlink',
+                 '-', 'Table',
+                 '-', 'Image',
+                 '-', 'NumberedList', 'BulletedList',
+                 '-', 'HorizontalRule',
+                 '-', 'Blockquote'
+                 ]
+            ],
+            'height': 300,
+            'width': '100%',
+            'toolbarCanCollapse': False,
+            'forcePasteAsPlainText': True
+        }
+    }
