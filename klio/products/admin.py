@@ -60,7 +60,8 @@ class ProductAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ProductAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields['recommended'].queryset = Product.objects.exclude(id__exact=obj.id)
+        if obj:
+            form.base_fields['recommended'].queryset = Product.objects.exclude(id__exact=obj.id)
         return form
 
 
