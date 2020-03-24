@@ -9,4 +9,4 @@ class Tag(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['activity', 'name']
+        ordering = ['-activity', 'name']

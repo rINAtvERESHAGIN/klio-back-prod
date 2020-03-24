@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('discount_price', models.DecimalField(blank=True, decimal_places=2, max_digits=10)),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.Product')),
-                ('special', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='special.Special')),
+                ('sale', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='sale.Special')),
             ],
         ),
         migrations.CreateModel(
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                 ('discount_type', models.CharField(blank=True, choices=[('percent', 'Percentage discount'), ('fixed', 'Fixed discount')], max_length=10)),
                 ('discount_price', models.DecimalField(blank=True, decimal_places=2, max_digits=10)),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.Category')),
-                ('special', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='special.Special')),
+                ('sale', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='sale.Special')),
             ],
         ),
     ]

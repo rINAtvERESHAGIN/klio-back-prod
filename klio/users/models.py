@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 
 from cities_light.models import City, Country
 
+from contacts.models import Phone
+
 
 # https://habrahabr.ru/post/313764/
 class User(AbstractUser):
@@ -13,7 +15,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=64, null=True, blank=False, default=None)
     middle_name = models.CharField(max_length=128, null=True, blank=True, default=None)
     birthday = models.DateField(null=True, blank=True, default=None)
-    phone = models.CharField(max_length=64, null=True, blank=False, default=None)
+    phones = models.ManyToManyField(Phone, through='UserPhone', related_name='users')
     email = models.EmailField()
     country = models.ForeignKey(Country, on_delete=models.PROTECT, null=True)
     city = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
@@ -30,3 +32,11 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ['-activity', 'last_name', 'username']
+
+
+class UserPhone(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    phone = models.ForeignKey(Phone, on_delete=models.CASCADE)
+    main = models.BooleanField(default=False)
+    order = models.PositiveSmallIntegerField(blank=False, default=1)
+    activity = models.BooleanField(default=True)
