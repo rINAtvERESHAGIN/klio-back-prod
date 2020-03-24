@@ -49,9 +49,9 @@ class Category(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk and not self.parent:
-            new_base_cat = super(Category, self).save(*args, **kwargs)
-            new_base_cat.group = new_base_cat.pk
-            return new_base_cat.save()
+            super(Category, self).save(*args, **kwargs)
+            self.group = self.pk
+            return self.save()
         if self.pk and not self.parent:
             self.group = self.pk
             return super(Category, self).save(*args, **kwargs)
