@@ -25,8 +25,10 @@ class User(AbstractUser):
     personal_data = models.BooleanField(default=False, blank=False)
 
     def __str__(self):
-        if self.first_name:
+        if self.middle_name:
             return "{0} {1} {2}".format(self.last_name, self.first_name, self.middle_name)
+        elif self.first_name and self.last_name:
+            return "{0} {1}".format(self.last_name, self.first_name)
         else:
             return self.username
 

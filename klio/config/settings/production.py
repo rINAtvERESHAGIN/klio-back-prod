@@ -25,3 +25,8 @@ class Production(Base):
             'PORT': int(os.getenv('POSTGRES_PORT'))
         }
     }
+
+    CORS_ORIGIN_WHITELIST = [
+        "http://45.80.71.10:8081",
+        "http://kliogem.ru",
+    ]
