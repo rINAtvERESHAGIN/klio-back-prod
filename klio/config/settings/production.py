@@ -12,7 +12,7 @@ class Production(Base):
     SECRET_KEY = 'jch3we75+$xlesg8m_wd(2yuo&9dpr=zuw66xo1ga7jpkpey(2'
 
     ALLOWED_HOSTS = [
-        '',
+        '45.80.71.10', 'kliogem.ru'
     ]
 
     DATABASES = {
