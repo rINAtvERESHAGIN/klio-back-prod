@@ -12,14 +12,12 @@ class Local(Base):
     ALLOWED_HOSTS = values.ListValue(['localhost', '127.0.0.1', 'web'])
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
-        'corsheaders',
         'debug_toolbar',
         'django_extensions',
     ]
 
     MIDDLEWARE = [
         'debug_toolbar.middleware.DebugToolbarMiddleware',
-        'corsheaders.middleware.CorsMiddleware',
     ] + Base.MIDDLEWARE
 
     # DATABASES = values.DatabaseURLValue('mysql://db_user:userpass@db:3306/database')

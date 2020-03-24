@@ -21,6 +21,7 @@ class Base(Configuration):
         # Third Party Packages
         'captcha',
         'cities_light',
+        'corsheaders',
         'ckeditor',
         'rest_framework',
 
@@ -35,6 +36,7 @@ class Base(Configuration):
     ]
 
     MIDDLEWARE = [
+        'corsheaders.middleware.CorsMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
