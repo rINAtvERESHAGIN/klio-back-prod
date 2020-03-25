@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
 
 from .models import User, UserPhone
 
@@ -9,6 +10,11 @@ class UserPhoneInline(admin.TabularInline):
 
 
 class CustomUserAdmin(UserAdmin):
+    fieldsets = (
+        *UserAdmin.fieldsets, (
+            _('Additional data'), {'fields': ('middle_name', 'birthday', 'country', 'city', 'address', 'avatar')},
+        ),
+    )
     list_display = ['__str__', 'registered', 'city', 'email', 'get_phones', 'activity']
     list_filter = ['activity']
     inlines = [

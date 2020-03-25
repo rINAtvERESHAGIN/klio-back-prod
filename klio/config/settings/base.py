@@ -89,6 +89,8 @@ class Base(Configuration):
 
     LANGUAGE_CODE = 'ru'
 
+    LOCALE_PATHS = (join(BASE_DIR, 'locale'),)
+
     TIME_ZONE = 'Europe/Moscow'
 
     USE_I18N = values.BooleanValue(True)
