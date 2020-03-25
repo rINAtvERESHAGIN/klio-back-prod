@@ -11,14 +11,14 @@ User = get_user_model()
 
 
 class Brand(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=64, blank=False, null=False)
-    slug = models.SlugField()
-    logo = models.ImageField()
-    description = RichTextField(blank=True)
-    order = models.PositiveIntegerField(default=1)
-    activity = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
+    modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
+    slug = models.SlugField(verbose_name=_('slug'))
+    logo = models.ImageField(verbose_name=_('logo'))
+    description = RichTextField(blank=True, verbose_name=_('description'))
+    order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     def __str__(self):
         return self.name
@@ -30,17 +30,18 @@ class Brand(models.Model):
 
 
 class Category(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=64, blank=False, null=False)
-    slug = models.SlugField()
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
-    group = models.PositiveIntegerField(default=0, null=True, editable=False)
-    img = models.ImageField()
-    description = RichTextField(blank=True)
-    order = models.PositiveIntegerField(default=1)
-    on_main = models.BooleanField(default=False)
-    activity = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
+    modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
+    slug = models.SlugField(verbose_name=_('slug'))
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children',
+                               verbose_name=_('parent'))
+    group = models.PositiveIntegerField(default=0, null=True, editable=False, verbose_name=_('group'))
+    img = models.ImageField(verbose_name=_('image'))
+    description = RichTextField(blank=True, verbose_name=_('description'))
+    order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
+    on_main = models.BooleanField(default=False, verbose_name=_('on main'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     class Meta:
         ordering = ['-activity', 'order', '-group', '-parent__name', 'name']
@@ -71,9 +72,10 @@ class Category(models.Model):
 
 
 class CategoryCityRating(models.Model):
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=False, null=False)
-    city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=False)
-    rating = models.PositiveIntegerField(default=0, blank=False, null=True)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=False, null=False,
+                                 verbose_name=_('category'))
+    city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=False, verbose_name=_('city'))
+    rating = models.PositiveIntegerField(default=0, blank=False, null=True, verbose_name=_('rating'))
 
 
 class Product(models.Model):
@@ -90,11 +92,11 @@ class Product(models.Model):
         (NOT_NEW, _('Not new')),
     ]
 
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=64, blank=False, null=False)
-    slug = models.SlugField()
-    description = RichTextField(blank=False)
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
+    modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
+    slug = models.SlugField(verbose_name=_('slug'))
+    description = RichTextField(blank=False, verbose_name=_('description'))
 
     """
     There's 3 kinds of products:
@@ -104,35 +106,39 @@ class Product(models.Model):
       specific version of the parent.
     - A parent product. It essentially represents a set of products.
     """
-    kind = models.CharField(max_length=7, choices=KIND_CHOICES)
+    kind = models.CharField(max_length=7, choices=KIND_CHOICES, verbose_name=_('kind'))
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True,
                                related_name='children', verbose_name=_("Parent product"),
                                help_text="Leave blank if this is a unique product "
                                          "(i.e. product does not have children)")
     """ None for child products, they inherit their parent's product type. """
     product_type = models.ForeignKey('ProductType', on_delete=models.PROTECT, null=True, blank=True,
-                                     related_name='products')
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, null=True)
-    brand = models.ForeignKey('Brand', on_delete=models.CASCADE, null=True, blank=True)
+                                     related_name='products', verbose_name=_('product type'))
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, null=True,
+                                 verbose_name=_('category'))
+    brand = models.ForeignKey('Brand', on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('brand'))
     """ Not required for parent products. """
-    art = models.IntegerField(blank=True, null=True)
-    tags = models.ManyToManyField(Tag, blank=True, related_name='products')
-    properties = models.ManyToManyField('ProductProperty', through='ProductPropertyValue', related_name='products')
+    art = models.IntegerField(blank=True, null=True, verbose_name=_('vendor code'))
+    tags = models.ManyToManyField(Tag, blank=True, related_name='products', verbose_name=_('tags'))
+    properties = models.ManyToManyField('ProductProperty', through='ProductPropertyValue', related_name='products',
+                                        verbose_name=_('properties'))
     """ Not required for parent products. """
     in_stock = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=4,
                                    help_text='For parents it will be calculated automatically',
                                    verbose_name=_('In_stock'))
     """ Not required for parent products. """
-    price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
-    base_amount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=4)
-    units = models.CharField(max_length=32, blank=True, verbose_name=_('Units'))
-    wholesale_threshold = models.IntegerField(blank=True, null=True)
-    wholesale_price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
-    recommended = models.ManyToManyField('self', blank=True)
+    price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'))
+    base_amount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=4,
+                                      verbose_name=_('base amount'))
+    units = models.CharField(max_length=32, blank=True, verbose_name=_('units'))
+    wholesale_threshold = models.IntegerField(blank=True, null=True, verbose_name=_('wholesale threshold'))
+    wholesale_price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2,
+                                          verbose_name=_('wholesale price'))
+    recommended = models.ManyToManyField('self', blank=True, verbose_name=_('recommended'))
     """ Leave default for parent products. """
-    is_new = models.CharField(max_length=12, choices=IS_NEW_CHOICES, default=CALCULATED)
-    order = models.PositiveIntegerField(default=1)
-    activity = models.BooleanField(default=True)
+    is_new = models.CharField(max_length=12, choices=IS_NEW_CHOICES, default=CALCULATED, verbose_name=_('is new'))
+    order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     def __str__(self):
         return self.name
@@ -144,11 +150,12 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False, related_name='images')
-    img = models.ImageField()
-    label = models.CharField(max_length=64, blank=True)
-    order = models.PositiveIntegerField(default=1)
-    activity = models.BooleanField(default=True)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False, related_name='images',
+                                verbose_name=_('product'))
+    img = models.ImageField(verbose_name=_('image'))
+    label = models.CharField(max_length=64, blank=True, verbose_name=_('label'))
+    order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     class Meta:
         ordering = ['-activity', 'order']
@@ -169,10 +176,10 @@ class ProductProperty(models.Model):
         (DATETIME, _("Datetime")),
     )
 
-    name = models.CharField(max_length=128, blank=False, null=False, verbose_name=_('Name'))
-    type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=20, verbose_name=_("Type"))
-    units = models.CharField(max_length=32, blank=True, verbose_name=_('Units'))
-    required = models.BooleanField(default=False, verbose_name=_('Required'))
+    name = models.CharField(max_length=128, blank=False, null=False, verbose_name=_('name'))
+    type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=20, verbose_name=_("type"))
+    units = models.CharField(max_length=32, blank=True, verbose_name=_('units'))
+    required = models.BooleanField(default=False, verbose_name=_('required'))
 
     def __str__(self):
         return self.name
@@ -183,10 +190,10 @@ class ProductProperty(models.Model):
 
 
 class ProductPropertyValue(models.Model):
-    prop = models.ForeignKey('ProductProperty', on_delete=models.CASCADE, verbose_name=_('Property'),
+    prop = models.ForeignKey('ProductProperty', on_delete=models.CASCADE, verbose_name=_('property'),
                              related_name='values')
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='property_values',
-                                verbose_name=_('Product'))
+                                verbose_name=_('product'))
 
     value_text = models.TextField(_('Text'), blank=True, null=True)
     value_integer = models.IntegerField(_('Integer'), blank=True, null=True, db_index=True)
@@ -195,8 +202,10 @@ class ProductPropertyValue(models.Model):
     value_richtext = models.TextField(_('Richtext'), blank=True, null=True)
     value_date = models.DateField(_('Date'), blank=True, null=True, db_index=True)
     value_datetime = models.DateTimeField(_('DateTime'), blank=True, null=True, db_index=True)
-    value_file = models.FileField(upload_to='products/properties/files', max_length=255, blank=True, null=True)
-    value_image = models.ImageField(upload_to='products/properties/images', max_length=255, blank=True, null=True)
+    value_file = models.FileField(upload_to='products/properties/files', max_length=255, blank=True, null=True,
+                                  verbose_name=_('file'))
+    value_image = models.ImageField(upload_to='products/properties/images', max_length=255, blank=True, null=True,
+                                    verbose_name=_('image'))
 
     def _get_value(self):
         value = getattr(self, 'value_%s' % self.prop.type)
@@ -239,12 +248,13 @@ class ProductPropertyValue(models.Model):
 
 
 class ProductType(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=64, blank=False, null=False)
-    slug = models.SlugField()
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=False, null=False)
-    activity = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
+    modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
+    slug = models.SlugField(verbose_name=_('slug'))
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=False, null=False,
+                                 verbose_name=_('category'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     def __str__(self):
         return self.name
@@ -256,10 +266,10 @@ class ProductType(models.Model):
 
 
 class UserProduct(models.Model):
-    added = models.DateTimeField(auto_now_add=True)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
-    selected = models.BooleanField(default=False)
+    added = models.DateTimeField(auto_now_add=True, verbose_name=_('added'))
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False, verbose_name=_('product'))
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, verbose_name=_('user'))
+    selected = models.BooleanField(default=False, verbose_name=_('selected'))
 
     def __str__(self):
         return '{0} - {1}'.format(self.user, self.product)
