@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
 from .models import User, UserPhone
 
@@ -7,7 +8,7 @@ class UserPhoneInline(admin.TabularInline):
     model = UserPhone
 
 
-class UserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin):
     list_display = ['__str__', 'registered', 'city', 'email', 'get_phones', 'activity']
     list_filter = ['activity']
     inlines = [
@@ -18,4 +19,4 @@ class UserAdmin(admin.ModelAdmin):
         return "; ".join([phone.__str__() for phone in obj.phones.filter(activity=True)])
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(User, CustomUserAdmin)
