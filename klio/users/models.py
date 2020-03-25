@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
 
 from cities_light.models import City, Country
 
@@ -10,19 +11,19 @@ from contacts.models import Phone
 class User(AbstractUser):
     """Override build-in User model."""
 
-    registered = models.DateTimeField(auto_now_add=True)
-    first_name = models.CharField(max_length=64, null=True, blank=False, default=None)
-    last_name = models.CharField(max_length=64, null=True, blank=False, default=None)
-    middle_name = models.CharField(max_length=128, null=True, blank=True, default=None)
-    birthday = models.DateField(null=True, blank=True, default=None)
-    phones = models.ManyToManyField(Phone, through='UserPhone', related_name='users')
+    registered = models.DateTimeField(auto_now_add=True, verbose_name=_('registered'))
+    first_name = models.CharField(max_length=64, null=True, blank=False, default=None, verbose_name=_('first name'))
+    last_name = models.CharField(max_length=64, null=True, blank=False, default=None, verbose_name=_('last name'))
+    middle_name = models.CharField(max_length=128, null=True, blank=True, default=None, verbose_name=_('middle name'))
+    birthday = models.DateField(null=True, blank=True, default=None, verbose_name=_('birthday'))
+    phones = models.ManyToManyField(Phone, through='UserPhone', related_name='users', verbose_name=_('phones'))
     email = models.EmailField()
-    country = models.ForeignKey(Country, on_delete=models.PROTECT, null=True)
-    city = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
-    address = models.CharField(max_length=256, blank=True)
-    avatar = models.ImageField(blank=True)
-    activity = models.BooleanField(default=True)
-    personal_data = models.BooleanField(default=False, blank=False)
+    country = models.ForeignKey(Country, on_delete=models.PROTECT, null=True, verbose_name=_('country'))
+    city = models.ForeignKey(City, on_delete=models.PROTECT, null=True, verbose_name=_('city'))
+    address = models.CharField(max_length=256, blank=True, verbose_name=_('address'))
+    avatar = models.ImageField(blank=True, verbose_name=_('avatar'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
+    personal_data = models.BooleanField(default=False, blank=False, verbose_name=_('personal data'))
 
     def __str__(self):
         if self.middle_name:
@@ -34,11 +35,18 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ['-activity', 'last_name', 'username']
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
 
 
 class UserPhone(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    phone = models.ForeignKey(Phone, on_delete=models.CASCADE)
-    main = models.BooleanField(default=False)
-    order = models.PositiveSmallIntegerField(blank=False, default=1)
-    activity = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('user'))
+    phone = models.ForeignKey(Phone, on_delete=models.CASCADE, verbose_name=_('phone'))
+    main = models.BooleanField(default=False, verbose_name=_('main'))
+    order = models.PositiveSmallIntegerField(blank=False, default=1, verbose_name=_('order'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
+
+    class Meta:
+        ordering = ['-activity', 'user', 'phone']
+        verbose_name = _('User Phone')
+        verbose_name_plural = _('User Phones')
