@@ -20,6 +20,8 @@ class Article(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_('author'))
     img = models.ImageField(blank=True, verbose_name=_('image'))
     tags = models.ManyToManyField(Tag, help_text=_('At least 1 tag is required.'), verbose_name=_('tags'))
+    abstract = models.TextField(verbose_name=_('abstract'), max_length=256,
+                                help_text=_('Short description - 256 symbols max.'))
     content = RichTextField(verbose_name=_('content'))
     activity = models.BooleanField(default=False, verbose_name=_('activity'))
 
@@ -161,6 +163,8 @@ class News(models.Model):
     img = models.ImageField(blank=True, verbose_name=_('image'))
     tags = models.ManyToManyField(Tag, help_text=_('At least 1 tag is required.'), verbose_name=_('tags'))
     content = RichTextField(verbose_name=_('content'))
+    abstract = models.TextField(verbose_name=_('abstract'), max_length=256,
+                                help_text=_('Short description - 256 symbols max.'))
     activity = models.BooleanField(default=False, verbose_name=_('activity'))
 
     def __str__(self):

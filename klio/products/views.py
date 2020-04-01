@@ -33,7 +33,18 @@ class CategoryProductListView(generics.ListAPIView):
     serializer_class = ProductListSerializer
 
     def get_queryset(self):
-        return Product.objects.filter(activity=True, category__slug=self.kwargs['slug'])
+        sort_by = self.request.query_params.get('sortby')
+        direction = self.request.query_params.get('direction')
+        queryset = Product.objects.filter(activity=True, category__slug=self.kwargs['slug']).order_by('name')
+        if sort_by == 'name':
+            if direction == 'desc':
+                queryset = queryset.order_by('-name')
+        if sort_by == 'price':
+            if direction == 'desc':
+                queryset = queryset.order_by('-price')
+            else:
+                queryset = queryset.order_by('price')
+        return queryset
 
 
 class ProductDetailView(generics.RetrieveAPIView):
