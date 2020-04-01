@@ -96,7 +96,7 @@ class Product(models.Model):
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
     name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(verbose_name=_('slug'))
-    description = RichTextField(blank=False, verbose_name=_('description'))
+    description = RichTextField(blank=True, verbose_name=_('description'))
 
     """
     There's 3 kinds of products:
@@ -126,11 +126,12 @@ class Product(models.Model):
     in_stock = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=4,
                                    help_text='For parents it will be calculated automatically',
                                    verbose_name=_('In_stock'))
+    units = models.ForeignKey('Unit', on_delete=models.SET_NULL, null=True, blank=True, related_name='products',
+                              verbose_name=_('units'))
     """ Not required for parent products. """
     price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'))
     base_amount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=4,
                                       verbose_name=_('base amount'))
-    units = models.CharField(max_length=32, blank=True, verbose_name=_('units'))
     wholesale_threshold = models.IntegerField(blank=True, null=True, verbose_name=_('wholesale threshold'))
     wholesale_price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2,
                                           verbose_name=_('wholesale price'))
@@ -178,7 +179,8 @@ class ProductProperty(models.Model):
 
     name = models.CharField(max_length=128, blank=False, null=False, verbose_name=_('name'))
     type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=20, verbose_name=_("type"))
-    units = models.CharField(max_length=32, blank=True, verbose_name=_('units'))
+    units = models.ForeignKey('Unit', on_delete=models.SET_NULL, null=True, blank=True, related_name='properties',
+                              verbose_name=_('units'))
     required = models.BooleanField(default=False, verbose_name=_('required'))
 
     def __str__(self):
@@ -263,6 +265,17 @@ class ProductType(models.Model):
         ordering = ['-activity', 'category', 'name']
         verbose_name = _('Product type')
         verbose_name_plural = _('Product types')
+
+
+class Unit(models.Model):
+    name = models.CharField(max_length=32, blank=True, verbose_name=_('name'))
+
+    class Meta:
+        verbose_name = _('Unit')
+        verbose_name_plural = _('Units')
+
+    def __str__(self):
+        return self.name
 
 
 class UserProduct(models.Model):

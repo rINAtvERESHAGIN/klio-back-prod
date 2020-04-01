@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from sale.models import SpecialProduct
 from .models import (Brand, Category, Product, ProductImage, ProductProperty, ProductPropertyValue,
-                     ProductType)
+                     ProductType, Unit)
 
 
 class BrandAdmin(admin.ModelAdmin):
@@ -85,3 +85,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductProperty, ProductPropertyAdmin)
 admin.site.register(ProductType, ProductTypeAdmin)
+admin.site.register(Unit)

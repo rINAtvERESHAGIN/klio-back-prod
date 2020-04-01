@@ -18,6 +18,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from general.views import SearchListView
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/contacts/', include('contacts.urls')),
@@ -25,6 +28,8 @@ urlpatterns = [
     path('api/v1/products/', include('products.urls')),
     path('api/v1/tags/', include('tags.urls')),
     path('api/v1/users/', include('users.urls')),
+
+    path('api/v1/search', SearchListView.as_view({'get': 'list'}), name='search_list'),
 ]
 
 if settings.DEBUG:

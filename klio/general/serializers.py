@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
+from products.serializers import CategoryListSerializer, ProductListSerializer
 from .models import Article, Banner, Menu, MenuItem, News
 
 User = get_user_model()
@@ -16,14 +17,10 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
 
 
 class ArticleListSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Article
-        fields = ('id', 'title', 'date', 'author')
-
-    def get_author(self, obj):
-        return obj.author.__str__()
+        fields = ('id', 'title', 'slug', 'img', 'date', 'abstract')
 
 
 class BannerDetailSerializer(serializers.ModelSerializer):
@@ -92,3 +89,18 @@ class NewsListSerializer(serializers.ModelSerializer):
 
     def get_author(self, obj):
         return obj.author.__str__()
+
+
+class SearchDataSerializer(serializers.Serializer):
+    categories = CategoryListSerializer(many=True)
+    products = ProductListSerializer(many=True)
+    articles = ArticleListSerializer(many=True)
+    news = NewsListSerializer(many=True)
+    counts = serializers.SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        self.counts = kwargs.pop('counts')
+        super().__init__(*args, **kwargs)
+
+    def get_counts(self, obj):
+        return self.counts
