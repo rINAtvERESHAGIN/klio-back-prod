@@ -8,7 +8,7 @@ from .views import (ArticleCreateView, ArticleDetailView, ArticleListView,
 urlpatterns = [
     path('articles/create', ArticleCreateView.as_view()),
     path('articles/list', ArticleListView.as_view()),
-    path('articles/<int:pk>/detail', ArticleDetailView.as_view()),
+    path('articles/<str:slug>/detail', ArticleDetailView.as_view()),
 
     path('banners/create', BannerCreateView.as_view()),
     path('banners/list', BannerListView.as_view()),
@@ -18,5 +18,5 @@ urlpatterns = [
 
     path('news/create', NewsCreateView.as_view()),
     path('news/list', NewsListView.as_view()),
-    path('news/<int:pk>/detail', NewsDetailView.as_view()),
+    path('news/<str:slug>/detail', NewsDetailView.as_view()),
 ]

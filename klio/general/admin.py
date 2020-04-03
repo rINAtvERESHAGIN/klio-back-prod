@@ -9,7 +9,7 @@ class HiddenAdmin(admin.ModelAdmin):
 
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'date', 'start_date', 'activity']
+    list_display = ['__str__', 'date', 'start_date', 'deadline', 'activity']
     list_editable = ['activity']
     prepopulated_fields = {"slug": ("title",)}
 
@@ -49,7 +49,7 @@ class MenuAdmin(admin.ModelAdmin):
 
 
 class NewsAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'date', 'start_date', 'activity']
+    list_display = ['__str__', 'date', 'start_date', 'deadline', 'activity']
     list_editable = ['activity']
     prepopulated_fields = {"slug": ("title",)}
 

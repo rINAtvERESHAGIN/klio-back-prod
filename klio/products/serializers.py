@@ -1,8 +1,7 @@
 from django.utils.timezone import now, timedelta
 
 from rest_framework import serializers
-
-from tags.models import Tag
+from tags.serializers import TagSerializer
 from .models import Brand, Category, Product, ProductImage, ProductProperty
 
 
@@ -65,13 +64,6 @@ class ProductPropertySerializer(serializers.ModelSerializer):
         value_obj = obj.values.first()
         field_name = 'value_' + obj.type
         return getattr(value_obj, field_name)
-
-
-class TagSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Tag
-        fields = ('id', 'name')
 
 
 class ProductListSerializer(serializers.ModelSerializer):

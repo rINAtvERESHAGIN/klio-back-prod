@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -13,25 +14,35 @@ class Article(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
     date = models.DateTimeField(help_text=_('Date to be shown in article.'), verbose_name=_('published'))
-    start_date = models.DateTimeField(help_text=_('Date to make article visible on site.'),
+    start_date = models.DateTimeField(blank=True, null=True,
+                                      help_text=_("""Date to make article visible on site.
+                                                  Leave this blank to show the article immediately."""),
                                       verbose_name=_('start date'))
+    deadline = models.DateTimeField(blank=True, null=True,
+                                    help_text=_("""Show article until this date.
+                                                Article will appear forever if this field blank."""),
+                                    verbose_name=_('deadline'))
     title = models.CharField(max_length=256, blank=False, null=False, verbose_name=_('title'))
     slug = models.SlugField(verbose_name=_('slug'))
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_('author'))
-    img = models.ImageField(blank=True, verbose_name=_('image'))
+    img = models.ImageField(verbose_name=_('image'))
     tags = models.ManyToManyField(Tag, help_text=_('At least 1 tag is required.'), verbose_name=_('tags'))
     abstract = models.TextField(verbose_name=_('abstract'), max_length=256,
                                 help_text=_('Short description - 256 symbols max.'))
     content = RichTextField(verbose_name=_('content'))
     activity = models.BooleanField(default=False, verbose_name=_('activity'))
 
-    def __str__(self):
-        return self.title[:50]
-
     class Meta:
         ordering = ['-activity', '-date']
         verbose_name = _('Article')
         verbose_name_plural = _('Articles')
+
+    def __str__(self):
+        return self.title[:50]
+
+    def clean(self):
+        if self.start_date and self.deadline and self.start_date >= self.deadline:
+            raise ValidationError(_("Deadline must be more than start date"))
 
 
 class Banner(models.Model):
@@ -61,13 +72,13 @@ class Banner(models.Model):
                                     verbose_name=_('deadline'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
-    def __str__(self):
-        return "#{0} {1}".format(self.id, self.name)
-
     class Meta:
         ordering = ['-activity', 'order']
         verbose_name = _('Banner')
         verbose_name_plural = _('Banners')
+
+    def __str__(self):
+        return "#{0} {1}".format(self.id, self.name)
 
 
 class CallbackInfo(models.Model):
@@ -80,13 +91,13 @@ class CallbackInfo(models.Model):
                              help_text=_('Enter the phone in the format +7(XXX)XXX-XX-XX.'))
     comment = models.TextField(blank=False, verbose_name=_('comment'))
 
-    def __str__(self):
-        return _("Callback") + " #{0}".format(self.id)
-
     class Meta:
         ordering = ['-date']
         verbose_name = _('Callback info')
         verbose_name_plural = _('Callback info')
+
+    def __str__(self):
+        return _("Callback") + " #{0}".format(self.id)
 
 
 class Menu(models.Model):
@@ -101,13 +112,13 @@ class Menu(models.Model):
     position = models.CharField(max_length=10, choices=MENU_POSITIONS, verbose_name=_('position'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['-activity', 'name']
         verbose_name = _('Menu')
         verbose_name_plural = _('Menu')
+
+    def __str__(self):
+        return self.name
 
 
 # TODO: Remove slug and add actual relation to object or leave free link.
@@ -135,13 +146,13 @@ class MenuItem(models.Model):
     link = models.URLField(blank=True, verbose_name=_('link'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['menu', 'order', 'name']
         verbose_name = _('Menu item')
         verbose_name_plural = _('Menu items')
+
+    def __str__(self):
+        return self.name
 
 
 # TODO: Add meta info to all objects.
@@ -154,26 +165,36 @@ class MenuItem(models.Model):
 class News(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
-    date = models.DateTimeField(help_text=_('Date to be shown in article.'), verbose_name=_('date'))
-    start_date = models.DateTimeField(help_text=_('Date to make article visible on site.'),
+    date = models.DateTimeField(help_text=_('Date to be shown in news.'), verbose_name=_('date'))
+    start_date = models.DateTimeField(blank=True, null=True,
+                                      help_text=_("""Date to make news visible on site.
+                                                  Leave this blank to show the news item immediately."""),
                                       verbose_name=_('start date'))
+    deadline = models.DateTimeField(blank=True, null=True,
+                                    help_text=_("""Show news item until this date.
+                                                News item will appear forever if this field blank."""),
+                                    verbose_name=_('deadline'))
     title = models.CharField(max_length=256, blank=False, null=False, verbose_name=_('title'))
     slug = models.SlugField(verbose_name=_('slug'))
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_('author'))
-    img = models.ImageField(blank=True, verbose_name=_('image'))
+    img = models.ImageField(verbose_name=_('image'))
     tags = models.ManyToManyField(Tag, help_text=_('At least 1 tag is required.'), verbose_name=_('tags'))
-    content = RichTextField(verbose_name=_('content'))
     abstract = models.TextField(verbose_name=_('abstract'), max_length=256,
                                 help_text=_('Short description - 256 symbols max.'))
+    content = RichTextField(verbose_name=_('content'))
     activity = models.BooleanField(default=False, verbose_name=_('activity'))
-
-    def __str__(self):
-        return self.title[:50]
 
     class Meta:
         ordering = ['-activity', '-date']
         verbose_name = _('News item')
         verbose_name_plural = _('News')
+
+    def __str__(self):
+        return self.title[:50]
+
+    def clean(self):
+        if self.start_date and self.deadline and self.start_date >= self.deadline:
+            raise ValidationError(_("Deadline must be more than start date"))
 
 
 class Page(models.Model):
@@ -184,13 +205,13 @@ class Page(models.Model):
     content = RichTextField(verbose_name=_('content'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['-activity', 'name']
         verbose_name = _('Page')
         verbose_name_plural = _('Pages')
+
+    def __str__(self):
+        return self.name
 
 
 class SubscriberInfo(models.Model):
@@ -201,10 +222,10 @@ class SubscriberInfo(models.Model):
     """ Automatically uploaded for registered users. """
     email = models.EmailField(blank=False)
 
-    def __str__(self):
-        return _("Subscription") + " #{0}".format(self.id)
-
     class Meta:
         ordering = ['-date']
         verbose_name = _('Subscriber info')
         verbose_name_plural = _('Subscriber info')
+
+    def __str__(self):
+        return _("Subscription") + " #{0}".format(self.id)

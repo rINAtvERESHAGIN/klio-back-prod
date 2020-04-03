@@ -3,20 +3,27 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from products.serializers import CategoryListSerializer, ProductListSerializer
-from .models import Article, Banner, Menu, MenuItem, News
+from tags.serializers import TagSerializer
+from .models import Article, Banner, Menu, MenuItem
 
 User = get_user_model()
 
 
 class ArticleDetailSerializer(serializers.ModelSerializer):
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    author = serializers.SerializerMethodField()
+    date = serializers.DateTimeField(format="%d.%m.%Y")
+    tags = TagSerializer(many=True)
 
     class Meta:
         model = Article
-        fields = '__all__'
+        fields = ('id', 'title', 'slug', 'author', 'img', 'date', 'content', 'tags')
+
+    def get_author(self, obj):
+        return obj.author.__str__()
 
 
 class ArticleListSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%d.%m.%Y")
 
     class Meta:
         model = Article
@@ -73,22 +80,24 @@ class MenuListSerializer(serializers.ModelSerializer):
 
 
 class NewsDetailSerializer(serializers.ModelSerializer):
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    author = serializers.SerializerMethodField()
+    date = serializers.DateTimeField(format="%d.%m.%Y")
+    tags = TagSerializer(many=True)
 
     class Meta:
-        model = News
-        fields = '__all__'
-
-
-class NewsListSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = News
-        fields = ('id', 'title', 'date', 'author')
+        model = Article
+        fields = ('id', 'title', 'slug', 'author', 'img', 'date', 'content', 'tags')
 
     def get_author(self, obj):
         return obj.author.__str__()
+
+
+class NewsListSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%d.%m.%Y")
+
+    class Meta:
+        model = Article
+        fields = ('id', 'title', 'slug', 'img', 'date', 'abstract')
 
 
 class SearchDataSerializer(serializers.Serializer):
