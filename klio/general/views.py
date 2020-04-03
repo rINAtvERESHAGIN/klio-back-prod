@@ -1,5 +1,6 @@
 from collections import namedtuple
 from django.db.models import Q
+from django.utils import timezone
 
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
@@ -17,10 +18,17 @@ class ArticleCreateView(generics.CreateAPIView):
 
 class ArticleListView(generics.ListAPIView):
     serializer_class = ArticleListSerializer
-    queryset = Article.objects.filter(activity=True)
+    queryset = Article.objects.filter(
+        activity=True
+    ).exclude(
+        start_date__isnull=False, start_date__gt=timezone.localtime()
+    ).exclude(
+        deadline__isnull=False, deadline__lt=timezone.localtime()
+    )
 
 
 class ArticleDetailView(generics.RetrieveUpdateDestroyAPIView):
+    lookup_field = 'slug'
     serializer_class = ArticleDetailSerializer
     queryset = Article.objects.all()
 
@@ -50,10 +58,17 @@ class NewsCreateView(generics.CreateAPIView):
 
 class NewsListView(generics.ListAPIView):
     serializer_class = NewsListSerializer
-    queryset = News.objects.filter(activity=True)
+    queryset = News.objects.filter(
+        activity=True
+    ).exclude(
+        start_date__isnull=False, start_date__gt=timezone.localtime()
+    ).exclude(
+        deadline__isnull=False, deadline__lt=timezone.localtime()
+    )
 
 
 class NewsDetailView(generics.RetrieveUpdateDestroyAPIView):
+    lookup_field = 'slug'
     serializer_class = NewsDetailSerializer
     queryset = News.objects.all()
 
