@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (ArticleCreateView, ArticleDetailView, ArticleListView,
                     BannerCreateView, BannerDetailView, BannerListView,
-                    MenuListView, NewsCreateView, NewsDetailView, NewsListView)
+                    MenuListView, NewsCreateView, NewsDetailView, NewsListView, PageDetailView)
 
 
 urlpatterns = [
@@ -19,4 +19,6 @@ urlpatterns = [
     path('news/create', NewsCreateView.as_view()),
     path('news/list', NewsListView.as_view()),
     path('news/<str:slug>/detail', NewsDetailView.as_view()),
+
+    path('pages/<str:slug>/detail', PageDetailView.as_view()),
 ]

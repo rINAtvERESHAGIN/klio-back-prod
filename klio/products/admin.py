@@ -14,7 +14,7 @@ class BrandAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'get_parent', 'group', 'order', 'on_main', 'activity']
-    list_editable = ['on_main', 'activity']
+    list_editable = ['order', 'on_main', 'activity']
     search_fields = ['name']
     list_filter = ['on_main', 'activity']
     prepopulated_fields = {"slug": ("name",)}

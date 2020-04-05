@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 from tags.models import Tag
 
@@ -123,15 +124,17 @@ class Menu(models.Model):
 
 # TODO: Remove slug and add actual relation to object or leave free link.
 class MenuItem(models.Model):
-    CATEGORY, PRODUCT_LIST, PAGE, ARTICLE, NEWS, EXTERNAL = \
-        'category', 'products', 'page', 'article', 'news', 'external'
+    ROOT, CATEGORY, PRODUCT_LIST, PAGE, ARTICLE, NEWS, SPECIAL, EXTERNAL = \
+        'root', 'category', 'products', 'page', 'article', 'news', 'special', 'external'
     RELATED_OBJ_TYPES = [
+        (ROOT, _('Root object')),
         (CATEGORY, _('Category')),
         (PRODUCT_LIST, _('Product list')),
-        (PAGE, _('Page')),
+        (PAGE, _('Info page')),
         (ARTICLE, _('Article')),
         (NEWS, _('News')),
-        (EXTERNAL, _('External')),
+        (SPECIAL, _('Special')),
+        (EXTERNAL, _('External link')),
     ]
 
     name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
@@ -141,9 +144,19 @@ class MenuItem(models.Model):
     order = models.PositiveIntegerField(blank=False, default=1, verbose_name=_('order'))
     menu = models.ForeignKey('Menu', on_delete=models.CASCADE, null=False, related_name='items', verbose_name=_('menu'))
     related_type = models.CharField(max_length=10, choices=RELATED_OBJ_TYPES, default=CATEGORY,
-                                    verbose_name=_('related type'))
+                                    verbose_name=_('related type'),
+                                    help_text=_("""
+        Root object - /{object}
+        Category - /categories/{object}
+        Product list - /categories/{object}/products
+        Info page - /info/{object}
+        Article - /articles/{object}
+        News - /news/{object}
+        Special - /specials/{object}
+        External link - {link}
+                                    """))
     """ Use this field to link an outer site. """
-    link = models.URLField(blank=True, verbose_name=_('link'))
+    link = models.URLField(blank=True, verbose_name=_('External link'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     class Meta:
@@ -202,7 +215,7 @@ class Page(models.Model):
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
     name = models.CharField(max_length=32, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(verbose_name=_('slug'))
-    content = RichTextField(verbose_name=_('content'))
+    content = RichTextUploadingField(verbose_name=_('content'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     class Meta:

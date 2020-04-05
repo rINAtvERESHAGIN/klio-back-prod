@@ -6,10 +6,10 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 
 from products.models import Category, Product
-from .models import Article, Banner, Menu, News
+from .models import Article, Banner, Menu, News, Page
 from .serializers import (ArticleDetailSerializer, ArticleListSerializer, BannerDetailSerializer,
                           BannerListSerializer, MenuListSerializer, NewsDetailSerializer, NewsListSerializer,
-                          SearchDataSerializer)
+                          PageDetailSerializer, SearchDataSerializer)
 
 
 class ArticleCreateView(generics.CreateAPIView):
@@ -71,6 +71,12 @@ class NewsDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
     serializer_class = NewsDetailSerializer
     queryset = News.objects.all()
+
+
+class PageDetailView(generics.RetrieveUpdateDestroyAPIView):
+    lookup_field = 'slug'
+    serializer_class = PageDetailSerializer
+    queryset = Page.objects.filter(activity=True)
 
 
 class SearchListView(viewsets.ViewSet):

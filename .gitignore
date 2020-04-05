@@ -26,6 +26,8 @@ local/
 *.log
 pip-log.txt
 
+/confs/
+
 /logs/
 
 .DS_Store
@@ -57,3 +59,6 @@ ENV/
 
 # Static
 /static/
+
+# Media
+/media/

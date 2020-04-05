@@ -1,6 +1,10 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from .models import Article, Banner, CallbackInfo, Menu, MenuItem, News, Page, SubscriberInfo
+
+
+admin.site.site_header = _('Klio Site Administration')
 
 
 class HiddenAdmin(admin.ModelAdmin):
@@ -55,7 +59,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 
 class PageAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'modified', 'activity']
+    list_display = ['__str__', 'slug', 'modified', 'activity']
     list_editable = ['activity']
     prepopulated_fields = {"slug": ("name",)}
 
