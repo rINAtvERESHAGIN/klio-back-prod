@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from products.serializers import CategoryListSerializer, ProductListSerializer
 from tags.serializers import TagSerializer
-from .models import Article, Banner, Menu, MenuItem
+from .models import Article, Banner, Menu, MenuItem, Page
 
 User = get_user_model()
 
@@ -46,10 +46,11 @@ class BannerListSerializer(serializers.ModelSerializer):
 
 class MenuItemListSerializer(serializers.ModelSerializer):
     letter = serializers.SerializerMethodField('get_letter')
+    path = serializers.SerializerMethodField('get_path')
 
     class Meta:
         model = MenuItem
-        fields = ('id', 'name', 'letter', 'slug', 'related_type', 'link', 'children')
+        fields = ('id', 'name', 'letter', 'slug', 'path', 'related_type', 'link', 'children')
 
     def __init__(self, *args, **kwargs):
         super(MenuItemListSerializer, self).__init__(*args, **kwargs)
@@ -64,6 +65,24 @@ class MenuItemListSerializer(serializers.ModelSerializer):
         fields = super(MenuItemListSerializer, self).get_fields()
         fields['children'] = MenuItemListSerializer(many=True)
         return fields
+
+    def get_path(self, obj):
+        if obj.related_type == 'root':
+            return obj.slug
+        if obj.related_type == 'category':
+            return 'categories/' + obj.slug
+        if obj.related_type == 'products':
+            return 'categories/' + obj.slug + '/products'
+        if obj.related_type == 'page':
+            return 'info/' + obj.slug
+        if obj.related_type == 'article':
+            return 'articles/' + obj.slug
+        if obj.related_type == 'news':
+            return 'news/' + obj.slug
+        if obj.related_type == 'special':
+            return 'specials/' + obj.slug
+        if obj.related_type == 'external':
+            return obj.link
 
 
 class MenuListSerializer(serializers.ModelSerializer):
@@ -98,6 +117,13 @@ class NewsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ('id', 'title', 'slug', 'img', 'date', 'abstract')
+
+
+class PageDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Page
+        fields = ('id', 'name', 'slug', 'content')
 
 
 class SearchDataSerializer(serializers.Serializer):

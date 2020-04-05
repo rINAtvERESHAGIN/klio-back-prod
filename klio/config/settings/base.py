@@ -10,6 +10,8 @@ class Base(Configuration):
     APPEND_SLASH = values.BooleanValue(False)
 
     INSTALLED_APPS = [
+        'grappelli',  # should appear before 'django.contrib.admin'
+
         # System Packages
         'django.contrib.admin',
         'django.contrib.auth',
@@ -23,6 +25,7 @@ class Base(Configuration):
         'cities_light',
         'corsheaders',
         'ckeditor',
+        'ckeditor_uploader',
         'rest_framework',
 
         # Own Packages
@@ -171,3 +174,5 @@ class Base(Configuration):
             'forcePasteAsPlainText': True
         }
     }
+
+    CKEDITOR_UPLOAD_PATH = "ckeditor_uploads/"

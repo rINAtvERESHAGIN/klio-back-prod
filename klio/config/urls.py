@@ -22,6 +22,9 @@ from general.views import SearchListView
 
 
 urlpatterns = [
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('grappelli/', include('grappelli.urls')),
+
     path('admin/', admin.site.urls),
     path('api/v1/contacts/', include('contacts.urls')),
     path('api/v1/general/', include('general.urls')),
