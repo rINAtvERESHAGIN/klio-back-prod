@@ -41,6 +41,7 @@ class MenuItemInline(admin.TabularInline):
 class MenuAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'position', 'get_items', 'activity']
     list_editable = ['activity']
+    list_filter = ['position', 'activity']
     inlines = [
         MenuItemInline,
     ]
