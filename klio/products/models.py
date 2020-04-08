@@ -15,7 +15,7 @@ class Brand(models.Model):
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
     name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(verbose_name=_('slug'))
-    logo = models.ImageField(verbose_name=_('logo'))
+    logo = models.ImageField(verbose_name=_('logo'), upload_to='brands')
     description = RichTextField(blank=True, verbose_name=_('description'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
@@ -37,7 +37,7 @@ class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children',
                                verbose_name=_('parent'))
     group = models.PositiveIntegerField(default=0, null=True, editable=False, verbose_name=_('group'))
-    img = models.ImageField(verbose_name=_('image'))
+    img = models.ImageField(verbose_name=_('image'), upload_to='categories')
     description = RichTextField(blank=True, verbose_name=_('description'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
     on_main = models.BooleanField(default=False, verbose_name=_('on main'))
@@ -153,7 +153,7 @@ class Product(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False, related_name='images',
                                 verbose_name=_('product'))
-    img = models.ImageField(verbose_name=_('image'))
+    img = models.ImageField(verbose_name=_('image'), upload_to='products')
     label = models.CharField(max_length=64, blank=True, verbose_name=_('label'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))

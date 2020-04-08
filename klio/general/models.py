@@ -26,7 +26,7 @@ class Article(models.Model):
     title = models.CharField(max_length=256, blank=False, null=False, verbose_name=_('title'))
     slug = models.SlugField(verbose_name=_('slug'))
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_('author'))
-    img = models.ImageField(verbose_name=_('image'))
+    img = models.ImageField(verbose_name=_('image'), upload_to='articles')
     tags = models.ManyToManyField(Tag, help_text=_('At least 1 tag is required.'), verbose_name=_('tags'))
     abstract = models.TextField(verbose_name=_('abstract'), max_length=256,
                                 help_text=_('Short description - 256 symbols max.'))
@@ -60,7 +60,8 @@ class Banner(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     name = models.CharField(max_length=256, blank=False, null=False, verbose_name=_('name'))
-    img = models.ImageField(blank=False, help_text=_('Upload image 1200x675 px.'), verbose_name=_('image'))
+    img = models.ImageField(blank=False, upload_to='banners', verbose_name=_('image'),
+                            help_text=_('Upload image 1200x675 px.'))
     content = models.TextField(blank=True, verbose_name=_('content'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
     link = models.URLField(blank=True, verbose_name=_('link'))
@@ -102,9 +103,10 @@ class CallbackInfo(models.Model):
 
 
 class Menu(models.Model):
-    HEADER, FOOTER, LEFTBAR = 'header', 'footer', 'leftbar'
+    HEADER, SUBHEADER, FOOTER, LEFTBAR = 'header', 'subheader', 'footer', 'leftbar'
     MENU_POSITIONS = [
         (HEADER, _('Header')),
+        (SUBHEADER, _('Subheader')),
         (FOOTER, _('Footer')),
         (LEFTBAR, _('Leftbar')),
     ]
@@ -115,11 +117,19 @@ class Menu(models.Model):
 
     class Meta:
         ordering = ['-activity', 'name']
+        unique_together = ('name', 'position')
         verbose_name = _('Menu')
         verbose_name_plural = _('Menu')
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if self.activity:
+            active_menus = Menu.objects.filter(activity=True, position=self.position).exclude(name=self.name)
+            if active_menus.exists():
+                raise ValidationError(_("""Active menu for selected position is already exists.
+                                        Please, deactivate it first."""))
 
 
 # TODO: Remove slug and add actual relation to object or leave free link.
@@ -141,6 +151,8 @@ class MenuItem(models.Model):
     slug = models.SlugField(blank=True, verbose_name=_('slug'))
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children',
                                verbose_name=_('parent'))
+    icon = models.FileField(blank=True, upload_to='menu/items/icons', verbose_name=_('icon'),
+                            help_text=_('Pay attention! Visible ONLY in HEADER SUBMENU! Preferred format - SVG.'))
     order = models.PositiveIntegerField(blank=False, default=1, verbose_name=_('order'))
     menu = models.ForeignKey('Menu', on_delete=models.CASCADE, null=False, related_name='items', verbose_name=_('menu'))
     related_type = models.CharField(max_length=10, choices=RELATED_OBJ_TYPES, default=CATEGORY,
@@ -190,7 +202,7 @@ class News(models.Model):
     title = models.CharField(max_length=256, blank=False, null=False, verbose_name=_('title'))
     slug = models.SlugField(verbose_name=_('slug'))
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_('author'))
-    img = models.ImageField(verbose_name=_('image'))
+    img = models.ImageField(verbose_name=_('image'), upload_to='news')
     tags = models.ManyToManyField(Tag, help_text=_('At least 1 tag is required.'), verbose_name=_('tags'))
     abstract = models.TextField(verbose_name=_('abstract'), max_length=256,
                                 help_text=_('Short description - 256 symbols max.'))

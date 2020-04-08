@@ -39,7 +39,13 @@ class BannerCreateView(generics.CreateAPIView):
 
 class BannerListView(generics.ListAPIView):
     serializer_class = BannerListSerializer
-    queryset = Banner.objects.filter(activity=True)
+    queryset = Banner.objects.filter(
+        activity=True
+    ).exclude(
+        start_date__isnull=False, start_date__gt=timezone.localtime()
+    ).exclude(
+        deadline__isnull=False, deadline__lt=timezone.localtime()
+    )
 
 
 class BannerDetailView(generics.RetrieveUpdateDestroyAPIView):

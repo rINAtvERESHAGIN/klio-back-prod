@@ -50,7 +50,7 @@ class MenuItemListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MenuItem
-        fields = ('id', 'name', 'letter', 'slug', 'path', 'related_type', 'link', 'children')
+        fields = ('id', 'name', 'letter', 'slug', 'icon', 'path', 'related_type', 'link', 'children')
 
     def __init__(self, *args, **kwargs):
         super(MenuItemListSerializer, self).__init__(*args, **kwargs)
@@ -94,7 +94,7 @@ class MenuListSerializer(serializers.ModelSerializer):
 
     def get_items(self, obj):
         items = MenuItem.objects.filter(menu=obj, activity=True, parent__isnull=True)
-        serializer = MenuItemListSerializer(instance=items, many=True)
+        serializer = MenuItemListSerializer(instance=items, many=True, context={"request": self.context.get('request')})
         return serializer.data
 
 
