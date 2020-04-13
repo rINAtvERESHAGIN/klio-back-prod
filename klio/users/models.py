@@ -23,13 +23,13 @@ class UserManager(BaseUserManager):
         user.full_name = full_name
         user.set_password(password)  # change password to hash
         user.profile_picture = profile_picture
-        user.admin = is_admin
-        user.staff = is_staff
-        user.active = is_active
+        user.is_admin = is_admin
+        user.is_staff = is_staff
+        user.is_active = is_active
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, is_active=True, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("User must have an email")
         if not password:
@@ -39,9 +39,10 @@ class UserManager(BaseUserManager):
             email=self.normalize_email(email)
         )
         user.set_password(password)
-        user.admin = True
-        user.staff = True
-        user.active = is_active
+        user.is_active = True
+        user.is_staff = True
+        user.is_admin = True
+        user.is_superuser = True
         user.save(using=self._db)
         return user
 
