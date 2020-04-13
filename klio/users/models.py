@@ -27,6 +27,8 @@ class UserManager(BaseUserManager):
         user.is_staff = is_staff
         user.is_active = is_active
         user.save(using=self._db)
+        user.username = 'user' + str(user.id)
+        user.save()
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
@@ -44,6 +46,8 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.is_superuser = True
         user.save(using=self._db)
+        user.username = 'user' + str(user.id)
+        user.save()
         return user
 
 
@@ -83,8 +87,10 @@ class User(AbstractUser):
             return "{0} {1}".format(self.last_name, self.first_name)
         elif self.username:
             return self.username
-        else:
+        elif self.first_name:
             return self.first_name
+        else:
+            return 'user{0}'.format(self.id)
 
 
 class UserPhone(models.Model):
