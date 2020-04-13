@@ -12,10 +12,6 @@ from .serializers import (ArticleDetailSerializer, ArticleListSerializer, Banner
                           PageDetailSerializer, SearchDataSerializer)
 
 
-class ArticleCreateView(generics.CreateAPIView):
-    serializer_class = ArticleDetailSerializer
-
-
 class ArticleListView(generics.ListAPIView):
     serializer_class = ArticleListSerializer
     queryset = Article.objects.filter(
@@ -31,10 +27,6 @@ class ArticleDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
     serializer_class = ArticleDetailSerializer
     queryset = Article.objects.all()
-
-
-class BannerCreateView(generics.CreateAPIView):
-    serializer_class = BannerDetailSerializer
 
 
 class BannerListView(generics.ListAPIView):
@@ -56,10 +48,6 @@ class BannerDetailView(generics.RetrieveUpdateDestroyAPIView):
 class MenuListView(generics.ListAPIView):
     serializer_class = MenuListSerializer
     queryset = Menu.objects.filter(activity=True)
-
-
-class NewsCreateView(generics.CreateAPIView):
-    serializer_class = NewsDetailSerializer
 
 
 class NewsListView(generics.ListAPIView):

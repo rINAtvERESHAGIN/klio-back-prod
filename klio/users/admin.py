@@ -12,11 +12,13 @@ class UserPhoneInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         *UserAdmin.fieldsets, (
-            _('Additional data'), {'fields': ('middle_name', 'birthday', 'country', 'city', 'address', 'avatar')},
+            _('Additional data'), {'fields': ('middle_name', 'birthday', 'country', 'city', 'address', 'avatar',
+                                              'personal_data')},
         ),
     )
-    list_display = ['__str__', 'registered', 'city', 'email', 'get_phones', 'activity']
-    list_filter = ['activity']
+    list_display = ['__str__', 'registered', 'city', 'email', 'get_phones', 'is_active']
+    list_editable = ['is_active']
+    list_filter = ['is_active']
     inlines = [
         UserPhoneInline,
     ]

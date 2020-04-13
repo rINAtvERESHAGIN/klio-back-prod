@@ -26,10 +26,10 @@ class ContactDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_city(self, obj):
-        return obj.city.name
+        return obj.city.alternate_names
 
     def get_country(self, obj):
-        return obj.country.name
+        return obj.country.alternate_names
 
 
 class ContactListSerializer(serializers.ModelSerializer):
