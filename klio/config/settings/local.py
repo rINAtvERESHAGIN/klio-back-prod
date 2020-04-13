@@ -29,7 +29,10 @@ class Local(Base):
 
     CORS_ORIGIN_WHITELIST = [
         "http://localhost:8080",
+        "http://127.0.0.1:8080",
     ]
 
     # for logger in Base.LOGGING['loggers']:
     #     Base.LOGGING['loggers'][logger]['handlers'] += ['console']
+
+    Base.REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].append('rest_framework.renderers.BrowsableAPIRenderer')

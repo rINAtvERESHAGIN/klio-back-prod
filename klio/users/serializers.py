@@ -17,7 +17,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     def get_city(self, obj):
         if obj.city:
-            return obj.city.name
+            return obj.city.alternate_names
 
     def get_country(self, obj):
         if obj.country:
@@ -39,4 +39,4 @@ class UserListSerializer(serializers.ModelSerializer):
 
     def get_city(self, obj):
         if obj.city:
-            return obj.city.name
+            return obj.city.alternate_names

@@ -1,22 +1,18 @@
 from django.urls import path
 
-from .views import (ArticleCreateView, ArticleDetailView, ArticleListView,
-                    BannerCreateView, BannerDetailView, BannerListView,
-                    MenuListView, NewsCreateView, NewsDetailView, NewsListView, PageDetailView)
+from .views import (ArticleDetailView, ArticleListView, BannerDetailView, BannerListView,
+                    MenuListView, NewsDetailView, NewsListView, PageDetailView)
 
 
 urlpatterns = [
-    path('articles/create', ArticleCreateView.as_view()),
     path('articles/list', ArticleListView.as_view()),
     path('articles/<str:slug>/detail', ArticleDetailView.as_view()),
 
-    path('banners/create', BannerCreateView.as_view()),
     path('banners/list', BannerListView.as_view()),
     path('banners/<int:pk>/detail', BannerDetailView.as_view()),
 
     path('menu/list', MenuListView.as_view()),
 
-    path('news/create', NewsCreateView.as_view()),
     path('news/list', NewsListView.as_view()),
     path('news/<str:slug>/detail', NewsDetailView.as_view()),
 

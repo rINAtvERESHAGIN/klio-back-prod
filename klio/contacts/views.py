@@ -4,10 +4,6 @@ from .serializers import ContactDetailSerializer, ContactListSerializer, SocialL
 from .models import Contact, SocialNet
 
 
-class ContactCreateView(generics.CreateAPIView):
-    serializer_class = ContactDetailSerializer
-
-
 class ContactListView(generics.ListAPIView):
     serializer_class = ContactListSerializer
     queryset = Contact.objects.filter(activity=True)

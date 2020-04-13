@@ -1,4 +1,5 @@
 import os
+from hashlib import sha1 as sha_constructor
 from os.path import join
 
 from configurations import Configuration, values
@@ -8,6 +9,25 @@ class Base(Configuration):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     APPEND_SLASH = values.BooleanValue(False)
+
+    SITE_ID = 1
+
+    ADMINS = ('pythonchem1st@gmail.com',)
+
+    # DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+    #
+    # EMAIL_HOST = os.getenv('EMAIL_HOST')
+    # EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+    # EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+    # EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    # EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+    DEFAULT_FROM_EMAIL = 'pythonchem1st@gmail.com'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'pythonchem1st@gmail.com'
+    EMAIL_HOST_PASSWORD = 'Fedo1702FG'
 
     INSTALLED_APPS = [
         'grappelli',  # should appear before 'django.contrib.admin'
@@ -19,6 +39,7 @@ class Base(Configuration):
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
+        'django.contrib.sites',
 
         # Third Party Packages
         'captcha',
@@ -31,6 +52,7 @@ class Base(Configuration):
         # Own Packages
         'basket',
         'contacts',
+        'auth.apps.AuthConfig',
         'general',
         'products',
         'sale',
@@ -52,7 +74,7 @@ class Base(Configuration):
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
+            'DIRS': [join(BASE_DIR, 'auth/templates')],
             'APP_DIRS': values.BooleanValue(True),
             'OPTIONS': {
                 'context_processors': [
@@ -125,8 +147,26 @@ class Base(Configuration):
     # Custom user app
     AUTH_USER_MODEL = 'users.User'
 
+    REGISTRATION_SALT = sha_constructor(str(135793716).encode('utf-8')).hexdigest()[:5]
+
+    ACCOUNT_ACTIVATION_DAYS = 7
+    PASSWORD_RESET_DAYS = 3
+
+    # REST FRAMEWORK
+    REST_FRAMEWORK = {
+        'DEFAULT_RENDERER_CLASSES': [
+            'rest_framework.renderers.JSONRenderer',
+        ],
+        'DEFAULT_AUTHENTICATION_CLASSES': [
+            'rest_framework_simplejwt.authentication.JWTAuthentication',
+        ],
+        'DEFAULT_PERMISSION_CLASSES': [
+            'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        ]
+    }
+
     # CITIES LIGHT SETTINGS
-    CITIES_LIGHT_TRANSLATION_LANGUAGES = ['ru']
+    CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en', 'ru']
     CITIES_LIGHT_INCLUDE_COUNTRIES = ['RU']
     CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG',
                                        'PPLL', 'PPLR', 'PPLS', 'STLMT', ]

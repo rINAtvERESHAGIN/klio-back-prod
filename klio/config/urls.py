@@ -18,6 +18,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from general.views import SearchListView
 
 
@@ -26,6 +28,9 @@ urlpatterns = [
     path('grappelli/', include('grappelli.urls')),
 
     path('admin/', admin.site.urls),
+    path('api/v1/auth/token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/auth/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/auth/', include('auth.urls')),
     path('api/v1/contacts/', include('contacts.urls')),
     path('api/v1/general/', include('general.urls')),
     path('api/v1/products/', include('products.urls')),
