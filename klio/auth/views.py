@@ -1,14 +1,15 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, logout
 from django.core import signing
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework.permissions import AllowAny
+from rest_framework.authentication import authenticate
 from rest_framework.generics import CreateAPIView, UpdateAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
 
 from .exceptions import ActivationError
@@ -75,17 +76,35 @@ class ActivationView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    model = get_user_model()
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
+
         data = request.data
-        serializer = LoginSerializer(data=data)
-        if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=HTTP_200_OK)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        email = data.get('email', None)
+        password = data.get('password', None)
+
+        if not email or not password:
+            return Response({'detail': _('Both email and password must be provided.')}, status=HTTP_400_BAD_REQUEST)
+
+        user = authenticate(username=email, password=password)
+
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+
+                return Response(status=HTTP_200_OK)
+            else:
+                return Response({'detail': _('User is not active.')}, status=HTTP_404_NOT_FOUND)
+        else:
+            return Response({'detail': _('Incorrect email or password.')}, status=HTTP_404_NOT_FOUND)
 
 
-# class LogoutView(APIView):
+class LogoutView(APIView):
+    def get(self, request, format=None):
+        logout(request)
+        return Response(status=HTTP_200_OK)
 
 
 class PasswordResetView(UpdateAPIView):

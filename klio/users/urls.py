@@ -1,9 +1,9 @@
 from django.urls import path
 
-from .views import UserDetailView, UserListView
+from .views import CurrentUserDetailView, CurrentUserUpdateView
 
 
 urlpatterns = [
-    path('list', UserListView.as_view()),
-    path('<int:pk>/detail', UserDetailView.as_view()),
+    path('current', CurrentUserDetailView.as_view(), name='current_user'),
+    path('current/update', CurrentUserUpdateView.as_view(), name='current_user_update'),
 ]

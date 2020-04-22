@@ -13,7 +13,7 @@ class BasketProductInline(admin.TabularInline):
 
 
 class BasketAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'created', 'get_user', 'active']
+    list_display = ['__str__', 'created', 'get_user', 'is_active']
     inlines = [
         BasketProductInline,
     ]
@@ -25,6 +25,7 @@ class BasketAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'created', 'get_user', 'status', 'step']
+    list_filter = ['status']
 
     def get_user(self, obj):
         return obj.user.__str__()
@@ -37,7 +38,7 @@ class PromoCodeAdmin(admin.ModelAdmin):
 
 admin.site.register(Basket, BasketAdmin)
 admin.site.register(Order, OrderAdmin)
-admin.site.register(OrderPrivateInfo, HiddenAdmin)
+admin.site.register(OrderPrivateInfo)
 admin.site.register(OrderDeliveryInfo, HiddenAdmin)
 admin.site.register(OrderPaymentInfo, HiddenAdmin)
 admin.site.register(PromoCode, PromoCodeAdmin)

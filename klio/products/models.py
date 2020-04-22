@@ -280,9 +280,10 @@ class Unit(models.Model):
 
 class UserProduct(models.Model):
     added = models.DateTimeField(auto_now_add=True, verbose_name=_('added'))
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False, verbose_name=_('product'))
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, verbose_name=_('user'))
-    selected = models.BooleanField(default=False, verbose_name=_('selected'))
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False,
+                                verbose_name=_('product'), related_name='selected_by')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, verbose_name=_('user'),
+                             related_name='favorites')
 
     def __str__(self):
         return '{0} - {1}'.format(self.user, self.product)

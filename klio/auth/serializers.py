@@ -13,21 +13,10 @@ User = get_user_model()
 class LoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True, min_length=4,
                                      required=True, label=_('password'))
-    token = serializers.CharField(allow_blank=True, read_only=True)
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'token']
-
-    def validate(self, data):
-        user_query = User.objects.filter(email=data.get('email', None))
-        if user_query.exists() and user_query.count() == 1:
-            user = user_query.first()
-            if user.check_password(data['password']):
-                data['token'] = "RANDOM TOKEN"
-                return data
-
-        raise serializers.ValidationError(_('Incorrect email or password.'))
+        fields = ['email', 'password']
 
 
 class PasswordResetSerializer(serializers.ModelSerializer):
