@@ -1,6 +1,7 @@
 from django.utils.timezone import now, timedelta
 
 from rest_framework import serializers
+
 from tags.serializers import TagSerializer
 from .models import Brand, Category, Product, ProductImage, ProductProperty
 
@@ -47,10 +48,15 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductImage
-        fields = ('id', 'label', 'img')
+        fields = ('id', 'label', 'url')
+
+    def get_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.img.url)
 
 
 class ProductPropertySerializer(serializers.ModelSerializer):
@@ -71,11 +77,12 @@ class ProductListSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     special = serializers.SerializerMethodField()
     is_new = serializers.SerializerMethodField()
+    units = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'slug', 'category', 'image', 'in_stock', 'art', 'base_amount', 'price', 'is_new',
-                  'special')
+        fields = ('id', 'name', 'slug', 'category', 'image', 'in_stock', 'art', 'base_amount', 'units', 'price',
+                  'is_new', 'special')
 
     def get_category(self, obj):
         return obj.category.slug if obj.category else 'no-category'
@@ -109,6 +116,19 @@ class ProductListSerializer(serializers.ModelSerializer):
             if obj.created > now() - timedelta(days=60):
                 result = True
         return result
+
+    def get_units(self, obj):
+        return obj.units.name
+
+
+class BasketProductListSerializer(ProductListSerializer):
+    quantity = serializers.SerializerMethodField()
+
+    class Meta(ProductListSerializer.Meta):
+        fields = ProductListSerializer.Meta.fields + ('quantity',)
+
+    def get_quantity(self, obj):
+        return obj.in_basket.get(basket_id=self.context.get('basket_id')).quantity
 
 
 class ProductSerializer(serializers.ModelSerializer):

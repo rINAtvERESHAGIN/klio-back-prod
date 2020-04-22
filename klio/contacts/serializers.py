@@ -4,10 +4,14 @@ from .models import Contact, Phone, SocialNet, WorkingHours
 
 
 class PhoneSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField('get_label')
 
     class Meta:
         model = Phone
-        fields = '__all__'
+        fields = ('phone', 'label')
+
+    def get_label(self, obj):
+        return obj.get_label_display()
 
 
 class WorkingHoursSerializer(serializers.ModelSerializer):

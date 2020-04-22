@@ -158,12 +158,16 @@ class Base(Configuration):
             'rest_framework.renderers.JSONRenderer',
         ],
         'DEFAULT_AUTHENTICATION_CLASSES': [
-            'rest_framework_simplejwt.authentication.JWTAuthentication',
+            # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
         ],
         'DEFAULT_PERMISSION_CLASSES': [
             'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-        ]
+        ],
+        'PAGE_SIZE': 25
     }
+
+    CORS_ALLOW_CREDENTIALS = True
 
     # CITIES LIGHT SETTINGS
     CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en', 'ru']

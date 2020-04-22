@@ -2,18 +2,23 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
+from contacts.serializers import PhoneSerializer
+
 User = get_user_model()
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    registered = serializers.SerializerMethodField(read_only=True)
-    date_joined = serializers.SerializerMethodField(read_only=True)
+    registered = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    last_login = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    birthday = serializers.DateField(format="%Y-%m-%d")
     city = serializers.SerializerMethodField('get_city')
     country = serializers.SerializerMethodField('get_country')
+    phones = PhoneSerializer(many=True)
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('id', 'username', 'last_name', 'first_name', 'middle_name', 'registered', 'birthday', 'email',
+                  'country', 'city', 'address', 'last_login', 'phones', 'avatar')
 
     def get_city(self, obj):
         if obj.city:
@@ -21,22 +26,4 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     def get_country(self, obj):
         if obj.country:
-            return obj.country.name
-
-    def get_date_joined(self, obj):
-        return obj.date_joined
-
-    def get_registered(self, obj):
-        return obj.registered
-
-
-class UserListSerializer(serializers.ModelSerializer):
-    city = serializers.SerializerMethodField('get_city')
-
-    class Meta:
-        model = User
-        fields = ('id', 'last_name', 'first_name', 'middle_name', 'city', 'email')
-
-    def get_city(self, obj):
-        if obj.city:
-            return obj.city.alternate_names
+            return obj.country.alternate_names
