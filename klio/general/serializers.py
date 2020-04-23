@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from products.serializers import CategoryListSerializer, ProductListSerializer
 from tags.serializers import TagSerializer
-from .models import Article, Banner, Menu, MenuItem, Page
+from .models import Article, Banner, Menu, MenuItem, Page, SubscriberInfo
 
 User = get_user_model()
 
@@ -139,3 +139,10 @@ class SearchDataSerializer(serializers.Serializer):
 
     def get_counts(self, obj):
         return self.counts
+
+
+class SubscriberInfoDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SubscriberInfo
+        fields = '__all__'

@@ -27,17 +27,21 @@ class Basket(models.Model):
 
     def __str__(self):
         if self.user:
-            return _('Basket') + ' #{0} ({1})'.format(self.id, self.user)
+            return gettext('Basket') + ' #{0} ({1})'.format(self.id, self.user)
         if self.session:
-            return _('Basket') + ' #{0} ('.format(self.id) + _('Anonymous') + '{0})'.format(self.session.id)
+            return gettext('Basket') + ' #{0} ('.format(self.id) + \
+                gettext('Anonymous') + ' {0})'.format(self.session.session_key)
         else:
-            return _('Basket') + ' #{0}'.format(self.id)
+            return gettext('Basket') + ' #{0}'.format(self.id)
 
     def clean(self):
-        if Basket.objects.filter(user=self.user, is_active=True).exists():
-            raise ValidationError(_('Active basket for current user already exists.'))
-        if Basket.objects.filter(session=self.session, is_active=True).exists():
-            raise ValidationError(_('Active basket already exists.'))
+        if self.user:
+            if Basket.objects.filter(user=self.user, user__isnull=False, is_active=True).exclude(pk=self.pk).exists():
+                raise ValidationError(_('Active basket for current user already exists.'))
+        if self.session:
+            if Basket.objects.filter(session=self.session, session__isnull=False,
+                                     is_active=True).exclude(pk=self.pk).exists():
+                raise ValidationError(_('Active basket already exists.'))
 
 
 class BasketProduct(models.Model):
@@ -159,7 +163,7 @@ class OrderPrivateInfo(models.Model):
     client_type = models.CharField(max_length=10, choices=CLIENT_TYPES, verbose_name=_('client type'))
     last_name = models.CharField(max_length=64, null=False, blank=False, default=None, verbose_name=_('last name'))
     first_name = models.CharField(max_length=64, null=False, blank=False, default=None, verbose_name=_('first name'))
-    middle_name = models.CharField(max_length=128, null=False, blank=True, default=None, verbose_name=_('middle name'))
+    middle_name = models.CharField(max_length=128, null=True, blank=True, default=None, verbose_name=_('middle name'))
     phone = models.CharField(max_length=64, null=False, blank=False, default=None, verbose_name=_('phone'))
     email = models.EmailField(blank=False, null=False)
     personal_data = models.BooleanField(default=False, blank=False, verbose_name=_('personal data'))

@@ -74,7 +74,7 @@ class Base(Configuration):
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [join(BASE_DIR, 'auth/templates')],
+            'DIRS': [join(BASE_DIR, 'auth/templates'), join(BASE_DIR, 'general/templates')],
             'APP_DIRS': values.BooleanValue(True),
             'OPTIONS': {
                 'context_processors': [
@@ -158,7 +158,6 @@ class Base(Configuration):
             'rest_framework.renderers.JSONRenderer',
         ],
         'DEFAULT_AUTHENTICATION_CLASSES': [
-            # 'rest_framework_simplejwt.authentication.JWTAuthentication',
             'rest_framework.authentication.SessionAuthentication',
         ],
         'DEFAULT_PERMISSION_CLASSES': [
@@ -166,6 +165,8 @@ class Base(Configuration):
         ],
         'PAGE_SIZE': 25
     }
+
+    SESSION_SAVE_EVERY_REQUEST = True
 
     CORS_ALLOW_CREDENTIALS = True
 

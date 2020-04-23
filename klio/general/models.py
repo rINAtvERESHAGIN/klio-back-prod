@@ -243,9 +243,7 @@ class SubscriberInfo(models.Model):
     date = models.DateTimeField(auto_now_add=True, verbose_name=_('date'))
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_('user'))
     """ Automatically uploaded for registered users. """
-    name = models.CharField(max_length=32, blank=False, verbose_name=_('name'))
-    """ Automatically uploaded for registered users. """
-    email = models.EmailField(blank=False)
+    email = models.EmailField(blank=False, unique=True)
 
     class Meta:
         ordering = ['-date']
