@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -91,6 +92,10 @@ class User(AbstractUser):
             return self.first_name
         else:
             return 'user{0}'.format(self.id)
+
+    def clean(self):
+        if not self.username:
+            raise ValidationError(_('Username can not be empty.'))
 
 
 class UserPhone(models.Model):

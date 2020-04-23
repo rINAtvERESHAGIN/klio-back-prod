@@ -1,18 +1,24 @@
 from collections import namedtuple
+from django.core.mail import EmailMessage
 from django.db.models import Q
+from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from rest_framework import generics, viewsets
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
+from rest_framework.viewsets import ViewSet
 
 from products.models import Category, Product
 from .models import Article, Banner, Menu, News, Page
 from .serializers import (ArticleDetailSerializer, ArticleListSerializer, BannerDetailSerializer,
                           BannerListSerializer, MenuListSerializer, NewsDetailSerializer, NewsListSerializer,
-                          PageDetailSerializer, SearchDataSerializer)
+                          PageDetailSerializer, SearchDataSerializer, SubscriberInfoDetailSerializer)
 
 
-class ArticleListView(generics.ListAPIView):
+class ArticleListView(ListAPIView):
     serializer_class = ArticleListSerializer
     queryset = Article.objects.filter(
         activity=True
@@ -23,13 +29,13 @@ class ArticleListView(generics.ListAPIView):
     )
 
 
-class ArticleDetailView(generics.RetrieveUpdateDestroyAPIView):
+class ArticleDetailView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
     serializer_class = ArticleDetailSerializer
     queryset = Article.objects.all()
 
 
-class BannerListView(generics.ListAPIView):
+class BannerListView(ListAPIView):
     serializer_class = BannerListSerializer
     queryset = Banner.objects.filter(
         activity=True
@@ -40,17 +46,17 @@ class BannerListView(generics.ListAPIView):
     )
 
 
-class BannerDetailView(generics.RetrieveUpdateDestroyAPIView):
+class BannerDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = BannerDetailSerializer
     queryset = Banner.objects.all()
 
 
-class MenuListView(generics.ListAPIView):
+class MenuListView(ListAPIView):
     serializer_class = MenuListSerializer
     queryset = Menu.objects.filter(activity=True)
 
 
-class NewsListView(generics.ListAPIView):
+class NewsListView(ListAPIView):
     serializer_class = NewsListSerializer
     queryset = News.objects.filter(
         activity=True
@@ -61,19 +67,19 @@ class NewsListView(generics.ListAPIView):
     )
 
 
-class NewsDetailView(generics.RetrieveUpdateDestroyAPIView):
+class NewsDetailView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
     serializer_class = NewsDetailSerializer
     queryset = News.objects.all()
 
 
-class PageDetailView(generics.RetrieveUpdateDestroyAPIView):
+class PageDetailView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
     serializer_class = PageDetailSerializer
     queryset = Page.objects.filter(activity=True)
 
 
-class SearchListView(viewsets.ViewSet):
+class SearchListView(ViewSet):
     SearchData = namedtuple('SearchData', ('categories', 'products', 'articles', 'news'))
 
     def list(self, request):
@@ -138,3 +144,33 @@ class SearchListView(viewsets.ViewSet):
                                           counts={'categories': categories_count, 'products': products_count,
                                                   'articles': articles_count, 'news': news_count})
         return Response(serializer.data)
+
+
+class SuscriberInfoCreateView(CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = SubscriberInfoDetailSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        if self.request.user:
+            data['user'] = self.request.user.id
+
+        serializer = self.serializer_class(data=data, context={'request': self.request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.create(validated_data=serializer.validated_data)
+            self.admin_email_notification('new_subscription.html', data=serializer.validated_data)
+            return Response(HTTP_200_OK)
+
+    def admin_email_notification(self, template, subj='Письмо с сайта Klio!', **kwargs):
+        html_content = render_to_string(template, {'kwargs': kwargs})
+        from_email, to = 'Klio Website <pythonchem1st@gmail.com>', ['reactive.90@mail.ru']
+        msg = EmailMessage(subj, html_content, from_email, to)
+        msg.content_subtype = "html"
+        msg.send()
+
+    def email_confirm(self, template, **kwargs):
+        html_content = render_to_string(template, kwargs)
+        from_email, to = 'Klio AutoReply <pythonchem1st@gmail.com>', [kwargs['email']]
+        msg = EmailMessage(_('Your Request Received!'), html_content, from_email, to)
+        msg.content_subtype = "html"
+        msg.send()

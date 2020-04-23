@@ -1,5 +1,5 @@
 import json
-from django.http import Http404
+from django.contrib.sessions.models import Session
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
@@ -25,7 +25,10 @@ class BasketAddProductView(CreateAPIView):
         if not self.request.user.is_anonymous:
             basket, _ = Basket.objects.get_or_create(user=self.request.user, is_active=True)
         else:
-            basket, _ = Basket.objects.get_or_create(session=self.request.session.session_key, is_active=True)
+            if not self.request.session.session_key:
+                self.request.session.create()
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            basket, _ = Basket.objects.get_or_create(session=current_session, is_active=True)
 
         product_in_basket, created = BasketProduct.objects.get_or_create(basket=basket, product_id=product_id)
 
@@ -49,7 +52,8 @@ class BasketDeleteProductView(DestroyAPIView):
         if not self.request.user.is_anonymous:
             basket = get_object_or_404(Basket, user=self.request.user, is_active=True)
         else:
-            basket = get_object_or_404(Basket, session=self.request.session.session_key, is_active=True)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            basket = get_object_or_404(Basket, session=current_session, is_active=True)
 
         instance = get_object_or_404(BasketProduct, basket=basket, product_id=product_id)
         self.perform_destroy(instance)
@@ -68,7 +72,8 @@ class BasketUpdateProductView(UpdateAPIView):
         if not self.request.user.is_anonymous:
             basket = get_object_or_404(Basket, user=self.request.user, is_active=True)
         else:
-            basket = get_object_or_404(Basket, session=self.request.session.session_key, is_active=True)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            basket = get_object_or_404(Basket, session=current_session, is_active=True)
 
         product_in_basket = get_object_or_404(BasketProduct, basket=basket, product_id=product_id)
         product_in_basket.quantity = amount
@@ -83,19 +88,21 @@ class CurrentBasketView(RetrieveAPIView):
     def get_object(self):
         if not self.request.user.is_anonymous:
             return get_object_or_404(Basket, user=self.request.user, is_active=True)
-        if self.request.session.session_key:
-            return get_object_or_404(Basket, session=self.request.session.session_key, is_active=True)
-        raise Http404
+        else:
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            return get_object_or_404(Basket, session=current_session, is_active=True)
 
 
 class CurrentBasketInactivateView(UpdateAPIView):
+    permission_classes = [AllowAny]
     serializer_class = BasketDetailSerializer
 
     def update(self, request, *args, **kwargs):
         if not self.request.user.is_anonymous:
             basket = get_object_or_404(Basket, user=self.request.user, is_active=True)
         else:
-            basket = get_object_or_404(Basket, session=self.request.session.session_key, is_active=True)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            basket = get_object_or_404(Basket, session=current_session, is_active=True)
 
         basket.is_active = False
         basket.save()
@@ -105,6 +112,7 @@ class CurrentBasketInactivateView(UpdateAPIView):
 
 
 class OrderCreateView(CreateAPIView):
+    permission_classes = [AllowAny]
     serializer_class = OrderDetailSerializer
 
     def create(self, request, *args, **kwargs):
@@ -113,13 +121,15 @@ class OrderCreateView(CreateAPIView):
         if not self.request.user.is_anonymous:
             basket = get_object_or_404(Basket, user=self.request.user, is_active=True)
         else:
-            basket = get_object_or_404(Basket, session=self.request.session.session_key, is_active=True)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            basket = get_object_or_404(Basket, session=current_session, is_active=True)
 
         # Check and create order
         if not self.request.user.is_anonymous:
             order, _ = Order.objects.get_or_create(user=self.request.user, basket=basket, status=Order.ACTIVE)
         else:
-            order, _ = Order.objects.get_or_create(session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order, _ = Order.objects.get_or_create(session=current_session, basket=basket, status=Order.ACTIVE)
 
         serializer = self.serializer_class(order, context={'request': self.request})
         return Response(serializer.data)
@@ -131,19 +141,21 @@ class OrderActiveRetrieveView(RetrieveAPIView):
     def get_object(self):
         if not self.request.user.is_anonymous:
             return get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
-        if self.request.session.session_key:
-            return get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
-        raise Http404
+        else:
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            return get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
 
 class OrderActiveToPendingView(UpdateAPIView):
+    permission_classes = [AllowAny]
     serializer_class = OrderDetailShortSerializer
 
     def update(self, request, *args, **kwargs):
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
-            order = get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         order.status = Order.PENDING
         order.save()
@@ -162,7 +174,8 @@ class OrderActiveUpdateView(UpdateAPIView):
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
-            order = get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         order.step = new_step
         order.save()
@@ -175,12 +188,13 @@ class OrderDeliveryInfoCreateView(CreateAPIView):
     serializer_class = OrderDetailSerializer
 
     def create(self, request, *args, **kwargs):
-        data = json.loads(request.body.decode('utf-8'))
+        data = request.data
 
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
-            order = get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         if order.delivery_info:
             return Response(_('Order already has a linked delivery info model'), status=HTTP_400_BAD_REQUEST)
@@ -189,7 +203,7 @@ class OrderDeliveryInfoCreateView(CreateAPIView):
 
         serializer = OrderDeliveryInfoSerializer(data=data, context={'request': self.request})
         if serializer.is_valid(raise_exception=True):
-            new_delivery_info = serializer.create(validated_data=data)
+            new_delivery_info = serializer.create(validated_data=serializer.validated_data)
             order.delivery_info = new_delivery_info
             order.save()
 
@@ -202,12 +216,13 @@ class OrderDeliveryInfoUpdateView(UpdateAPIView):
     serializer_class = OrderDetailSerializer
 
     def update(self, request, *args, **kwargs):
-        data = json.loads(request.body.decode('utf-8'))
+        data = request.data
 
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
-            order = get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         delivery_info = get_object_or_404(OrderDeliveryInfo, order=order)
         serializer = OrderDeliveryInfoSerializer(delivery_info, data=data, partial=True,
@@ -232,12 +247,13 @@ class OrderPaymentInfoCreateView(CreateAPIView):
     serializer_class = OrderDetailSerializer
 
     def create(self, request, *args, **kwargs):
-        data = json.loads(request.body.decode('utf-8'))
+        data = request.data
 
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
-            order = get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         if order.payment_info:
             return Response(_('Order already has a linked payment info model'), status=HTTP_400_BAD_REQUEST)
@@ -246,7 +262,7 @@ class OrderPaymentInfoCreateView(CreateAPIView):
 
         serializer = OrderPaymentInfoSerializer(data=data, context={'request': self.request})
         if serializer.is_valid(raise_exception=True):
-            new_payment_info = serializer.create(validated_data=data)
+            new_payment_info = serializer.create(validated_data=serializer.validated_data)
             order.payment_info = new_payment_info
             order.save()
 
@@ -259,12 +275,13 @@ class OrderPaymentInfoUpdateView(UpdateAPIView):
     serializer_class = OrderDetailSerializer
 
     def update(self, request, *args, **kwargs):
-        data = json.loads(request.body.decode('utf-8'))
+        data = request.data
 
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
-            order = get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         payment_info = get_object_or_404(OrderPaymentInfo, order=order)
         serializer = OrderPaymentInfoSerializer(payment_info, data=data, partial=True,
@@ -281,12 +298,13 @@ class OrderPrivateInfoCreateView(CreateAPIView):
     serializer_class = OrderDetailSerializer
 
     def create(self, request, *args, **kwargs):
-        data = json.loads(request.body.decode('utf-8'))
+        data = request.data
 
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
-            order = get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         if order.private_info:
             return Response(_('Order already has a linked private info model'), status=HTTP_400_BAD_REQUEST)
@@ -295,7 +313,7 @@ class OrderPrivateInfoCreateView(CreateAPIView):
 
         serializer = OrderPrivateInfoSerializer(data=data, context={'request': self.request})
         if serializer.is_valid(raise_exception=True):
-            new_private_info = serializer.create(validated_data=data)
+            new_private_info = serializer.create(validated_data=serializer.validated_data)
             order.private_info = new_private_info
             order.save()
 
@@ -308,12 +326,13 @@ class OrderPrivateInfoUpdateView(UpdateAPIView):
     serializer_class = OrderDetailSerializer
 
     def update(self, request, *args, **kwargs):
-        data = json.loads(request.body.decode('utf-8'))
+        data = request.data
 
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
-            order = get_object_or_404(Order, session=self.request.session.session_key, status=Order.ACTIVE)
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         private_info = get_object_or_404(OrderPrivateInfo, order=order)
         serializer = OrderPrivateInfoSerializer(private_info, data=data, partial=True,

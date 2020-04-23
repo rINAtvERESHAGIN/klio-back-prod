@@ -54,7 +54,7 @@ class OrderPrivateInfoSerializer(serializers.ModelSerializer):
 
 class OrderDetailSerializer(serializers.ModelSerializer):
     basket = BasketDetailSerializer()
-    created = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    created = serializers.DateTimeField(format="%Y-%m-%d")
     delivery_info = OrderDeliveryInfoSerializer()
     modified = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     payment_info = OrderPaymentInfoSerializer()
@@ -75,7 +75,7 @@ class OrderDetailShortSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(serializers.ModelSerializer):
     basket = BasketDetailSerializer()
-    created = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    created = serializers.DateTimeField(format="%Y-%m-%d")
 
     class Meta:
         model = Order

@@ -66,12 +66,12 @@ class PageAdmin(admin.ModelAdmin):
 
 
 class SubscriberInfoAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'date', 'name', 'email']
+    list_display = ['__str__', 'date', 'email']
 
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Banner, BannerAdmin)
-admin.site.register(CallbackInfo, CallBackInfoAdmin)
+admin.site.register(CallbackInfo, HiddenAdmin)
 admin.site.register(Menu, MenuAdmin)
 admin.site.register(MenuItem, MenuItemAdmin)
 admin.site.register(News, NewsAdmin)
