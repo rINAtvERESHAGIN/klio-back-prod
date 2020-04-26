@@ -118,7 +118,9 @@ class ProductListSerializer(serializers.ModelSerializer):
         return result
 
     def get_units(self, obj):
-        return obj.units.name
+        if obj.units:
+            return obj.units.name
+        return None
 
 
 class BasketProductListSerializer(ProductListSerializer):
