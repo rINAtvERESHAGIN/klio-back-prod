@@ -21,6 +21,7 @@ class BasketAddProductView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         product_id = kwargs.get('id')
         amount = request.data.get('amount')
+        price = request.data.get('price')
 
         if not self.request.user.is_anonymous:
             basket, _ = Basket.objects.get_or_create(user=self.request.user, is_active=True)
@@ -37,6 +38,7 @@ class BasketAddProductView(CreateAPIView):
                 product_in_basket.quantity += 1
         else:
             product_in_basket.quantity = amount
+        product_in_basket.price = price
         product_in_basket.save()
         serializer = self.serializer_class(basket, context={'request': self.request})
         return Response(serializer.data)
@@ -68,6 +70,7 @@ class BasketUpdateProductView(UpdateAPIView):
     def update(self, request, *args, **kwargs):
         product_id = kwargs.get('id')
         amount = request.data.get('amount')
+        price = request.data.get('price')
 
         if not self.request.user.is_anonymous:
             basket = get_object_or_404(Basket, user=self.request.user, is_active=True)
@@ -77,6 +80,7 @@ class BasketUpdateProductView(UpdateAPIView):
 
         product_in_basket = get_object_or_404(BasketProduct, basket=basket, product_id=product_id)
         product_in_basket.quantity = amount
+        product_in_basket.price = price
         product_in_basket.save()
         serializer = self.serializer_class(basket, context={'request': self.request})
         return Response(serializer.data)

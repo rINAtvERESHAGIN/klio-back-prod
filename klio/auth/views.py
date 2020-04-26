@@ -1,11 +1,10 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.core import signing
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework.authentication import authenticate
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -14,6 +13,8 @@ from rest_framework.views import APIView
 
 from .exceptions import ActivationError
 from .serializers import LoginSerializer, PasswordResetSerializer, PasswordSetSerializer, RegistrationSerializer
+
+User = get_user_model()
 
 
 class ActivationView(APIView):
@@ -88,17 +89,16 @@ class LoginView(APIView):
         if not email or not password:
             return Response({'detail': _('Both email and password must be provided.')}, status=HTTP_400_BAD_REQUEST)
 
-        user = authenticate(username=email, password=password)
+        user = authenticate(request, username=email, password=password)
 
         if user is not None:
-            if user.is_active:
-                login(request, user)
-
-                return Response(status=HTTP_200_OK)
-            else:
-                return Response({'detail': _('User is not active.')}, status=HTTP_404_NOT_FOUND)
+            login(request, user)
+            return Response(status=HTTP_200_OK)
         else:
-            return Response({'detail': _('Incorrect email or password.')}, status=HTTP_404_NOT_FOUND)
+            if User.objects.filter(email=email, is_active=False).exists():
+                return Response({'detail': _('User is not active.')}, status=HTTP_404_NOT_FOUND)
+            else:
+                return Response({'detail': _('Incorrect email or password.')}, status=HTTP_404_NOT_FOUND)
 
 
 class LogoutView(APIView):
@@ -220,7 +220,59 @@ class PasswordSetView(UpdateAPIView):
 
 
 class RegistrationView(CreateAPIView):
-
-    model = get_user_model()
     permission_classes = [AllowAny]
     serializer_class = RegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+
+        serializer = self.serializer_class(data=data, context={'request': self.request})
+        if serializer.is_valid(raise_exception=True):
+            new_user = serializer.create(validated_data=serializer.validated_data)
+
+            self.send_activation_email(new_user)
+
+            return Response(status=HTTP_200_OK)
+
+        return Response(status=HTTP_400_BAD_REQUEST)
+
+    def get_activation_key(self, user):
+        """
+        Generate the activation key which will be emailed to the user.
+        """
+        return signing.dumps(obj=user.email, salt=settings.REGISTRATION_SALT)
+
+    def get_email_context(self, activation_key):
+        """
+        Build the template context used for the activation email.
+        """
+        scheme = "https" if self.request.is_secure() else "http"
+        return {
+            "scheme": scheme,
+            "activation_key": activation_key,
+            "expiration_days": settings.ACCOUNT_ACTIVATION_DAYS,
+            "site": get_current_site(self.request),
+        }
+
+    def send_activation_email(self, user):
+        """
+        Send the activation email. The activation key is the email,
+        signed using sha1.
+        """
+        activation_key = self.get_activation_key(user)
+        context = self.get_email_context(activation_key)
+        context["user"] = user
+        subject = render_to_string(
+            template_name="registration/activation_email_subject.txt",
+            context=context,
+            request=self.request,
+        )
+        # Force subject to a single line to avoid header-injection
+        # issues.
+        subject = "".join(subject.splitlines())
+        message = render_to_string(
+            template_name="registration/activation_email_body.txt",
+            context=context,
+            request=self.request,
+        )
+        user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)

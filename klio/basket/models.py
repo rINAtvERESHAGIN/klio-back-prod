@@ -49,6 +49,7 @@ class BasketProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False, verbose_name=_('product'),
                                 related_name='in_basket')
     quantity = models.PositiveIntegerField(default=1, verbose_name=_('quantity'))
+    price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'))
     added = models.DateTimeField(auto_now_add=True, verbose_name=_('added'))
 
     class Meta:
@@ -72,6 +73,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('user'))
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('session'))
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=ACTIVE, verbose_name=_('status'))
+    is_paid = models.BooleanField(default=False, verbose_name=_('is paid'))
     step = models.PositiveSmallIntegerField(default=1, verbose_name=_('step'))
     promo = models.BooleanField(default=False, verbose_name=_('promo'))
     promo_code = models.CharField(max_length=14, blank=True, verbose_name=_('promo code'))
@@ -98,18 +100,19 @@ class OrderDeliveryInfo(models.Model):
     DELIVERY_TYPES = [
         (PICKUP, _('Pickup')),
         (COURIER, _('Courier')),
-        (COURIER, _('Transport company')),
+        (COMPANY, _('Transport company')),
     ]
 
-    type = models.CharField(max_length=10, choices=DELIVERY_TYPES, verbose_name=_('type'))
+    type = models.CharField(max_length=20, choices=DELIVERY_TYPES, verbose_name=_('type'))
     from_address = models.ForeignKey(Contact, on_delete=models.CASCADE, null=True, blank=True,
                                      verbose_name=_('from address'))
     to_country = models.ForeignKey(Country, on_delete=models.PROTECT, null=True, blank=True,
                                    verbose_name=_('to country'))
     to_city = models.ForeignKey(City, on_delete=models.PROTECT, null=True, blank=True, verbose_name=_('to city'))
-    to_address = models.CharField(max_length=512, blank=False, null=False, verbose_name=_('to address'))
+    to_address = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('to address'))
     comment = models.TextField(blank=True, null=True, verbose_name=_('comment'))
     delivery_terms = models.BooleanField(default=False, blank=False, verbose_name=_('delivery terms'))
+    moscow_terms = models.BooleanField(default=False, blank=False, verbose_name=_('moscow terms'))
 
     class Meta:
         verbose_name = _('Order Delivery Info')
