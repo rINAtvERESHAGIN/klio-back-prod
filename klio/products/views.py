@@ -129,7 +129,7 @@ class SearchProductListView(ListAPIView):
         queryset = Product.objects.filter(activity=True).order_by('name')
 
         if text:
-            queryset = queryset.filter(
+            queryset = queryset .filter(
                 Q(name__icontains=text) | Q(art__icontains=text) | Q(category__name__icontains=text),
             )
         if sort_by == 'name':

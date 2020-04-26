@@ -82,7 +82,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name', 'slug', 'category', 'image', 'in_stock', 'art', 'base_amount', 'units', 'price',
-                  'is_new', 'special')
+                  'wholesale_threshold', 'wholesale_price', 'is_new', 'special')
 
     def get_category(self, obj):
         return obj.category.slug if obj.category else 'no-category'
@@ -94,7 +94,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_special(self, obj):
         result = {}
-        main_special = obj.special_relations.filter(special__activity=True, on_main=True).first()
+        main_special = obj.special_relations.filter(special__activity=True).first()
         if main_special:
             result['slug'] = main_special.special.slug
             if main_special.discount_amount:
@@ -123,9 +123,13 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 class BasketProductListSerializer(ProductListSerializer):
     quantity = serializers.SerializerMethodField()
+    current_price = serializers.SerializerMethodField()
 
     class Meta(ProductListSerializer.Meta):
-        fields = ProductListSerializer.Meta.fields + ('quantity',)
+        fields = ProductListSerializer.Meta.fields + ('quantity', 'current_price',)
+
+    def get_current_price(self, obj):
+        return obj.in_basket.get(basket_id=self.context.get('basket_id')).price
 
     def get_quantity(self, obj):
         return obj.in_basket.get(basket_id=self.context.get('basket_id')).quantity
@@ -135,6 +139,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     images = ProductImageSerializer(many=True)
     is_new = serializers.SerializerMethodField()
+    units = serializers.SerializerMethodField()
     special = serializers.SerializerMethodField()
     tags = TagSerializer(many=True)
     properties = ProductPropertySerializer(many=True)
@@ -143,7 +148,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name', 'description', 'category', 'images', 'in_stock', 'art', 'tags', 'base_amount', 'price',
-                  'is_new', 'special', 'properties', 'recommended')
+                  'units', 'wholesale_threshold', 'wholesale_price', 'is_new', 'special', 'properties', 'recommended')
 
     def get_category(self, obj):
         if obj.category:
@@ -153,7 +158,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_special(self, obj):
         result = {}
-        main_special = obj.special_relations.filter(special__activity=True, on_main=True).first()
+        main_special = obj.special_relations.filter(special__activity=True).first()
         if main_special:
             result['slug'] = main_special.special.slug
             if main_special.discount_amount:
@@ -175,3 +180,6 @@ class ProductSerializer(serializers.ModelSerializer):
             if obj.created > now() - timedelta(days=60):
                 result = True
         return result
+
+    def get_units(self, obj):
+        return obj.units.name
