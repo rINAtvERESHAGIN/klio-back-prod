@@ -2,6 +2,7 @@ from django.utils.timezone import now, timedelta
 
 from rest_framework import serializers
 
+from sale.models import Special
 from tags.serializers import TagSerializer
 from .models import Brand, Category, Product, ProductImage, ProductProperty
 
@@ -94,17 +95,31 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_special(self, obj):
         result = {}
-        main_special = obj.special_relations.filter(special__activity=True).first()
-        if main_special:
-            result['slug'] = main_special.special.slug
-            if main_special.discount_amount:
-                result['new_price'] = str(round(obj.price - main_special.discount_amount, 2))
+        special = None
+        # TODO: do smth with selection of just the first special
+        # First get private product special
+        special_relation = obj.special_relations.filter(special__activity=True).first()
+        if special_relation:
+            special = special_relation.special
+        # Else get special via category
+        if not special:
+            special = Special.objects.filter(categories__in=[obj.category.id]).first()
+        # Or via tags
+        if not special:
+            tags_ids = [tag.id for tag in obj.tags.filter(activity=True)]
+            special = Special.objects.filter(tags__in=tags_ids).first()
+
+        if special:
+            result['slug'] = special.slug
+            result['threshold'] = special.threshold if special.threshold else 0
+            if special_relation and special_relation.discount_amount:
+                result['new_price'] = str(round(obj.price - special.discount_amount, 2))
                 return result
             else:
-                if main_special.special.discount_type == 'percent':
-                    result['new_price'] = str(round(obj.price * (1 - main_special.special.discount_amount / 100), 2))
-                elif main_special.special.discount_type == 'fixed':
-                    result['new_price'] = str(round(obj.price - main_special.special.discount_amount, 2))
+                if special.discount_type == 'percent':
+                    result['new_price'] = str(round(obj.price * (1 - special.discount_amount / 100), 2))
+                elif special.special.discount_type == 'fixed':
+                    result['new_price'] = str(round(obj.price - special.discount_amount, 2))
             return result
         return None
 
@@ -160,17 +175,31 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_special(self, obj):
         result = {}
-        main_special = obj.special_relations.filter(special__activity=True).first()
-        if main_special:
-            result['slug'] = main_special.special.slug
-            if main_special.discount_amount:
-                result['new_price'] = str(round(obj.price - main_special.discount_amount, 2))
+        special = None
+        # TODO: do smth with selection of just the first special
+        # First get private product special
+        special_relation = obj.special_relations.filter(special__activity=True).first()
+        if special_relation:
+            special = special_relation.special
+        # Else get special via category
+        if not special:
+            special = Special.objects.filter(categories__in=[obj.category.id]).first()
+        # Or via tags
+        if not special:
+            tags_ids = [tag.id for tag in obj.tags.filter(activity=True)]
+            special = Special.objects.filter(tags__in=tags_ids).first()
+
+        if special:
+            result['slug'] = special.slug
+            result['threshold'] = special.threshold if special.threshold else 0
+            if special_relation and special_relation.discount_amount:
+                result['new_price'] = str(round(obj.price - special.discount_amount, 2))
                 return result
             else:
-                if main_special.special.discount_type == 'percent':
-                    result['new_price'] = str(round(obj.price * (1 - main_special.special.discount_amount / 100), 2))
-                elif main_special.special.discount_type == 'fixed':
-                    result['new_price'] = str(round(obj.price - main_special.special.discount_amount, 2))
+                if special.discount_type == 'percent':
+                    result['new_price'] = str(round(obj.price * (1 - special.discount_amount / 100), 2))
+                elif special.special.discount_type == 'fixed':
+                    result['new_price'] = str(round(obj.price - special.discount_amount, 2))
             return result
         return None
 

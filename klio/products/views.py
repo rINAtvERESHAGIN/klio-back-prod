@@ -122,16 +122,20 @@ class SearchProductListView(ListAPIView):
     pagination_class = DynamicPageNumberPagination
 
     def get_queryset(self):
+        direction = self.request.query_params.get('direction')
+        tags = self.request.query_params.get('tags')
         text = self.request.query_params.get('text')
         sort_by = self.request.query_params.get('sortby')
-        direction = self.request.query_params.get('direction')
 
         queryset = Product.objects.filter(activity=True).order_by('name')
 
         if text:
-            queryset = queryset .filter(
+            queryset = queryset.filter(
                 Q(name__icontains=text) | Q(art__icontains=text) | Q(category__name__icontains=text),
             )
+        if tags:
+            tags_list = tags.split(',')
+            queryset = queryset.filter(tags__name__in=tags_list)
         if sort_by == 'name':
             if direction == 'desc':
                 queryset = queryset.order_by('-name')

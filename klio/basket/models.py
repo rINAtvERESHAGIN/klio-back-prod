@@ -7,7 +7,8 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cities_light.models import City, Country
 
 from contacts.models import Contact
-from products.models import Product
+from products.models import Category, Product
+from tags.models import Tag
 
 User = get_user_model()
 
@@ -45,7 +46,8 @@ class Basket(models.Model):
 
 
 class BasketProduct(models.Model):
-    basket = models.ForeignKey('Basket', on_delete=models.CASCADE, null=False, blank=False, verbose_name=_('basket'))
+    basket = models.ForeignKey('Basket', on_delete=models.CASCADE, null=False, blank=False, verbose_name=_('basket'),
+                               related_name='inside')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False, verbose_name=_('product'),
                                 related_name='in_basket')
     quantity = models.PositiveIntegerField(default=1, verbose_name=_('quantity'))
@@ -69,7 +71,7 @@ class Order(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
-    # TODO: receieved
+    received = models.DateTimeField(blank=True, null=True, verbose_name=_('received'))
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('user'))
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('session'))
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=ACTIVE, verbose_name=_('status'))
@@ -85,6 +87,7 @@ class Order(models.Model):
                                         related_name='order', verbose_name=_('payment info'))
     basket = models.OneToOneField('Basket', on_delete=models.CASCADE, null=False, verbose_name=_('basket'),
                                   related_name='order')
+    price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'))
 
     class Meta:
         ordering = ['-created']
@@ -188,10 +191,23 @@ class OrderPrivateInfo(models.Model):
 
 
 class PromoCode(models.Model):
-    code = models.CharField(max_length=20, blank=False, null=False, verbose_name=_('code'))
+    PERCENT, FIXED = 'percent', 'fixed'
+    DISCOUNT_TYPES = [
+        (PERCENT, _('Percentage discount')),
+        (FIXED, _('Fixed discount')),
+    ]
+
+    code = models.CharField(max_length=20, blank=False, null=False, unique=True, verbose_name=_('code'))
     start_date = models.DateField(verbose_name=_('start date'))
     deadline = models.DateField(verbose_name=_('deadline'))
+    categories = models.ManyToManyField(Category, blank=True, related_name='promos', verbose_name=_('categories'))
+    products = models.ManyToManyField(Product, blank=True, related_name='promos', verbose_name=_('products'))
+    tags = models.ManyToManyField(Tag, blank=True, related_name='promos', verbose_name=_('tags'))
     activity = models.BooleanField(default=False, verbose_name=_('activity'))
+    discount_type = models.CharField(choices=DISCOUNT_TYPES, default=PERCENT, max_length=10, blank=True,
+                                     verbose_name=_('discount type'))
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True,
+                                          verbose_name=_('discount amount'))
 
     class Meta:
         ordering = ['-activity']

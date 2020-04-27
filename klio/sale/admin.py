@@ -16,9 +16,9 @@ class SpecialProductInline(admin.TabularInline):
 
 
 class SpecialAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'discount_type', 'discount_amount', 'start_date', 'deadline', 'activity']
+    list_display = ['__str__', 'discount_type', 'discount_amount', 'threshold', 'start_date', 'deadline', 'activity']
     list_editable = ['activity']
-    autocomplete_fields = ['tags']
+    autocomplete_fields = ['categories', 'tags']
     prepopulated_fields = {"slug": ("name",)}
     inlines = [
         SpecialProductInline,
