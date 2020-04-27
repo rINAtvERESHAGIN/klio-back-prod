@@ -3,6 +3,7 @@ from rest_framework import generics
 
 from products.models import Product
 from products.serializers import ProductListSerializer
+from products.views import DynamicPageNumberPagination
 from .models import Special
 from .serializers import SpecialDetailSerializer, SpecialListSerializer
 
@@ -26,6 +27,7 @@ class SpecialDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class SpecialProductListView(generics.ListAPIView):
     serializer_class = ProductListSerializer
+    pagination_class = DynamicPageNumberPagination
 
     def get_queryset(self):
         sort_by = self.request.query_params.get('sortby')

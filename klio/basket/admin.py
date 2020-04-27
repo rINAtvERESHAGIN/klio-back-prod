@@ -25,7 +25,7 @@ class BasketAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'created', 'get_user', 'get_email', 'status', 'is_paid']
+    list_display = ['__str__', 'received', 'get_user', 'get_email', 'status', 'is_paid', 'price']
     list_filter = ['status']
 
     def get_user(self, obj):
@@ -55,6 +55,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 class PromoCodeAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'start_date', 'deadline', 'activity']
+    autocomplete_fields = ['products', 'categories', 'tags']
 
 
 admin.site.register(Basket, BasketAdmin)

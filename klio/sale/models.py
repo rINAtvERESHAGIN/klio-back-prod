@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from ckeditor.fields import RichTextField
 
-from products.models import Product
+from products.models import Category, Product
 from tags.models import Tag
 
 
@@ -35,11 +35,13 @@ class Special(models.Model):
                                      verbose_name=_('discount type'))
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True,
                                           verbose_name=_('discount amount'))
+    threshold = models.IntegerField(blank=True, null=True, verbose_name=_('discount threshold'))
+    categories = models.ManyToManyField(Category, blank=True, related_name='specials', verbose_name=_('categories'))
     products = models.ManyToManyField(Product, through='SpecialProduct',
                                       help_text=_('At least 1 product is required.'),
                                       related_name='specials', verbose_name=_('products'))
-    tags = models.ManyToManyField(Tag, help_text=_('At least 1 tag is required.'), verbose_name=_('tags'))
-    # total_price_min = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True, verbose_name=_('tags'))
+    # TODO: total_price_min = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     activity = models.BooleanField(default=False, verbose_name=_('activity'))
 
     class Meta:
@@ -53,24 +55,6 @@ class Special(models.Model):
     def clean(self):
         if self.start_date and self.deadline and self.start_date >= self.deadline:
             raise ValidationError(_("Deadline must be more than start date"))
-
-
-# class SpecialCategory(models.Model):
-#     PERCENT, FIXED = 'percent', 'fixed'
-#     DISCOUNT_TYPES = [
-#         (PERCENT, 'Percentage discount'),
-#         (FIXED, 'Fixed discount'),
-#     ]
-#
-#     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=False, null=False)
-#     special = models.ForeignKey('Special', on_delete=models.CASCADE, blank=False, null=False)
-#     discount = models.BooleanField(default=False)
-#     discount_type = models.CharField(choices=DISCOUNT_TYPES, max_length=10, blank=True)
-#     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-#
-#     class Meta:
-#         verbose_name = _('Special Category')
-#         verbose_name_plural = _('Special Categories')
 
 
 class SpecialProduct(models.Model):

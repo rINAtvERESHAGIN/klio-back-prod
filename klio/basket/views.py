@@ -1,6 +1,9 @@
 import json
+from decimal import Decimal
 from django.contrib.sessions.models import Session
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
@@ -8,7 +11,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
-from .models import Basket, BasketProduct, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPrivateInfo
+from .models import Basket, BasketProduct, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPrivateInfo, PromoCode
 from .serializers import (BasketDetailSerializer, OrderDeliveryInfoSerializer, OrderDetailSerializer,
                           OrderDetailShortSerializer, OrderListSerializer, OrderPaymentInfoSerializer,
                           OrderPrivateInfoSerializer)
@@ -161,7 +164,14 @@ class OrderActiveToPendingView(UpdateAPIView):
             current_session = Session.objects.get(session_key=self.request.session.session_key)
             order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
+        if not order.price:
+            sum_price = 0
+            for basket_product in order.basket.inside.all():
+                sum_price += (basket_product.quantity * basket_product.price)
+            order.price = sum_price
+
         order.status = Order.PENDING
+        order.received = timezone.localtime()
         order.save()
         serializer = self.serializer_class(order, context={'request': self.request})
         return Response(serializer.data)
@@ -173,7 +183,8 @@ class OrderActiveUpdateView(UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         data = json.loads(request.body.decode('utf-8'))
-        new_step = data['step']
+        new_step = data.get('step')
+        promocode = data.get('promocode', None)
 
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
@@ -181,10 +192,61 @@ class OrderActiveUpdateView(UpdateAPIView):
             current_session = Session.objects.get(session_key=self.request.session.session_key)
             order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
+        if promocode:
+            # Check promocode first
+            promo_active = PromoCode.objects.filter(activity=True, code=promocode)\
+                .exclude(start_date__isnull=False, start_date__gt=timezone.localtime())\
+                .exclude(deadline__isnull=False, deadline__lt=timezone.localtime())\
+                .first()
+
+            # Find suitable products in basket
+            if promo_active:
+                order.promo = True
+                order.promo_code = promo_active.code
+                suitable_categories_ids = promo_active.categories.values_list('id', flat=True)
+                suitable_tags_ids = promo_active.tags.values_list('id', flat=True)
+                suitable_products_ids = promo_active.products.values_list('id', flat=True)
+                promo_basket_products = order.basket.inside.filter(Q(
+                    product__activity=True, product__in=suitable_products_ids
+                ) | Q(
+                    product__activity=True, product__category__in=suitable_categories_ids
+                ) | Q(
+                    product__activity=True, product__tags__in=suitable_tags_ids
+                )
+                ).distinct()
+
+                # Calculate and save sum to order
+                discounted_sum = 0
+                if promo_basket_products:
+                    for basket_product in promo_basket_products:
+                        if promo_active.discount_type == 'percent':
+                            basket_product.price = str(
+                                round(basket_product.price * (1 - promo_active.discount_amount / 100), 2)
+                            )
+                        elif promo_active.special.discount_type == 'fixed':
+                            basket_product.price = round(basket_product.price - promo_active.discount_amount, 2)
+
+                        discounted_sum += (Decimal(basket_product.price) * basket_product.quantity)
+
+                    basket_products = order.basket.inside.exclude(
+                        id__in=promo_basket_products.values_list('id', flat=True))
+
+                    sum_price = 0
+                    for basket_product in basket_products:
+                        sum_price += (basket_product.quantity * basket_product.price)
+
+                    if discounted_sum:
+                        sum_price += discounted_sum
+
+                    order.price = sum_price
+
+            else:
+                return Response({'promocode': _('Promocode is not valid.')}, status=HTTP_400_BAD_REQUEST)
+
         order.step = new_step
         order.save()
         serializer = self.serializer_class(order, context={'request': self.request})
-        return Response(serializer.data)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class OrderDeliveryInfoCreateView(CreateAPIView):

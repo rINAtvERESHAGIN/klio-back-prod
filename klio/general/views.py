@@ -83,6 +83,7 @@ class SearchListView(ViewSet):
     SearchData = namedtuple('SearchData', ('categories', 'products', 'articles', 'news'))
 
     def list(self, request):
+        tags = self.request.query_params.get('tags')
         text = self.request.query_params.get('text')
         obj_type = self.request.query_params.get('type')
         sort_by = self.request.query_params.get('sortby')
@@ -106,6 +107,14 @@ class SearchListView(ViewSet):
             news = news.filter(
                 Q(title__icontains=text) | Q(tags__name__icontains=text) | Q(content__icontains=text),
             )
+
+        if tags:
+            tags_list = tags.split(',')
+            # Need to get empty set of categories
+            categories = categories.filter(id=0)
+            products = products.filter(tags__name__in=tags_list)
+            articles = articles.filter(tags__name__in=tags_list)
+            news = news.filter(tags__name__in=tags_list)
 
         categories_count = categories.count()
         products_count = products.count()
