@@ -40,7 +40,9 @@ class OrderAdmin(admin.ModelAdmin):
     get_email.short_description = _('User Email')
 
     def get_delivery_type(self, obj):
-        return obj.delivery_info.get_type_display()
+        if obj.delivery_info:
+            return obj.delivery_info.get_type_display()
+        return None
     get_delivery_type.short_description = _('Delivery')
 
     def get_products(self, obj):
