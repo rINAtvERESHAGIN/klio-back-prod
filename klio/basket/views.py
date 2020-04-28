@@ -1,5 +1,4 @@
 import json
-from decimal import Decimal
 from django.contrib.sessions.models import Session
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -182,10 +181,47 @@ class OrderActiveUpdateView(UpdateAPIView):
     serializer_class = OrderDetailSerializer
 
     def update(self, request, *args, **kwargs):
+        # Get data
         data = json.loads(request.body.decode('utf-8'))
         new_step = data.get('step')
         promocode = data.get('promocode', None)
 
+        # Check if step param is provided
+        if not new_step:
+            return Response(_('Order step is not provided'), status=HTTP_400_BAD_REQUEST)
+
+        def check_promo_code(code):
+            promo = PromoCode.objects.filter(activity=True, code=code) \
+                .exclude(start_date__isnull=False, start_date__gt=timezone.localtime()) \
+                .exclude(deadline__isnull=False, deadline__lt=timezone.localtime()) \
+                .first()
+            return promo
+
+        def get_promo_basket_products(order_obj, promo_obj):
+            promo_products = order_obj.basket.inside.filter(Q(
+                product__activity=True, product__in=promo_obj.products.values_list('id', flat=True)
+            ) | Q(
+                product__activity=True, product__category__in=promo_obj.categories.values_list('id', flat=True)
+            ) | Q(
+                product__activity=True, product__tags__in=promo_obj.tags.values_list('id', flat=True)
+            )
+            ).distinct()
+            return promo_products
+
+        def recalculate_basket_products_promo_prices(promo_bps, promo_obj):
+            for bp in promo_bps:
+
+                if promo_obj.discount_type == 'percent':
+                    bp.promo_price = round(
+                        bp.price * (1 - promo_obj.discount_amount / 100), 2)
+
+                elif promo_obj.special.discount_type == 'fixed':
+                    bp.promo_price = round(
+                        bp.price - promo_obj.discount_amount, 2)
+
+                bp.save()
+
+        # Get order
         if not self.request.user.is_anonymous:
             order = get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
         else:
@@ -193,55 +229,54 @@ class OrderActiveUpdateView(UpdateAPIView):
             order = get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
 
         if promocode:
-            # Check promocode first
-            promo_active = PromoCode.objects.filter(activity=True, code=promocode)\
-                .exclude(start_date__isnull=False, start_date__gt=timezone.localtime())\
-                .exclude(deadline__isnull=False, deadline__lt=timezone.localtime())\
-                .first()
+            # Check promo code first
+            promo_active = check_promo_code(promocode)
 
-            # Find suitable products in basket
             if promo_active:
-                order.promo = True
-                order.promo_code = promo_active.code
-                suitable_categories_ids = promo_active.categories.values_list('id', flat=True)
-                suitable_tags_ids = promo_active.tags.values_list('id', flat=True)
-                suitable_products_ids = promo_active.products.values_list('id', flat=True)
-                promo_basket_products = order.basket.inside.filter(Q(
-                    product__activity=True, product__in=suitable_products_ids
-                ) | Q(
-                    product__activity=True, product__category__in=suitable_categories_ids
-                ) | Q(
-                    product__activity=True, product__tags__in=suitable_tags_ids
-                )
-                ).distinct()
+                # If promo code is valid find promo products in basket
+                promo_basket_products = get_promo_basket_products(order, promo_active)
 
-                # Calculate and save sum to order
-                discounted_sum = 0
                 if promo_basket_products:
-                    for basket_product in promo_basket_products:
-                        if promo_active.discount_type == 'percent':
-                            basket_product.price = str(
-                                round(basket_product.price * (1 - promo_active.discount_amount / 100), 2)
-                            )
-                        elif promo_active.special.discount_type == 'fixed':
-                            basket_product.price = round(basket_product.price - promo_active.discount_amount, 2)
+                    # Recalculate promo prices for promo products
+                    recalculate_basket_products_promo_prices(promo_basket_products, promo_active)
 
-                        discounted_sum += (Decimal(basket_product.price) * basket_product.quantity)
+                    order.promo = True
+                    order.promo_code = promo_active.code
 
-                    basket_products = order.basket.inside.exclude(
-                        id__in=promo_basket_products.values_list('id', flat=True))
-
-                    sum_price = 0
-                    for basket_product in basket_products:
-                        sum_price += (basket_product.quantity * basket_product.price)
-
-                    if discounted_sum:
-                        sum_price += discounted_sum
-
-                    order.price = sum_price
+                else:
+                    return Response({'promocode': _('No promo products in the basket.')}, status=HTTP_400_BAD_REQUEST)
 
             else:
                 return Response({'promocode': _('Promocode is not valid.')}, status=HTTP_400_BAD_REQUEST)
+
+        else:
+            # Check if order already has a promo and recalculate the promo prices for products
+            if order.promo and order.promo_code:
+
+                # Check if promo code is valid
+                promo_active = check_promo_code(order.promo_code)
+
+                if promo_active:
+                    # For valid promocode find promo products in basket
+                    promo_basket_products = get_promo_basket_products(order, promo_active)
+
+                    if promo_basket_products:
+                        # Recalculate promo prices for promo products
+                        recalculate_basket_products_promo_prices(promo_basket_products, promo_active)
+
+                else:
+                    # For invalid promocode erase all promo prices for all basket products
+                    for basket_product in order.basket.inside.all():
+                        basket_product.promo_price = None
+                        basket_product.save()
+
+        # Recalculate the price on the 3rd stage of order process:
+        if new_step == 3:
+            order_price = 0
+            for basket_product in order.basket.inside.all():
+                product_price = basket_product.promo_price if basket_product.promo_price else basket_product.price
+                order_price += product_price * basket_product.quantity
+            order.price = order_price
 
         order.step = new_step
         order.save()

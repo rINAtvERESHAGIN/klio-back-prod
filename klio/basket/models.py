@@ -52,6 +52,8 @@ class BasketProduct(models.Model):
                                 related_name='in_basket')
     quantity = models.PositiveIntegerField(default=1, verbose_name=_('quantity'))
     price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'))
+    promo_price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2,
+                                      verbose_name=_('promo_price'))
     added = models.DateTimeField(auto_now_add=True, verbose_name=_('added'))
 
     class Meta:
@@ -61,10 +63,11 @@ class BasketProduct(models.Model):
 
 
 class Order(models.Model):
-    ACTIVE, PENDING, COMPLETED, DENIED = 'active', 'pending', 'completed', 'denied'
+    ACTIVE, PENDING, DELIVERY, COMPLETED, DENIED = 'active', 'pending', 'delivery', 'completed', 'denied'
     STATUS_CHOICES = [
         (ACTIVE, _('Order is active')),
         (PENDING, _('Order pending')),
+        (DELIVERY, _('Order on delivery')),
         (COMPLETED, _('Order completed')),
         (DENIED, _('Order denied')),
     ]
