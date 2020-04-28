@@ -58,7 +58,9 @@ class OrderAdmin(admin.ModelAdmin):
     get_products.short_description = _('Products')
 
     def get_city(self, obj):
-        return obj.delivery_info.to_city
+        if obj.delivery_info:
+            return obj.delivery_info.to_city
+        return None
     get_city.short_description = _('City')
 
 
