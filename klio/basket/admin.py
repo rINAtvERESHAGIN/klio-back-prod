@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.html import linebreaks
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from .models import Basket, BasketProduct, Order, OrderPrivateInfo, OrderDeliveryInfo, OrderPaymentInfo, PromoCode
@@ -25,8 +27,9 @@ class BasketAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'received', 'get_user', 'get_email', 'status', 'is_paid', 'price']
-    list_filter = ['status']
+    list_display = ['__str__', 'received', 'get_user', 'get_email', 'status', 'get_delivery_type', 'is_paid', 'price',
+                    'promo', 'promo_code', 'get_city', 'get_products']
+    list_filter = ['status', 'is_paid', 'promo']
 
     def get_user(self, obj):
         return obj.user.__str__()
@@ -36,21 +39,25 @@ class OrderAdmin(admin.ModelAdmin):
         return obj.user.email
     get_email.short_description = _('User Email')
 
-    # def get_sum(self, obj):
-    #     return
-    # get_sum.short_description = _('Sum')
-    #
-    # def get_positions(self, obj):
-    #     return
-    # get_positions.short_description = _('Positions')
-    #
-    # def get_city(self, obj):
-    #     return
-    # get_city.short_description = _('City')
-    #
-    # def get_country(self, obj):
-    #     return
-    # get_country.short_description = _('Country')
+    def get_delivery_type(self, obj):
+        return obj.delivery_info.get_type_display()
+    get_delivery_type.short_description = _('Delivery')
+
+    def get_products(self, obj):
+        result = ''
+        for bp in obj.basket.inside.all():
+            price = bp.promo_price if bp.promo_price else bp.price if bp.price else 0
+            line = linebreaks('<strong>{0}</strong> {1}, цена: {2}, кол-во: {3}, сумма: {4}<br />'.format(
+                bp.product.art, bp.product.name, price, bp.quantity, price * bp.quantity
+            ))
+            result += line
+        return mark_safe(result)
+
+    get_products.short_description = _('Products')
+
+    def get_city(self, obj):
+        return obj.delivery_info.to_city
+    get_city.short_description = _('City')
 
 
 class PromoCodeAdmin(admin.ModelAdmin):
