@@ -234,7 +234,10 @@ class OrderActiveUpdateView(UpdateAPIView):
 
             if promo_active:
                 # If promo code is valid find promo products in basket
-                promo_basket_products = get_promo_basket_products(order, promo_active)
+                if promo_active.for_all_products:
+                    promo_basket_products = order.basket.inside.all()
+                else:
+                    promo_basket_products = get_promo_basket_products(order, promo_active)
 
                 if promo_basket_products:
                     # Recalculate promo prices for promo products
@@ -258,7 +261,10 @@ class OrderActiveUpdateView(UpdateAPIView):
 
                 if promo_active:
                     # For valid promocode find promo products in basket
-                    promo_basket_products = get_promo_basket_products(order, promo_active)
+                    if promo_active.for_all_products:
+                        promo_basket_products = order.basket.inside.all()
+                    else:
+                        promo_basket_products = get_promo_basket_products(order, promo_active)
 
                     if promo_basket_products:
                         # Recalculate promo prices for promo products

@@ -204,6 +204,7 @@ class PromoCode(models.Model):
     code = models.CharField(max_length=20, blank=False, null=False, unique=True, verbose_name=_('code'))
     start_date = models.DateField(verbose_name=_('start date'))
     deadline = models.DateField(verbose_name=_('deadline'))
+    for_all_products = models.BooleanField(default=False, blank=True, verbose_name=_('For all products'))
     categories = models.ManyToManyField(Category, blank=True, related_name='promos', verbose_name=_('categories'))
     products = models.ManyToManyField(Product, blank=True, related_name='promos', verbose_name=_('products'))
     tags = models.ManyToManyField(Tag, blank=True, related_name='promos', verbose_name=_('tags'))
