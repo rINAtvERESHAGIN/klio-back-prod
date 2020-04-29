@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 
+from cities_light.models import City
 from rest_framework import serializers
 
 from products.serializers import CategoryListSerializer, ProductListSerializer
@@ -16,7 +17,8 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('id', 'title', 'slug', 'author', 'img', 'date', 'content', 'tags')
+        fields = ('id', 'meta_title', 'meta_description', 'meta_keywords', 'title', 'slug', 'author', 'img', 'date',
+                  'content', 'tags')
 
     def get_author(self, obj):
         return obj.author.__str__()
@@ -42,6 +44,25 @@ class BannerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
         fields = '__all__'
+
+
+class CityListSerializer(serializers.ModelSerializer):
+    value = serializers.SerializerMethodField()
+    text = serializers.SerializerMethodField()
+
+    class Meta:
+        model = City
+        fields = ('value', 'text')
+
+    def get_value(self, obj):
+        if obj.id:
+            return obj.id
+        return None
+
+    def get_text(self, obj):
+        if obj.alternate_names:
+            return obj.alternate_names
+        return None
 
 
 class MenuItemListSerializer(serializers.ModelSerializer):
@@ -105,7 +126,8 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('id', 'title', 'slug', 'author', 'img', 'date', 'content', 'tags')
+        fields = ('id', 'meta_title', 'meta_description', 'meta_keywords', 'title', 'slug', 'author', 'img', 'date',
+                  'content', 'tags')
 
     def get_author(self, obj):
         return obj.author.__str__()
@@ -123,7 +145,7 @@ class PageDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
-        fields = ('id', 'name', 'slug', 'content')
+        fields = ('id', 'meta_title', 'meta_description', 'meta_keywords', 'name', 'slug', 'content')
 
 
 class SearchDataSerializer(serializers.Serializer):

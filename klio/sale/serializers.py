@@ -11,8 +11,8 @@ class SpecialDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Special
-        fields = ('id', 'name', 'slug', 'img', 'date', 'deadline', 'content', 'discount', 'discount_type',
-                  'discount_amount', 'tags')
+        fields = ('id', 'meta_title', 'meta_description', 'meta_keywords', 'name', 'slug', 'img', 'date', 'deadline',
+                  'content', 'discount', 'discount_type', 'discount_amount', 'tags')
 
 
 class SpecialListSerializer(serializers.ModelSerializer):

@@ -16,6 +16,9 @@ class Special(models.Model):
         (FIXED, _('Fixed discount')),
     ]
 
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
     name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(max_length=128, blank=False, verbose_name=_('slug'))
     date = models.DateTimeField(default=timezone.now,

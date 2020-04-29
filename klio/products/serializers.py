@@ -33,7 +33,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'slug', 'img', 'children', 'parent')
+        fields = ('id', 'name', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'img', 'description',
+                  'children', 'parent')
 
     def get_fields(self):
         fields = super(CategorySerializer, self).get_fields()
@@ -164,8 +165,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'category', 'images', 'in_stock', 'art', 'tags', 'base_amount', 'price',
-                  'units', 'wholesale_threshold', 'wholesale_price', 'is_new', 'special', 'properties', 'recommended')
+        fields = ('id', 'meta_title', 'meta_description', 'meta_keywords', 'name', 'description', 'category', 'images',
+                  'in_stock', 'art', 'tags', 'base_amount', 'price', 'units', 'wholesale_threshold', 'wholesale_price',
+                  'is_new', 'special', 'properties', 'recommended')
 
     def get_category(self, obj):
         if obj.category:
