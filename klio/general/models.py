@@ -14,6 +14,9 @@ User = get_user_model()
 class Article(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
     date = models.DateTimeField(help_text=_('Date to be shown in article.'), verbose_name=_('published'))
     start_date = models.DateTimeField(blank=True, null=True,
                                       help_text=_("""Date to make article visible on site.
@@ -190,6 +193,9 @@ class MenuItem(models.Model):
 class News(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
     date = models.DateTimeField(help_text=_('Date to be shown in news.'), verbose_name=_('date'))
     start_date = models.DateTimeField(blank=True, null=True,
                                       help_text=_("""Date to make news visible on site.
@@ -225,6 +231,9 @@ class News(models.Model):
 class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
     name = models.CharField(max_length=32, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(verbose_name=_('slug'))
     content = RichTextUploadingField(verbose_name=_('content'))

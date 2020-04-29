@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from cities_light.models import City
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -14,8 +15,9 @@ from rest_framework.viewsets import ViewSet
 from products.models import Category, Product
 from .models import Article, Banner, Menu, News, Page
 from .serializers import (ArticleDetailSerializer, ArticleListSerializer, BannerDetailSerializer,
-                          BannerListSerializer, MenuListSerializer, NewsDetailSerializer, NewsListSerializer,
-                          PageDetailSerializer, SearchDataSerializer, SubscriberInfoDetailSerializer)
+                          BannerListSerializer, CityListSerializer, MenuListSerializer, NewsDetailSerializer,
+                          NewsListSerializer, PageDetailSerializer, SearchDataSerializer,
+                          SubscriberInfoDetailSerializer)
 
 
 class ArticleListView(ListAPIView):
@@ -49,6 +51,11 @@ class BannerListView(ListAPIView):
 class BannerDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = BannerDetailSerializer
     queryset = Banner.objects.all()
+
+
+class CityListView(ListAPIView):
+    serializer_class = CityListSerializer
+    queryset = City.objects.all().exclude(alternate_names='null').order_by('alternate_names')
 
 
 class MenuListView(ListAPIView):

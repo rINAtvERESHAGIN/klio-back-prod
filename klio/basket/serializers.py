@@ -25,11 +25,19 @@ class OrderDeliveryInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderDeliveryInfo
-        fields = ('type', 'from_address', 'to_country', 'to_city', 'to_address', 'comment', 'delivery_terms')
+        fields = ('type', 'from_address', 'to_city', 'to_address', 'comment', 'price', 'delivery_terms',
+                  'moscow_terms')
 
     def validate_delivery_terms(self, value):
         if not value:
             raise serializers.ValidationError(_('You must agree to the delivery terms.'))
+        return value
+
+    def validate_moscow_terms(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                _('You must agree that you are informed that the order is packaged in Moscow.')
+            )
         return value
 
 

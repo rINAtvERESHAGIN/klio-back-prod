@@ -114,9 +114,10 @@ class OrderDeliveryInfo(models.Model):
                                      verbose_name=_('from address'))
     to_country = models.ForeignKey(Country, on_delete=models.PROTECT, null=True, blank=True,
                                    verbose_name=_('to country'))
-    to_city = models.ForeignKey(City, on_delete=models.PROTECT, null=True, blank=True, verbose_name=_('to city'))
+    to_city = models.ForeignKey(City, on_delete=models.PROTECT, null=False, blank=False, verbose_name=_('to city'))
     to_address = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('to address'))
     comment = models.TextField(blank=True, null=True, verbose_name=_('comment'))
+    price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'))
     delivery_terms = models.BooleanField(default=False, blank=False, verbose_name=_('delivery terms'))
     moscow_terms = models.BooleanField(default=False, blank=False, verbose_name=_('moscow terms'))
 

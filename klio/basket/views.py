@@ -270,13 +270,27 @@ class OrderActiveUpdateView(UpdateAPIView):
                         basket_product.promo_price = None
                         basket_product.save()
 
-        # Recalculate the price on the 3rd stage of order process:
         if new_step == 3:
+            # Recalculate the price on the 3rd stage of order process:
             order_price = 0
             for basket_product in order.basket.inside.all():
                 product_price = basket_product.promo_price if basket_product.promo_price else basket_product.price
                 order_price += product_price * basket_product.quantity
             order.price = order_price
+
+            # Refresh delivery price
+            delivery = order.delivery_info
+            order_price, delivery_price = 0, 0
+            if delivery.to_city.name in ['Moscow', 'Kostroma']:
+                for basket_product in order.basket.inside.all():
+                    order_price += basket_product.price * basket_product.quantity
+                delivery_price = 350 if order_price < 3000 else 0
+            if delivery.to_city.name == 'Saint Petersburg':
+                for basket_product in order.basket.inside.all():
+                    order_price += basket_product.price * basket_product.quantity
+                delivery_price = 500 if order_price < 5000 else 0
+            delivery.price = delivery_price
+            delivery.save()
 
         order.step = new_step
         order.save()

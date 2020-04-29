@@ -32,6 +32,9 @@ class Brand(models.Model):
 class Category(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
     name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(verbose_name=_('slug'))
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children',
@@ -94,6 +97,9 @@ class Product(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
     name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(verbose_name=_('slug'))
     description = RichTextField(blank=True, verbose_name=_('description'))

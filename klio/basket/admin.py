@@ -27,8 +27,8 @@ class BasketAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'received', 'get_user', 'get_email', 'status', 'get_delivery_type', 'is_paid', 'price',
-                    'promo', 'promo_code', 'get_city', 'get_products']
+    list_display = ['__str__', 'received', 'get_user', 'get_email', 'status', 'get_delivery_type', 'get_delivery_price',
+                    'is_paid', 'price', 'promo', 'promo_code', 'get_city', 'get_products']
     list_filter = ['status', 'is_paid', 'promo']
 
     def get_user(self, obj):
@@ -45,6 +45,12 @@ class OrderAdmin(admin.ModelAdmin):
         return None
     get_delivery_type.short_description = _('Delivery')
 
+    def get_delivery_price(self, obj):
+        if obj.delivery_info:
+            return obj.delivery_info.price
+        return None
+    get_delivery_price.short_description = _('Delivery price')
+
     def get_products(self, obj):
         result = ''
         for bp in obj.basket.inside.all():
@@ -59,7 +65,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def get_city(self, obj):
         if obj.delivery_info:
-            return obj.delivery_info.to_city
+            return obj.delivery_info.to_city.alternate_names
         return None
     get_city.short_description = _('City')
 
