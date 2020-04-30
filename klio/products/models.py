@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -85,8 +88,8 @@ class Product(models.Model):
     UNIQUE, PARENT, CHILD = 'unique', 'parent', 'child'
     KIND_CHOICES = [
         (UNIQUE, _('Unique product')),
-        (PARENT, _('Child product')),
-        (CHILD, _('Parent product')),
+        (PARENT, _('Parent product')),
+        (CHILD, _('Child product')),
     ]
     NEW, CALCULATED, NOT_NEW = 'new', 'calculated', 'not_new'
     IS_NEW_CHOICES = [
@@ -100,8 +103,8 @@ class Product(models.Model):
     meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
     meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
     meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
-    name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
-    slug = models.SlugField(verbose_name=_('slug'))
+    name = models.CharField(max_length=124, blank=False, null=False, verbose_name=_('name'))
+    slug = models.SlugField(max_length=124, blank=False, verbose_name=_('slug'))
     description = RichTextField(blank=True, verbose_name=_('description'))
 
     """
@@ -112,48 +115,156 @@ class Product(models.Model):
       specific version of the parent.
     - A parent product. It essentially represents a set of products.
     """
-    kind = models.CharField(max_length=7, choices=KIND_CHOICES, verbose_name=_('kind'))
+    kind = models.CharField(max_length=7, choices=KIND_CHOICES, default=UNIQUE, verbose_name=_('kind'))
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True,
                                related_name='children', verbose_name=_("Parent product"),
-                               help_text="Leave blank if this is a unique product "
-                                         "(i.e. product does not have children)")
+                               help_text=_("Leave blank if this is a unique product"))
     """ None for child products, they inherit their parent's product type. """
     product_type = models.ForeignKey('ProductType', on_delete=models.PROTECT, null=True, blank=True,
-                                     related_name='products', verbose_name=_('product type'))
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, null=True,
-                                 verbose_name=_('category'))
-    brand = models.ForeignKey('Brand', on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('brand'))
+                                     related_name='products', verbose_name=_('product type'),
+                                     help_text=_("Choose the product type. Properties will be inherited after saving."
+                                                 "Click 'Save & Continue' button."))
+    """ None for child products, they inherit their parent's product type. """
+    category = models.ForeignKey('Category', on_delete=models.PROTECT, blank=True, null=True,
+                                 verbose_name=_('category'), help_text=_('Choose the most detailed category'))
+    """ None for child products, they inherit their parent's product type. """
+    brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('brand'),
+                              help_text=_("If this field is empty for child product, Brand will be inherited from"
+                                          "parent."))
     """ Not required for parent products. """
-    art = models.IntegerField(blank=True, null=True, verbose_name=_('vendor code'))
-    tags = models.ManyToManyField(Tag, blank=True, related_name='products', verbose_name=_('tags'))
+    art = models.IntegerField(unique=True, blank=True, null=True, verbose_name=_('vendor code'),
+                              help_text="Do not set article number for parent product.")
+    tags = models.ManyToManyField(Tag, blank=True, related_name='products', verbose_name=_('tags'),
+                                  help_text=_("If not provided for child product, tags will be inherited from parent."))
     properties = models.ManyToManyField('ProductProperty', through='ProductPropertyValue', related_name='products',
-                                        verbose_name=_('properties'))
+                                        verbose_name=_('properties'),
+                                        help_text=_("Properties should be set on Product Type level, but you can"
+                                                    "provide single-product property as well."))
     """ Not required for parent products. """
-    in_stock = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=4,
+    in_stock = models.DecimalField(default=0, blank=False, null=True, max_digits=10, decimal_places=4,
                                    help_text='For parents it will be calculated automatically',
                                    verbose_name=_('In_stock'))
     units = models.ForeignKey('Unit', on_delete=models.SET_NULL, null=True, blank=True, related_name='products',
                               verbose_name=_('units'))
     """ Not required for parent products. """
-    price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'))
+    price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'),
+                                help_text=_("Do not set the price on a parent product."))
     base_amount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=4,
-                                      verbose_name=_('base amount'))
+                                      verbose_name=_('base amount'),
+                                      help_text=_("Used for correct displaying and calculating the amount and the "
+                                                  "price of a product."))
     wholesale_threshold = models.IntegerField(blank=True, null=True, verbose_name=_('wholesale threshold'))
     wholesale_price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2,
                                           verbose_name=_('wholesale price'))
-    recommended = models.ManyToManyField('self', blank=True, verbose_name=_('recommended'))
+    recommended = models.ManyToManyField('self', blank=True, verbose_name=_('recommended'),
+                                         help_text=_('Choose only unique or child products.'))
     """ Leave default for parent products. """
-    is_new = models.CharField(max_length=12, choices=IS_NEW_CHOICES, default=CALCULATED, verbose_name=_('is new'))
+    is_new = models.CharField(max_length=12, choices=IS_NEW_CHOICES, default=CALCULATED, verbose_name=_('is new'),
+                              help_text=_("If set to 'Calculated', the product will be valued as new for 2 months from"
+                                          "the date of adding"))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         ordering = ['-activity', 'product_type', 'order']
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        # General check
+        if self.in_stock < 0:
+            raise ValidationError(_('Amount in stock can not be negative.'))
+        if self.price:
+            if self.price < 0:
+                raise ValidationError(_('Product price can not be negative.'))
+
+        getattr(self, '_clean_%s' % self.kind)()
+
+    def _clean_unique(self):
+        if self.parent:
+            raise ValidationError(_('Unique product should not have a parent'))
+        if not self.category:
+            raise ValidationError(_('Unique product should contain a category'))
+        if not self.art:
+            raise ValidationError(_('Unique product should contain an article number'))
+        if not self.price:
+            raise ValidationError(_('Unique product should contain a price'))
+        if not self.base_amount:
+            raise ValidationError(_('Unique product should contain a base amount'))
+
+    def _clean_parent(self):
+        if self.parent:
+            raise ValidationError(_('Parent product should not have a parent'))
+        if not self.category:
+            raise ValidationError(_('Parent product should contain a category'))
+        if self.art:
+            raise ValidationError(_('Parent product should not have an article number'))
+        if self.in_stock > 0:
+            raise ValidationError(_('Parent product should not have a number of items in stock. Set it to 0.'))
+        if self.price:
+            raise ValidationError(_('Parent product should not have a price'))
+        if not self.base_amount:
+            raise ValidationError(_('Parent product should contain a base amount'))
+
+    def _clean_child(self):
+        if not self.parent:
+            raise ValidationError(_('Child product must have a parent'))
+        if self.category:
+            raise ValidationError(_('Child product inherit its parent category'))
+        if self.product_type:
+            raise ValidationError(_('Child product inherit its parent product type'))
+        if self.brand:
+            raise ValidationError(_('Child product inherit its parent brand'))
+        if self.units:
+            raise ValidationError(_('Child product inherit its parent units'))
+        if self.base_amount:
+            raise ValidationError(_('Child product inherit its parent base amount'))
+        if not self.price:
+            raise ValidationError(_('Child product must have a price'))
+        if not self.art:
+            raise ValidationError(_('Child product must have an article number'))
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        for prop in self.get_all_properties():
+            product_property, created = ProductPropertyValue.objects.get_or_create(product=self, prop=prop)
+            if created and self.is_child:
+                product_property.value = self.parent.get_value_by_property(prop).value
+                product_property.save()
+
+    @property
+    def is_unique(self):
+        return self.kind == self.UNIQUE
+
+    @property
+    def is_parent(self):
+        return self.kind == self.PARENT
+
+    @property
+    def is_child(self):
+        return self.kind == self.CHILD
+
+    def get_product_type(self):
+        """
+        Return a product's item type. Child products inherit their parent's.
+        """
+        if self.is_child:
+            return self.parent.product_type
+        else:
+            return self.product_type
+    get_product_type.short_description = _("Product type")
+
+    def get_values(self):
+        return self.property_values.all()
+
+    def get_value_by_property(self, prop):
+        return self.get_values().get(prop=prop)
+
+    def get_all_properties(self):
+        return self.get_product_type().properties.all()
 
 
 class ProductImage(models.Model):
@@ -171,15 +282,13 @@ class ProductImage(models.Model):
 
 
 class ProductProperty(models.Model):
-    (TEXT, INTEGER, BOOLEAN, FLOAT, RICHTEXT, DATE, DATETIME) = (
-        "text", "integer", "boolean", "float", "richtext", "date", "datetime")
+    (TEXT, INTEGER, BOOLEAN, FLOAT, DATETIME) = (
+        "text", "integer", "boolean", "float", "datetime")
     TYPE_CHOICES = (
         (TEXT, _("Text")),
         (INTEGER, _("Integer")),
         (BOOLEAN, _("True / False")),
         (FLOAT, _("Float")),
-        (RICHTEXT, _("Rich Text")),
-        (DATE, _("Date")),
         (DATETIME, _("Datetime")),
     )
 
@@ -196,6 +305,56 @@ class ProductProperty(models.Model):
         verbose_name = _('Property')
         verbose_name_plural = _('Properties')
 
+    # def _save_value(self, value_obj, value):
+    #     if value is None or value == '':
+    #         value_obj.delete()
+    #         return
+    #     if value != value_obj.value:
+    #         value_obj.value = value
+    #         value_obj.save()
+    #
+    # def save_value(self, product, value):  # noqa: C901 too complex
+    #     ProductPropertyValue = get_model('products', 'ProductPropertyValue')
+    #     try:
+    #         value_obj = product.property_values.get(property=self)
+    #     except ProductPropertyValue.DoesNotExist:
+    #         # FileField uses False for announcing deletion of the file
+    #         # not creating a new value
+    #         if value is None or value == '':
+    #             return
+    #         value_obj = ProductPropertyValue.objects.create(
+    #             product=product, property=self)
+    #
+    #     self._save_value(value_obj, value)
+
+    def validate_value(self, value):
+        validator = getattr(self, '_validate_%s' % self.type)
+        validator(value)
+
+    def _validate_text(self, value):
+        if not isinstance(value, str):
+            raise ValidationError(_("Must be str"))
+
+    def _validate_float(self, value):
+        try:
+            float(value)
+        except ValueError:
+            raise ValidationError(_("Must be a float"))
+
+    def _validate_integer(self, value):
+        try:
+            int(value)
+        except ValueError:
+            raise ValidationError(_("Must be an integer"))
+
+    def _validate_datetime(self, value):
+        if not isinstance(value, datetime):
+            raise ValidationError(_("Must be a datetime"))
+
+    def _validate_boolean(self, value):
+        if not type(value) == bool:
+            raise ValidationError(_("Must be a boolean"))
+
 
 class ProductPropertyValue(models.Model):
     prop = models.ForeignKey('ProductProperty', on_delete=models.CASCADE, verbose_name=_('property'),
@@ -207,39 +366,26 @@ class ProductPropertyValue(models.Model):
     value_integer = models.IntegerField(_('Integer'), blank=True, null=True, db_index=True)
     value_boolean = models.NullBooleanField(_('Boolean'), blank=True, db_index=True)
     value_float = models.FloatField(_('Float'), blank=True, null=True, db_index=True)
-    value_richtext = models.TextField(_('Richtext'), blank=True, null=True)
-    value_date = models.DateField(_('Date'), blank=True, null=True, db_index=True)
     value_datetime = models.DateTimeField(_('DateTime'), blank=True, null=True, db_index=True)
-    value_file = models.FileField(upload_to='products/properties/files', max_length=255, blank=True, null=True,
-                                  verbose_name=_('file'))
-    value_image = models.ImageField(upload_to='products/properties/images', max_length=255, blank=True, null=True,
-                                    verbose_name=_('image'))
-
-    def _get_value(self):
-        value = getattr(self, 'value_%s' % self.prop.type)
-        if hasattr(value, 'all'):
-            value = value.all()
-        return value
-
-    def _set_value(self, new_value):
-        attr_name = 'value_%s' % self.prop.type
-
-        setattr(self, attr_name, new_value)
-        return
-
-    value = property(_get_value, _set_value)
 
     class Meta:
         unique_together = ('prop', 'product')
         verbose_name = _('Product property value')
         verbose_name_plural = _('Product property values')
 
-    def __str__(self):
-        return self.summary()
+    def _get_value(self):
+        return getattr(self, 'value_%s' % self.prop.type)
+
+    def _set_value(self, new_value):
+        attr_name = 'value_%s' % self.prop.type
+        setattr(self, attr_name, new_value)
+        return
+
+    value = property(_get_value, _set_value)
 
     def summary(self):
         """
-        Gets a string representation of both the property and it's value,
+        Gets a string representation of both the attribute and it's value,
         used e.g in product summaries.
         """
         return "%s: %s" % (self.prop.name, self.value_as_text)
@@ -247,12 +393,14 @@ class ProductPropertyValue(models.Model):
     @property
     def value_as_text(self):
         """
-        Returns a string representation of the attribute's value. To customise
-        e.g. image attribute values, declare a _image_as_text property and
-        return something appropriate.
+        Returns a string representation of the attribute's value.
         """
         property_name = '_%s_as_text' % self.prop.type
         return getattr(self, property_name, self.value)
+
+    def clean(self):
+        if self.prop.required and not self.product.is_child and not self.value:
+            raise ValidationError(_("Value {0} is required").format(self.prop.name))
 
 
 class ProductType(models.Model):
@@ -260,15 +408,13 @@ class ProductType(models.Model):
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
     name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(verbose_name=_('slug'))
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=False, null=False,
-                                 verbose_name=_('category'))
-    activity = models.BooleanField(default=True, verbose_name=_('activity'))
+    properties = models.ManyToManyField('ProductProperty', related_name='product_types', verbose_name=_('properties'))
 
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ['-activity', 'category', 'name']
+        ordering = ['name']
         verbose_name = _('Product type')
         verbose_name_plural = _('Product types')
 

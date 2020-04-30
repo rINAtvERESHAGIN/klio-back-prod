@@ -30,13 +30,22 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'received', 'get_user', 'get_email', 'status', 'get_delivery_type', 'get_delivery_price',
                     'is_paid', 'price', 'promo', 'promo_code', 'get_city', 'get_products']
     list_filter = ['status', 'is_paid', 'promo']
+    search_fields = ['user__first_name', 'user__last_name', 'user__middle_name', 'user__username', 'user__email']
 
     def get_user(self, obj):
-        return obj.user.__str__()
+        if obj.user:
+            return obj.user.__str__()
+        if obj.private_info:
+            return '{0} {1} (без регистрации)'.format(obj.private_info.last_name, obj.private_info.first_name)
+        return _('Anonymous')
     get_user.short_description = _('User')
 
     def get_email(self, obj):
-        return obj.user.email
+        if obj.user:
+            return obj.user.email
+        if obj.private_info:
+            return obj.private_info.email
+        return None
     get_email.short_description = _('User Email')
 
     def get_delivery_type(self, obj):

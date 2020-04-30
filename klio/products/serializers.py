@@ -63,28 +63,39 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductPropertySerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField()
+    units = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductProperty
         fields = ('id', 'name', 'units', 'value')
 
     def get_value(self, obj):
-        value_obj = obj.values.first()
-        field_name = 'value_' + obj.type
-        return getattr(value_obj, field_name)
+        own_value = obj.values.get(product_id=self.context.get('product_id')).value
+        if self.context.get('is_child') and not own_value:
+            return obj.values.get(product_id=self.context.get('parent_id')).value
+        return own_value
+
+    def get_units(self, obj):
+        if obj.units:
+            return obj.units.name
+        return None
 
 
 class ProductListSerializer(serializers.ModelSerializer):
+    base_amount = serializers.SerializerMethodField()
     category = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
-    special = serializers.SerializerMethodField()
     is_new = serializers.SerializerMethodField()
+    special = serializers.SerializerMethodField()
     units = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ('id', 'name', 'slug', 'category', 'image', 'in_stock', 'art', 'base_amount', 'units', 'price',
                   'wholesale_threshold', 'wholesale_price', 'is_new', 'special')
+
+    def get_base_amount(self, obj):
+        return obj.base_amount if obj.base_amount else obj.parent.base_amount
 
     def get_category(self, obj):
         return obj.category.slug if obj.category else 'no-category'
@@ -104,7 +115,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             special = special_relation.special
         # Else get special via category
         if not special:
-            special = Special.objects.filter(categories__in=[obj.category.id]).first()
+            if obj.category:
+                special = Special.objects.filter(categories__in=[obj.category.id]).first()
         # Or via tags
         if not special:
             tags_ids = [tag.id for tag in obj.tags.filter(activity=True)]
@@ -160,7 +172,7 @@ class ProductSerializer(serializers.ModelSerializer):
     units = serializers.SerializerMethodField()
     special = serializers.SerializerMethodField()
     tags = TagSerializer(many=True)
-    properties = ProductPropertySerializer(many=True)
+    properties = serializers.SerializerMethodField()
     recommended = ProductListSerializer(many=True)
 
     class Meta:
@@ -169,11 +181,20 @@ class ProductSerializer(serializers.ModelSerializer):
                   'in_stock', 'art', 'tags', 'base_amount', 'price', 'units', 'wholesale_threshold', 'wholesale_price',
                   'is_new', 'special', 'properties', 'recommended')
 
+    def get_base_amount(self, obj):
+        return obj.base_amount if obj.base_amount else obj.parent.base_amount
+
     def get_category(self, obj):
         if obj.category:
             return SubCategorySerializer(obj.category).data
         else:
             return None
+
+    def get_properties(self, obj):
+        self.context['product_id'] = obj.id
+        self.context['parent_id'] = obj.parent.id
+        self.context['is_child'] = obj.is_child
+        return ProductPropertySerializer(obj.properties.all(), many=True, context=self.context).data
 
     def get_special(self, obj):
         result = {}
@@ -185,7 +206,8 @@ class ProductSerializer(serializers.ModelSerializer):
             special = special_relation.special
         # Else get special via category
         if not special:
-            special = Special.objects.filter(categories__in=[obj.category.id]).first()
+            if obj.category:
+                special = Special.objects.filter(categories__in=[obj.category.id]).first()
         # Or via tags
         if not special:
             tags_ids = [tag.id for tag in obj.tags.filter(activity=True)]
