@@ -46,7 +46,8 @@ class CategoryProductListView(ListAPIView):
         sort_by = self.request.query_params.get('sortby')
         direction = self.request.query_params.get('direction')
 
-        queryset = Product.objects.filter(activity=True, category__slug=self.kwargs['slug']).order_by('name')
+        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD],
+                                          category__slug=self.kwargs['slug']).order_by('name')
         if sort_by == 'name':
             if direction == 'desc':
                 queryset = queryset.order_by('-name')
@@ -67,7 +68,8 @@ class FavoriteCreateView(CreateAPIView):
 
         favorite, _ = UserProduct.objects.get_or_create(user=self.request.user, product_id=product_id)
 
-        favorites = Product.objects.filter(activity=True, selected_by__user=self.request.user)
+        favorites = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD],
+                                           selected_by__user=self.request.user)
         serializer = self.serializer_class(favorites, many=True, context={'request': self.request})
         return Response(serializer.data)
 
@@ -82,7 +84,8 @@ class FavoriteDeleteView(DestroyAPIView):
         favorite = get_object_or_404(UserProduct, user=self.request.user, product_id=product_id)
         self.perform_destroy(favorite)
 
-        favorites = Product.objects.filter(activity=True, selected_by__user=self.request.user)
+        favorites = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD],
+                                           selected_by__user=self.request.user)
         serializer = self.serializer_class(favorites, many=True, context={'request': self.request})
         return Response(serializer.data)
 
@@ -92,27 +95,32 @@ class FavoriteListView(ListAPIView):
     serializer_class = ProductListSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.filter(activity=True, selected_by__user=self.request.user)
+        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD],
+                                          selected_by__user=self.request.user)
         return queryset
 
 
 class ProductDetailView(RetrieveAPIView):
     lookup_field = 'slug'
     serializer_class = ProductSerializer
-    queryset = Product.objects.filter(activity=True)
+    queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD])
 
 
 class ProductMainNewListView(ListAPIView):
     serializer_class = ProductListSerializer
     new_product_period = datetime.today() - timedelta(days=60)
     queryset = Product.objects.filter(
-        Q(activity=True, is_new='new') | Q(activity=True, is_new='calculated', created__gte=new_product_period)
+        Q(activity=True, is_new='new', kind__in=[Product.UNIQUE, Product.CHILD]) | Q(
+            activity=True, is_new='calculated', created__gte=new_product_period,
+            kind__in=[Product.UNIQUE, Product.CHILD]
+        )
     )[:20]
 
 
 class ProductMainSpecialListView(ListAPIView):
     serializer_class = ProductListSerializer
     queryset = Product.objects.filter(activity=True,
+                                      kind__in=[Product.UNIQUE, Product.CHILD],
                                       special_relations__special__activity=True,
                                       special_relations__on_main=True)[:20]
 
@@ -127,7 +135,7 @@ class SearchProductListView(ListAPIView):
         text = self.request.query_params.get('text')
         sort_by = self.request.query_params.get('sortby')
 
-        queryset = Product.objects.filter(activity=True).order_by('name')
+        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).order_by('name')
 
         if text:
             queryset = queryset.filter(
