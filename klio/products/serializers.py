@@ -192,7 +192,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_properties(self, obj):
         self.context['product_id'] = obj.id
-        self.context['parent_id'] = obj.parent.id
+        if obj.parent:
+            self.context['parent_id'] = obj.parent.id
         self.context['is_child'] = obj.is_child
         return ProductPropertySerializer(obj.properties.all(), many=True, context=self.context).data
 
