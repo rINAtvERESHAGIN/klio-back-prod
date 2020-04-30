@@ -175,8 +175,9 @@ class Product(models.Model):
 
     def clean(self):
         # General check
-        if self.in_stock < 0:
-            raise ValidationError(_('Amount in stock can not be negative.'))
+        if self.in_stock:
+            if self.in_stock < 0:
+                raise ValidationError(_('Amount in stock can not be negative.'))
         if self.price:
             if self.price < 0:
                 raise ValidationError(_('Product price can not be negative.'))
