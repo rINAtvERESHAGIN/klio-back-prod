@@ -189,6 +189,8 @@ class Product(models.Model):
             raise ValidationError(_('Unique product should not have a parent'))
         if not self.category:
             raise ValidationError(_('Unique product should contain a category'))
+        if not self.product_type:
+            raise ValidationError(_('Unique product should contain a product type'))
         if not self.art:
             raise ValidationError(_('Unique product should contain an article number'))
         if not self.price:
@@ -201,6 +203,8 @@ class Product(models.Model):
             raise ValidationError(_('Parent product should not have a parent'))
         if not self.category:
             raise ValidationError(_('Parent product should contain a category'))
+        if not self.product_type:
+            raise ValidationError(_('Parent product should contain a product type'))
         if self.art:
             raise ValidationError(_('Parent product should not have an article number'))
         if self.in_stock > 0:
