@@ -95,7 +95,7 @@ class ProductListSerializer(serializers.ModelSerializer):
                   'wholesale_threshold', 'wholesale_price', 'is_new', 'special')
 
     def get_base_amount(self, obj):
-        return obj.base_amount if obj.base_amount else obj.parent.base_amount
+        return obj.base_amount if obj.base_amount else obj.parent.base_amount if obj.parent else 1
 
     def get_category(self, obj):
         return obj.category.slug if obj.category else 'no-category'
@@ -182,7 +182,7 @@ class ProductSerializer(serializers.ModelSerializer):
                   'is_new', 'special', 'properties', 'recommended')
 
     def get_base_amount(self, obj):
-        return obj.base_amount if obj.base_amount else obj.parent.base_amount
+        return obj.base_amount if obj.base_amount else obj.parent.base_amount if obj.parent else 1
 
     def get_category(self, obj):
         if obj.category:
