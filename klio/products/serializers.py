@@ -213,6 +213,7 @@ class FilterListSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    base_amount = serializers.SerializerMethodField()
     category = serializers.SerializerMethodField()
     images = ProductImageSerializer(many=True)
     is_new = serializers.SerializerMethodField()
