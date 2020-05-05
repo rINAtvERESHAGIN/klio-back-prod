@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import generics
 
@@ -32,7 +33,20 @@ class SpecialProductListView(generics.ListAPIView):
     def get_queryset(self):
         sort_by = self.request.query_params.get('sortby')
         direction = self.request.query_params.get('direction')
-        queryset = Product.objects.filter(activity=True, specials__slug=self.kwargs['slug']).order_by('name')
+        special = Special.objects.filter(slug=self.kwargs['slug']).first()
+        special_tags_ids = [tag.id for tag in special.tags.filter(activity=True)]
+        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
+            Q(
+                specials__in=[special.id]
+            ) | Q(
+                category__in=special.categories.filter(activity=True)
+            ) | Q(
+                parent__category__in=special.categories.filter(activity=True)
+            ) | Q(
+                tags__in=special_tags_ids
+            )
+        ).distinct().order_by('name')
+
         if sort_by == 'name':
             if direction == 'desc':
                 queryset = queryset.order_by('-name')

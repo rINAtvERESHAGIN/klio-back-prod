@@ -1,3 +1,4 @@
+from django.db.models import Max, Min
 from django.utils.timezone import now, timedelta
 
 from rest_framework import serializers
@@ -95,10 +96,10 @@ class ProductListSerializer(serializers.ModelSerializer):
                   'wholesale_threshold', 'wholesale_price', 'is_new', 'special')
 
     def get_base_amount(self, obj):
-        return obj.base_amount if obj.base_amount else obj.parent.base_amount if obj.parent else 1
+        return obj.get_base_amount()
 
     def get_category(self, obj):
-        return obj.category.slug if obj.category else 'no-category'
+        return obj.get_category().slug if obj.get_category() else 'no-category'
 
     def get_image(self, obj):
         return ProductImageSerializer(instance=obj.images.filter().first(),
@@ -115,8 +116,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             special = special_relation.special
         # Else get special via category
         if not special:
-            if obj.category:
-                special = Special.objects.filter(categories__in=[obj.category.id]).first()
+            if obj.get_category():
+                special = Special.objects.filter(categories__in=[obj.get_category().id]).first()
         # Or via tags
         if not special:
             tags_ids = [tag.id for tag in obj.tags.filter(activity=True)]
@@ -146,8 +147,8 @@ class ProductListSerializer(serializers.ModelSerializer):
         return result
 
     def get_units(self, obj):
-        if obj.units:
-            return obj.units.name
+        if obj.get_units():
+            return obj.get_units().name
         return None
 
 
@@ -165,15 +166,61 @@ class BasketProductListSerializer(ProductListSerializer):
         return obj.in_basket.get(basket_id=self.context.get('basket_id')).quantity
 
 
+class FilterListSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+    options = serializers.SerializerMethodField()
+    min = serializers.SerializerMethodField()
+    max = serializers.SerializerMethodField()
+    units = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductProperty
+        fields = ('name', 'slug', 'type', 'units', 'value', 'options', 'min', 'max', 'interval')
+
+    def get_type(self, obj):
+        if obj.type in ['integer', 'float']:
+            return 'digit'
+        return obj.type
+
+    def get_options(self, obj):
+        if obj.type == 'text':
+            products_ids = self.context.get('products_ids')
+            return obj.values.filter(product__in=products_ids).values_list('value_text', flat=True)
+        return None
+
+    def get_min(self, obj):
+        if obj.type in ['integer', 'float']:
+            products_ids = self.context.get('products_ids')
+            return list(obj.values.filter(product__in=products_ids).aggregate(Min('value_%s' % obj.type)).values())[0]
+        return None
+
+    def get_max(self, obj):
+        if obj.type in ['integer', 'float']:
+            products_ids = self.context.get('products_ids')
+            return list(obj.values.filter(product__in=products_ids).aggregate(Max('value_%s' % obj.type)).values())[0]
+        return None
+
+    def get_value(self, obj):
+        if self.get_min(obj) and self.get_max(obj):
+            return [self.get_min(obj), self.get_max(obj)]
+        return None
+
+    def get_units(self, obj):
+        if obj.units:
+            return obj.units.name
+        return None
+
+
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     images = ProductImageSerializer(many=True)
     is_new = serializers.SerializerMethodField()
-    units = serializers.SerializerMethodField()
+    properties = serializers.SerializerMethodField()
+    recommended = serializers.SerializerMethodField()
     special = serializers.SerializerMethodField()
     tags = TagSerializer(many=True)
-    properties = serializers.SerializerMethodField()
-    recommended = ProductListSerializer(many=True)
+    units = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -182,13 +229,22 @@ class ProductSerializer(serializers.ModelSerializer):
                   'is_new', 'special', 'properties', 'recommended')
 
     def get_base_amount(self, obj):
-        return obj.base_amount if obj.base_amount else obj.parent.base_amount if obj.parent else 1
+        return obj.get_base_amount()
 
     def get_category(self, obj):
-        if obj.category:
-            return SubCategorySerializer(obj.category).data
+        if obj.get_category():
+            return SubCategorySerializer(obj.get_category()).data
         else:
             return None
+
+    def get_is_new(self, obj):
+        result = None
+        if obj.is_new == 'new':
+            result = True
+        if obj.is_new == 'calculated':
+            if obj.created > now() - timedelta(days=60):
+                result = True
+        return result
 
     def get_properties(self, obj):
         self.context['product_id'] = obj.id
@@ -196,6 +252,10 @@ class ProductSerializer(serializers.ModelSerializer):
             self.context['parent_id'] = obj.parent.id
         self.context['is_child'] = obj.is_child
         return ProductPropertySerializer(obj.properties.all(), many=True, context=self.context).data
+
+    def get_recommended(self, obj):
+        return ProductListSerializer(obj.recommended.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]),
+                                     many=True, context=self.context).data
 
     def get_special(self, obj):
         result = {}
@@ -207,8 +267,8 @@ class ProductSerializer(serializers.ModelSerializer):
             special = special_relation.special
         # Else get special via category
         if not special:
-            if obj.category:
-                special = Special.objects.filter(categories__in=[obj.category.id]).first()
+            if obj.get_category():
+                special = Special.objects.filter(categories__in=[obj.get_category().id]).first()
         # Or via tags
         if not special:
             tags_ids = [tag.id for tag in obj.tags.filter(activity=True)]
@@ -228,16 +288,7 @@ class ProductSerializer(serializers.ModelSerializer):
             return result
         return None
 
-    def get_is_new(self, obj):
-        result = None
-        if obj.is_new == 'new':
-            result = True
-        if obj.is_new == 'calculated':
-            if obj.created > now() - timedelta(days=60):
-                result = True
-        return result
-
     def get_units(self, obj):
-        if obj.units:
-            return obj.units.name
+        if obj.get_units():
+            return obj.get_units().name
         return None

@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
+from products.models import Product
 from products.serializers import BasketProductListSerializer
 from .models import Basket, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPrivateInfo
 
@@ -17,8 +18,10 @@ class BasketDetailSerializer(serializers.ModelSerializer):
 
     def get_products(self, obj):
         self.context['basket_id'] = obj.id
-        return BasketProductListSerializer(obj.products.filter(activity=True), many=True,
-                                           read_only=True, context=self.context).data
+        return BasketProductListSerializer(
+            obj.products.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]),
+            many=True, read_only=True, context=self.context
+        ).data
 
 
 class OrderDeliveryInfoSerializer(serializers.ModelSerializer):
