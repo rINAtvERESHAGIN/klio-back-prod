@@ -186,7 +186,7 @@ class FilterListSerializer(serializers.ModelSerializer):
     def get_options(self, obj):
         if obj.type == 'text':
             products_ids = self.context.get('products_ids')
-            return obj.values.filter(product__in=products_ids, null=False)\
+            return obj.values.filter(product__in=products_ids, value_text__isnull=False)\
                              .distinct()\
                              .values_list('value_text', flat=True)
         return None
