@@ -42,8 +42,9 @@ class CategoryFilterListView(ListAPIView):
     serializer_class = FilterListSerializer
 
     def get_products_ids(self):
-        products_ids = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD],
-                                              category__slug=self.kwargs['slug']).values_list('id', flat=True)
+        products_ids = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
+            Q(category__slug=self.kwargs['slug']) | Q(parent__category__slug=self.kwargs['slug'])
+        ).values_list('id', flat=True)
         return products_ids
 
     def get_queryset(self):
