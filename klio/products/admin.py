@@ -83,14 +83,9 @@ class ProductAdmin(admin.ModelAdmin):
     get_type.admin_order_field = 'product_type__name'
 
 
-class ProductAttrAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'order', 'activity']
-    list_editable = ['activity']
-
-
 class ProductPropertyAdmin(admin.ModelAdmin):
     search_fields = ['name']
-    list_display = ['__str__', 'type', 'units']
+    list_display = ['__str__', 'slug', 'type', 'units', 'interval', 'required']
 
 
 class ProductTypeAdmin(admin.ModelAdmin):

@@ -329,8 +329,9 @@ class ProductProperty(models.Model):
         # (DATETIME, _("Datetime")),
     )
 
-    name = models.CharField(max_length=128, blank=False, null=False, verbose_name=_('name'))
-    slug = models.SlugField(max_length=128, blank=False, verbose_name=_('slug'))
+    name = models.CharField(max_length=128, blank=False, null=False, unique=True, verbose_name=_('name'))
+    slug = models.SlugField(max_length=128, blank=False, null=False, unique=True, verbose_name=_('slug'),
+                            help_text=_('Slug is used for filtration purposes. Use only symbols [a-z,0-9,-]'))
     type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=20, verbose_name=_("type"))
     units = models.ForeignKey('Unit', on_delete=models.SET_NULL, null=True, blank=True, related_name='properties',
                               verbose_name=_('units'))
@@ -346,6 +347,12 @@ class ProductProperty(models.Model):
     class Meta:
         verbose_name = _('Property')
         verbose_name_plural = _('Properties')
+
+    def clean(self):
+        if self.type in ['integer', 'float'] and not self.interval:
+            raise ValidationError(_('Integer and float properties should have interval.'))
+        if '_' in self.slug:
+            raise ValidationError(_('Slug can not contain _ symbol.'))
 
     def validate_value(self, value):
         validator = getattr(self, '_validate_%s' % self.type)
