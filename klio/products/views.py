@@ -69,8 +69,9 @@ class CategoryProductListView(ListAPIView):
             query_dict.pop(k, None)
         prop_filters = query_dict
 
-        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD],
-                                          category__slug=self.kwargs['slug']).order_by('name')
+        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
+            Q(category__slug=self.kwargs['slug']) | Q(parent__category__slug=self.kwargs['slug'])
+        ).order_by('name')
 
         # Filtering block
         if in_stock:
