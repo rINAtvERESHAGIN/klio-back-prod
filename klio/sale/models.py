@@ -59,6 +59,15 @@ class Special(models.Model):
         if self.start_date and self.deadline and self.start_date >= self.deadline:
             raise ValidationError(_("Deadline must be more than start date"))
 
+    def save(self, *args, **kwargs):
+        if not self.meta_title:
+            self.meta_title = self.name
+        if not self.meta_description:
+            self.meta_description = self.name
+        if not self.meta_keywords:
+            self.meta_keywords = ', '.join(self.name.split())
+        super(Special, self).save(*args, **kwargs)
+
 
 class SpecialProduct(models.Model):
     special = models.ForeignKey('Special', on_delete=models.CASCADE, blank=False, null=False,

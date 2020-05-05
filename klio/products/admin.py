@@ -45,7 +45,7 @@ class SpecialProductInline(admin.TabularInline):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'kind', 'category', 'art', 'in_stock', 'price', 'order', 'modified',
+    list_display = ['__str__', 'kind', 'get_type', 'get_category', 'art', 'in_stock', 'price', 'order', 'modified',
                     'activity']
     list_editable = ['in_stock', 'price', 'order', 'activity']
     search_fields = ['name', 'art']
@@ -69,6 +69,18 @@ class ProductAdmin(admin.ModelAdmin):
         if obj:
             form.base_fields['recommended'].queryset = Product.objects.exclude(id__exact=obj.id)
         return form
+
+    def get_category(self, obj):
+        return obj.get_category()
+
+    get_category.short_description = 'Category'
+    get_category.admin_order_field = 'category__name'
+
+    def get_type(self, obj):
+        return obj.get_product_type()
+
+    get_type.short_description = 'Product Type'
+    get_type.admin_order_field = 'product_type__name'
 
 
 class ProductAttrAdmin(admin.ModelAdmin):

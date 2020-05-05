@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
+from products.models import Product
 from .models import Basket, BasketProduct, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPrivateInfo, PromoCode
 from .serializers import (BasketDetailSerializer, OrderDeliveryInfoSerializer, OrderDetailSerializer,
                           OrderDetailShortSerializer, OrderListSerializer, OrderPaymentInfoSerializer,
@@ -198,12 +199,14 @@ class OrderActiveUpdateView(UpdateAPIView):
             return promo
 
         def get_promo_basket_products(order_obj, promo_obj):
-            promo_products = order_obj.basket.inside.filter(Q(
-                product__activity=True, product__in=promo_obj.products.values_list('id', flat=True)
+            promo_products = order_obj.basket.inside.filter(
+                product__activity=True, product__kind__in=[Product.UNIQUE, Product.CHILD]
+            ).filter(Q(
+                product__in=promo_obj.products.values_list('id', flat=True)
             ) | Q(
-                product__activity=True, product__category__in=promo_obj.categories.values_list('id', flat=True)
+                product__category__in=promo_obj.categories.values_list('id', flat=True)
             ) | Q(
-                product__activity=True, product__tags__in=promo_obj.tags.values_list('id', flat=True)
+                product__tags__in=promo_obj.tags.values_list('id', flat=True)
             )
             ).distinct()
             return promo_products

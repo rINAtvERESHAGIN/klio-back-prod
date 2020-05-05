@@ -14,9 +14,12 @@ User = get_user_model()
 class Article(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
-    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
-    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
-    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'),
+                                  help_text=_('Leave blank to fill automatically with name.'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'),
+                                        help_text=_('Leave blank to fill automatically with name.'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'),
+                                     help_text=_('Leave blank to fill automatically with words taken from name.'))
     date = models.DateTimeField(help_text=_('Date to be shown in article.'), verbose_name=_('published'))
     start_date = models.DateTimeField(blank=True, null=True,
                                       help_text=_("""Date to make article visible on site.
@@ -47,6 +50,15 @@ class Article(models.Model):
     def clean(self):
         if self.start_date and self.deadline and self.start_date >= self.deadline:
             raise ValidationError(_("Deadline must be more than start date"))
+
+    def save(self, *args, **kwargs):
+        if not self.meta_title:
+            self.meta_title = self.title
+        if not self.meta_description:
+            self.meta_description = self.title
+        if not self.meta_keywords:
+            self.meta_keywords = ', '.join(self.title.split())
+        super(Article, self).save(*args, **kwargs)
 
 
 class Banner(models.Model):
@@ -183,19 +195,15 @@ class MenuItem(models.Model):
         return self.name
 
 
-# TODO: Add meta info to all objects.
-# class MetaMixin(models.AbstractModel):
-#     meta_title = models.CharField()
-#     meta_desc = models.CharField()
-#     meta_keywords = models.CharField()
-
-
 class News(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
-    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
-    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
-    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'),
+                                  help_text=_('Leave blank to fill automatically with name.'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'),
+                                        help_text=_('Leave blank to fill automatically with name.'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'),
+                                     help_text=_('Leave blank to fill automatically with words taken from name.'))
     date = models.DateTimeField(help_text=_('Date to be shown in news.'), verbose_name=_('date'))
     start_date = models.DateTimeField(blank=True, null=True,
                                       help_text=_("""Date to make news visible on site.
@@ -227,13 +235,25 @@ class News(models.Model):
         if self.start_date and self.deadline and self.start_date >= self.deadline:
             raise ValidationError(_("Deadline must be more than start date"))
 
+    def save(self, *args, **kwargs):
+        if not self.meta_title:
+            self.meta_title = self.title
+        if not self.meta_description:
+            self.meta_description = self.title
+        if not self.meta_keywords:
+            self.meta_keywords = ', '.join(self.title.split())
+        super(News, self).save(*args, **kwargs)
+
 
 class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
-    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'))
-    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'))
-    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'))
+    meta_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('meta title'),
+                                  help_text=_('Leave blank to fill automatically with name.'))
+    meta_description = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('meta description'),
+                                        help_text=_('Leave blank to fill automatically with name.'))
+    meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'),
+                                     help_text=_('Leave blank to fill automatically with words taken from name.'))
     name = models.CharField(max_length=32, blank=False, null=False, verbose_name=_('name'))
     slug = models.SlugField(verbose_name=_('slug'))
     content = RichTextUploadingField(verbose_name=_('content'))
@@ -246,6 +266,15 @@ class Page(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.meta_title:
+            self.meta_title = self.name
+        if not self.meta_description:
+            self.meta_description = self.name
+        if not self.meta_keywords:
+            self.meta_keywords = ', '.join(self.name.split())
+        super(Page, self).save(*args, **kwargs)
 
 
 class SubscriberInfo(models.Model):
