@@ -86,6 +86,7 @@ class ProductAdmin(admin.ModelAdmin):
 class ProductPropertyAdmin(admin.ModelAdmin):
     search_fields = ['name']
     list_display = ['__str__', 'slug', 'type', 'units', 'interval', 'required']
+    prepopulated_fields = {"slug": ("name",)}
 
 
 class ProductTypeAdmin(admin.ModelAdmin):
