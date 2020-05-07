@@ -1,4 +1,5 @@
 from collections import namedtuple
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.mail import EmailMessage
 from django.db.models import Q
 from django.template.loader import render_to_string
@@ -102,18 +103,33 @@ class SearchListView(ViewSet):
         news = News.objects.filter(activity=True)
 
         if text:
-            categories = categories.filter(
-                name__search=text
-            )
-            products = products.filter(
-                Q(name__search=text) | Q(art__icontains=text) | Q(category__name__search=text),
-            )
-            articles = articles.filter(
-                Q(title__search=text) | Q(tags__name__search=text) | Q(content__search=text),
-            )
-            news = news.filter(
-                Q(title__search=text) | Q(tags__name__search=text) | Q(content__search=text),
-            )
+            categories = categories.annotate(
+                similarity=TrigramSimilarity('name', text)
+            ).filter(
+                similarity__gt=0.1
+            ).order_by('-similarity')
+
+            products = products.annotate(
+                similarity=TrigramSimilarity('name', text),
+                similarity_art=TrigramSimilarity('art', text),
+                similarity_cat=TrigramSimilarity('category__name', text)
+            ).filter(
+                Q(similarity__gt=0.1) | Q(similarity_art__gt=0.1) | Q(similarity_cat__gt=0.1)
+            ).order_by('-similarity')
+
+            articles = articles.annotate(
+                similarity=TrigramSimilarity('title', text),
+                similarity_cont=TrigramSimilarity('content', text),
+            ).filter(
+                Q(similarity__gt=0.1) | Q(similarity_cont__gt=0.1)
+            ).order_by('-similarity')
+
+            news = news.annotate(
+                similarity=TrigramSimilarity('title', text),
+                similarity_cont=TrigramSimilarity('content', text),
+            ).filter(
+                Q(similarity__gt=0.1) | Q(similarity_cont__gt=0.1)
+            ).order_by('-similarity')
 
         if tags:
             tags_list = tags.split(',')
@@ -134,11 +150,16 @@ class SearchListView(ViewSet):
 
         if obj_type:
             if obj_type == 'categories':
-                categories = categories.order_by('-name') if direction == 'desc' else categories.order_by('name')
+                if sort_by == 'name':
+                    if direction == 'asc':
+                        categories = categories.order_by('name')
+                    if direction == 'desc':
+                        categories = categories.order_by('-name')
                 search_data = self.SearchData(categories=categories, products=None, articles=None, news=None)
             if obj_type == 'products':
-                products = products.order_by('name')
                 if sort_by == 'name':
+                    if direction == 'asc':
+                        products = categories.order_by('name')
                     if direction == 'desc':
                         products = products.order_by('-name')
                 if sort_by == 'price':
@@ -148,12 +169,18 @@ class SearchListView(ViewSet):
                         products = products.order_by('price')
                 search_data = self.SearchData(categories=None, products=products, articles=None, news=None)
             if obj_type == 'articles':
-                articles = (articles.order_by('-title') if sort_by == 'title' and direction == 'desc'
-                            else articles.order_by('title'))
+                if sort_by == 'title':
+                    if direction == 'acs':
+                        articles = articles.order_by('title')
+                    if direction == 'desc':
+                        articles = articles.order_by('-title')
                 search_data = self.SearchData(categories=None, products=None, articles=articles, news=None)
             if obj_type == 'news':
-                news = (news.order_by('-title') if sort_by == 'title' and direction == 'desc'
-                        else news.order_by('title'))
+                if sort_by == 'title':
+                    if direction == 'acs':
+                        news = news.order_by('title')
+                    if direction == 'desc':
+                        news = news.order_by('-title')
                 search_data = self.SearchData(categories=None, products=None, articles=None, news=news)
 
         serializer = SearchDataSerializer(search_data, context={'request': request},
