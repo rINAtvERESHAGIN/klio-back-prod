@@ -1,6 +1,7 @@
 from collections import namedtuple
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.mail import EmailMessage
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -111,7 +112,7 @@ class SearchListView(ViewSet):
             products = products.annotate(
                 similarity=TrigramSimilarity('name', text)
             ).filter(
-                similarity__gt=0.1, art__icontains=text
+                Q(similarity__gt=0.1) | Q(art__icontains=text)
             ).order_by('-similarity')
 
             articles = articles.annotate(
