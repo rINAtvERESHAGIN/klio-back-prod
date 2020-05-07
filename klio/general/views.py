@@ -97,22 +97,22 @@ class SearchListView(ViewSet):
         direction = self.request.query_params.get('direction')
 
         categories = Category.objects.filter(activity=True)
-        products = Product.objects.filter(activity=True)
+        products = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD])
         articles = Article.objects.filter(activity=True)
         news = News.objects.filter(activity=True)
 
         if text:
             categories = categories.filter(
-                name__icontains=text
+                name__search=text
             )
             products = products.filter(
-                Q(name__icontains=text) | Q(art__icontains=text) | Q(category__name__icontains=text),
+                Q(name__search=text) | Q(art__icontains=text) | Q(category__name__search=text),
             )
             articles = articles.filter(
-                Q(title__icontains=text) | Q(tags__name__icontains=text) | Q(content__icontains=text),
+                Q(title__search=text) | Q(tags__name__search=text) | Q(content__search=text),
             )
             news = news.filter(
-                Q(title__icontains=text) | Q(tags__name__icontains=text) | Q(content__icontains=text),
+                Q(title__search=text) | Q(tags__name__search=text) | Q(content__search=text),
             )
 
         if tags:
