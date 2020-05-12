@@ -91,17 +91,17 @@ class MenuItemListSerializer(serializers.ModelSerializer):
         if obj.related_type == 'root':
             return obj.slug
         if obj.related_type == 'category':
-            return '/catalog/categories/' + obj.slug
+            return 'catalog/categories/' + obj.slug
         if obj.related_type == 'products':
-            return '/catalog/categories/' + obj.slug + '/products'
+            return 'catalog/categories/' + obj.slug + '/products'
         if obj.related_type == 'page':
-            return '/info/' + obj.slug
+            return 'info/' + obj.slug
         if obj.related_type == 'article':
-            return '/articles/' + obj.slug
+            return 'articles/' + obj.slug
         if obj.related_type == 'news':
-            return '/news/' + obj.slug
+            return 'news/' + obj.slug
         if obj.related_type == 'special':
-            return '/specials/' + obj.slug
+            return 'specials/' + obj.slug
         if obj.related_type == 'external':
             return obj.link
 
