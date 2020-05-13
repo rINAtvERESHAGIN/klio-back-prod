@@ -155,7 +155,7 @@ class SearchListView(ViewSet):
             if obj_type == 'products':
                 if sort_by == 'name':
                     if direction == 'asc':
-                        products = categories.order_by('name')
+                        products = products.order_by('name')
                     if direction == 'desc':
                         products = products.order_by('-name')
                 if sort_by == 'price':
