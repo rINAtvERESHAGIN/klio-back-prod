@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -193,21 +194,28 @@ class SearchProductListView(ListAPIView):
         queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).order_by('name')
 
         if text:
-            queryset = queryset.filter(
-                Q(
-                    name__icontains=text
-                ) | Q(
-                    art__icontains=text
-                ) | Q(
-                    category__name__icontains=text
-                ) | Q(
-                    parent__category__name__icontains=text
-                ),
-            )
+            queryset = queryset.annotate(
+                similarity=TrigramSimilarity('name', text)
+            ).filter(
+                Q(similarity__gt=0.1) | Q(art__icontains=text)
+            ).order_by('-similarity')
+            # queryset = queryset.filter(
+            #     Q(
+            #         name__icontains=text
+            #     ) | Q(
+            #         art__icontains=text
+            #     ) | Q(
+            #         category__name__icontains=text
+            #     ) | Q(
+            #         parent__category__name__icontains=text
+            #     ),
+            # )
         if tags:
             tags_list = tags.split(',')
             queryset = queryset.filter(tags__name__in=tags_list)
         if sort_by == 'name':
+            if direction == 'asc':
+                queryset = queryset.order_by('name')
             if direction == 'desc':
                 queryset = queryset.order_by('-name')
         if sort_by == 'price':
