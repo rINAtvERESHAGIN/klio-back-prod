@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
+from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 
-from .models import Article, Banner, CallbackInfo, Menu, MenuItem, News, Page, SubscriberInfo
+from .models import Article, Banner, CallbackInfo, Menu, MenuItem, News, Page, SiteSettings, SubscriberInfo
 
 
 admin.site.site_header = _('Klio Site Administration')
@@ -65,6 +67,14 @@ class PageAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
 
+class SiteSettingsInline(admin.StackedInline):
+    model = SiteSettings
+
+
+class SiteAdmin(BaseSiteAdmin):
+    inlines = (SiteSettingsInline,)
+
+
 class SubscriberInfoAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'date', 'email']
 
@@ -76,4 +86,6 @@ admin.site.register(Menu, MenuAdmin)
 admin.site.register(MenuItem, MenuItemAdmin)
 admin.site.register(News, NewsAdmin)
 admin.site.register(Page, PageAdmin)
+admin.site.unregister(Site)
+admin.site.register(Site, SiteAdmin)
 admin.site.register(SubscriberInfo, SubscriberInfoAdmin)

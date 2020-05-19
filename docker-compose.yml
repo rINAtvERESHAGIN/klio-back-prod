@@ -23,6 +23,7 @@ services:
     volumes:
       - ./klio:/src
       - ./static:/static
+      - ./media:/media
     expose:
       - "8000"
     links:
