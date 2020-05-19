@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -275,6 +276,28 @@ class Page(models.Model):
         if not self.meta_keywords:
             self.meta_keywords = ', '.join(self.name.split())
         super(Page, self).save(*args, **kwargs)
+
+
+class SiteSettings(models.Model):
+    site = models.OneToOneField(Site, on_delete=models.CASCADE, null=False, related_name='additional_info')
+    description = RichTextUploadingField(blank=True, verbose_name=_('description'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
+
+    class Meta:
+        unique_together = ('site', 'description')
+        verbose_name = _('Site settings')
+        verbose_name_plural = _('Site settings')
+
+    def __str__(self):
+        return 'Дополнительная информация по сайту #{0}'.format(self.id)
+
+    def save(self, *args, **kwargs):
+        if self.activity:
+            current_settings = SiteSettings.objects.filter(activity=True).first()
+            if current_settings:
+                current_settings.activity = False
+                current_settings.save()
+        super(SiteSettings, self).save(*args, **kwargs)
 
 
 class SubscriberInfo(models.Model):

@@ -1,10 +1,30 @@
+import csv
+from decimal import Decimal
+
 from django.contrib import admin
 from django.db import models
-from django.forms import Textarea
+from django.forms import FileField, Form, Textarea
+from django.shortcuts import redirect, render
+from django.urls import path
+
+from slugify import slugify
 
 from sale.models import SpecialProduct
 from .models import (Brand, Category, Product, ProductImage, ProductProperty, ProductPropertyValue,
                      ProductType, Unit)
+
+CYRILLIC = [
+    (u'ё', u'yo'),
+    (u'Ё', u'yo'),
+    (u'я', u'ya'),
+    (u'Я', u'ya'),
+    (u'х', u'h'),
+    (u'Х', u'h'),
+    (u'щ', u'sh'),
+    (u'Щ', u'sh'),
+    (u'ю', u'yu'),
+    (u'Ю', u'yu'),
+]
 
 
 class BrandAdmin(admin.ModelAdmin):
@@ -16,6 +36,7 @@ class BrandAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'get_parent', 'group', 'order', 'on_main', 'activity']
+    list_per_page = 50
     list_editable = ['order', 'on_main', 'activity']
     search_fields = ['name']
     list_filter = ['on_main', 'activity']
@@ -44,9 +65,14 @@ class SpecialProductInline(admin.TabularInline):
     model = SpecialProduct
 
 
+class CsvImportForm(Form):
+    csv_file = FileField()
+
+
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'kind', 'get_type', 'get_category', 'art', 'in_stock', 'price', 'order', 'modified',
                     'activity']
+    list_per_page = 25
     list_editable = ['in_stock', 'price', 'order', 'activity']
     search_fields = ['name', 'art']
     list_filter = ['kind', 'product_type', 'activity']
@@ -58,11 +84,64 @@ class ProductAdmin(admin.ModelAdmin):
         SpecialProductInline,
     ]
     save_on_top = True
+    change_list_template = "products_changelist.html"
 
     class Media:
         css = {
             'all': ('../static/css/style.css',)
         }
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path('import-csv/', self.import_csv),
+        ]
+        return my_urls + urls
+
+    def import_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
+            for row in csv_data:
+                categories_str, name, art, price, images_str = row
+
+                categories_names = categories_str.split(',')
+                parent_category = None
+                for category_name in categories_names:
+                    category_slug = slugify(category_name, replacements=CYRILLIC)
+                    category = Category.objects.filter(slug=category_slug).first()
+                    if not category:
+                        category = Category.objects.create(
+                            name=category_name, slug=category_slug, parent=parent_category
+                        )
+                    parent_category = category
+
+                product = Product.objects.filter(art=art).first()
+                if product:
+                    product.category = parent_category
+                    product.name = name
+                    product.price = Decimal(price.replace(" ", ""))
+                    product.save()
+
+                else:
+                    product = Product.objects.create(name=name, slug=slugify(name, replacements=CYRILLIC),
+                                                     category=parent_category, kind=Product.UNIQUE, art=art,
+                                                     price=Decimal(price.replace(" ", "")))
+
+                images_names = images_str.split(',')
+                for index, image_name in enumerate(images_names):
+                    prod_img, _ = ProductImage.objects.get_or_create(product=product,
+                                                                     img='products/{0}'.format(image_name))
+                    prod_img.label = '{0} - Изображение #{1}'.format(product.name, index + 1)
+                    prod_img.save()
+
+            self.message_user(request, "CSV файл был успешно загружен.")
+            return redirect("..")
+        form = CsvImportForm()
+        payload = {"form": form}
+        return render(
+            request, "csv_form.html", payload
+        )
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ProductAdmin, self).get_form(request, obj, **kwargs)

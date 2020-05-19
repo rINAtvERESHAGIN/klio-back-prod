@@ -44,7 +44,7 @@ class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children',
                                verbose_name=_('parent'))
     group = models.PositiveIntegerField(default=0, null=True, editable=False, verbose_name=_('group'))
-    img = models.ImageField(verbose_name=_('image'), upload_to='categories')
+    img = models.ImageField(blank=True, verbose_name=_('image'), upload_to='categories')
     description = RichTextField(blank=True, verbose_name=_('description'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
     on_main = models.BooleanField(default=False, verbose_name=_('on main'))
@@ -301,14 +301,16 @@ class Product(models.Model):
         return 0
 
     def get_all_properties(self):
-        return self.get_product_type().properties.all()
+        if self.get_product_type():
+            return self.get_product_type().properties.all()
+        return []
 
 
 class ProductImage(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False, related_name='images',
                                 verbose_name=_('product'))
     img = models.ImageField(verbose_name=_('image'), upload_to='products')
-    label = models.CharField(max_length=64, blank=True, verbose_name=_('label'))
+    label = models.CharField(max_length=128, blank=True, verbose_name=_('label'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 

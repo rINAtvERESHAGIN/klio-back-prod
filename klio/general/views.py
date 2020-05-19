@@ -2,22 +2,23 @@ from collections import namedtuple
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.mail import EmailMessage
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cities_light.models import City
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.viewsets import ViewSet
 
 from products.models import Category, Product
-from .models import Article, Banner, Menu, News, Page
+from .models import Article, Banner, Menu, News, Page, SiteSettings
 from .serializers import (ArticleDetailSerializer, ArticleListSerializer, BannerDetailSerializer,
                           BannerListSerializer, CityListSerializer, MenuListSerializer, NewsDetailSerializer,
-                          NewsListSerializer, PageDetailSerializer, SearchDataSerializer,
+                          NewsListSerializer, PageDetailSerializer, SearchDataSerializer, SiteDetailSerializer,
                           SubscriberInfoDetailSerializer)
 
 
@@ -183,6 +184,16 @@ class SearchListView(ViewSet):
                                           counts={'categories': categories_count, 'products': products_count,
                                                   'articles': articles_count, 'news': news_count})
         return Response(serializer.data)
+
+
+class SettingsDetailView(RetrieveAPIView):
+    serializer_class = SiteDetailSerializer
+    queryset = SiteSettings.objects.all()
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, activity=True)
+        return obj
 
 
 class SuscriberInfoCreateView(CreateAPIView):

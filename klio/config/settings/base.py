@@ -75,7 +75,11 @@ class Base(Configuration):
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [join(BASE_DIR, 'auth/templates'), join(BASE_DIR, 'general/templates')],
+            'DIRS': [
+                join(BASE_DIR, 'auth/templates'),
+                join(BASE_DIR, 'general/templates'),
+                join(BASE_DIR, 'products/templates')
+            ],
             'APP_DIRS': values.BooleanValue(True),
             'OPTIONS': {
                 'context_processors': [

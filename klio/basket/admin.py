@@ -17,6 +17,7 @@ class BasketProductInline(admin.TabularInline):
 
 class BasketAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'created', 'get_user', 'is_active']
+    list_per_page = 50
     inlines = [
         BasketProductInline,
     ]
@@ -29,6 +30,7 @@ class BasketAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'received', 'get_user', 'get_email', 'status', 'get_delivery_type', 'get_delivery_price',
                     'is_paid', 'price', 'promo', 'promo_code', 'get_city', 'get_products']
+    list_per_page = 25
     list_filter = ['status', 'is_paid', 'promo']
     search_fields = ['user__first_name', 'user__last_name', 'user__middle_name', 'user__username', 'user__email']
 

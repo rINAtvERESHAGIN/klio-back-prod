@@ -1,7 +1,8 @@
 from django.urls import path
 
 from .views import (ArticleDetailView, ArticleListView, BannerDetailView, BannerListView, CityListView,
-                    MenuListView, NewsDetailView, NewsListView, PageDetailView, SuscriberInfoCreateView)
+                    MenuListView, NewsDetailView, NewsListView, PageDetailView, SettingsDetailView,
+                    SuscriberInfoCreateView)
 
 
 urlpatterns = [
@@ -14,5 +15,6 @@ urlpatterns = [
     path('news/list', NewsListView.as_view()),
     path('news/<str:slug>/detail', NewsDetailView.as_view()),
     path('pages/<str:slug>/detail', PageDetailView.as_view()),
+    path('settings/detail', SettingsDetailView.as_view()),
     path('subscribe', SuscriberInfoCreateView.as_view()),
 ]
