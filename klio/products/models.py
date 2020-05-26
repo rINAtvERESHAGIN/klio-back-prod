@@ -39,8 +39,8 @@ class Category(models.Model):
                                         help_text=_('Leave blank to fill automatically with name.'))
     meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'),
                                      help_text=_('Leave blank to fill automatically with words taken from name.'))
-    name = models.CharField(max_length=64, blank=False, null=False, verbose_name=_('name'))
-    slug = models.SlugField(verbose_name=_('slug'))
+    name = models.CharField(max_length=128, blank=False, null=False, verbose_name=_('name'))
+    slug = models.SlugField(max_length=128, verbose_name=_('slug'))
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children',
                                verbose_name=_('parent'))
     group = models.PositiveIntegerField(default=0, null=True, editable=False, verbose_name=_('group'))
