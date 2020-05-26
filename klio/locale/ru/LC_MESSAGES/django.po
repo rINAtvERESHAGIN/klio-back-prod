@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the KLIO package.
+# CHEM1ST <PYTHONCHEM1ST@GMAIL.COM>, 2020.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-25 04:12+0300\n"
+"POT-Creation-Date: 2020-05-26 04:42+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -185,10 +185,8 @@ msgid "Delivery"
 msgstr "Доставка"
 
 #: basket/admin.py:63
-#, fuzzy
-#| msgid "Delivery"
 msgid "Delivery price"
-msgstr "Доставка"
+msgstr "Стоимость доставки"
 
 #: basket/admin.py:75 products/models.py:184
 msgid "Products"
@@ -501,10 +499,8 @@ msgid "deadline"
 msgstr "дата окончания"
 
 #: basket/models.py:207
-#, fuzzy
-#| msgid "products"
 msgid "For all products"
-msgstr "товары"
+msgstr "Для всех товаров"
 
 #: basket/models.py:208 sale/models.py:42
 #, fuzzy
@@ -903,7 +899,7 @@ msgstr ""
 msgid "Root object"
 msgstr "Базовый объект"
 
-#: general/models.py:157 products/models.py:55
+#: general/models.py:157 products/admin.py:157 products/models.py:55
 msgid "Category"
 msgstr "Категория"
 
@@ -1051,6 +1047,16 @@ msgstr "Подписка"
 #: general/views.py:224
 msgid "Your Request Received!"
 msgstr "Ваш запрос получен!"
+
+#: products/admin.py:140
+msgid "CSV file was successfully uploaded."
+msgstr "СSV файл успешно загружен."
+
+#: products/admin.py:163
+#, fuzzy
+#| msgid "Product type"
+msgid "Product Type"
+msgstr "Тип товара"
 
 #: products/apps.py:7
 msgid "Products App"

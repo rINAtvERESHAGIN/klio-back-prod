@@ -137,7 +137,7 @@ class ProductAdmin(admin.ModelAdmin):
                     prod_img.label = '{0} - Изображение #{1}'.format(product.name, index + 1)
                     prod_img.save()
 
-            self.message_user(request, _("CSV fail was successfully uploaded."))
+            self.message_user(request, _("CSV file was successfully uploaded."))
             return redirect("..")
         form = CsvImportForm()
         payload = {"form": form}
