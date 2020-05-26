@@ -146,7 +146,7 @@ class Product(models.Model):
                                           "parent."))
     """ Not required for parent products. """
     art = models.IntegerField(unique=True, blank=True, null=True, verbose_name=_('vendor code'),
-                              help_text="Do not set article number for parent product.")
+                              help_text=_("Do not set article number for parent product."))
     tags = models.ManyToManyField(Tag, blank=True, related_name='products', verbose_name=_('tags'),
                                   help_text=_("If not provided for child product, tags will be inherited from parent."))
     properties = models.ManyToManyField('ProductProperty', through='ProductPropertyValue', related_name='products',
@@ -155,7 +155,7 @@ class Product(models.Model):
                                                     "provide single-product property as well."))
     """ Not required for parent products. """
     in_stock = models.DecimalField(default=0, blank=False, null=True, max_digits=10, decimal_places=4,
-                                   help_text='For parents it will be calculated automatically',
+                                   help_text=_('For parents it will be calculated automatically'),
                                    verbose_name=_('In_stock'))
     units = models.ForeignKey('Unit', on_delete=models.SET_NULL, null=True, blank=True, related_name='products',
                               verbose_name=_('units'))
@@ -182,6 +182,7 @@ class Product(models.Model):
         ordering = ['-activity', 'product_type', 'order']
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
+        unique_together = ('category', 'slug')
 
     def __str__(self):
         return self.name
@@ -429,7 +430,7 @@ class ProductPropertyValue(models.Model):
 
     def clean(self):
         if self.prop.required and not self.product.is_child and not self.value:
-            raise ValidationError(_("Value {0} is required").format(self.prop.name))
+            raise ValidationError(_("Value") + self.prop.name + _('is required'))
 
 
 class ProductType(models.Model):

@@ -12,7 +12,7 @@ class UserPhoneInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         *UserAdmin.fieldsets, (
-            _('Additional data'), {'fields': ('middle_name', 'birthday', 'country', 'city', 'address', 'avatar',
+            _('Additional data'), {'fields': ('middle_name', 'birthday', 'city', 'address', 'avatar',
                                               'personal_data')},
         ),
     )

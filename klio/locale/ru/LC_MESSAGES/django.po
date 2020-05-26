@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the KLIO package.
+# CHEM1ST <PYTHONCHEM1ST@GMAIL.COM>, 2020.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-29 18:48+0300\n"
+"POT-Creation-Date: 2020-05-26 04:42+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,7 +40,7 @@ msgstr "фамилия"
 msgid "first name"
 msgstr "имя"
 
-#: auth/serializers.py:65 basket/serializers.py:59
+#: auth/serializers.py:65 basket/serializers.py:62
 msgid "You must agree to the processing of personal data."
 msgstr "Подтвердите согласие на обработку персональных данных."
 
@@ -168,29 +168,31 @@ msgstr "Ключ для смены истек."
 msgid "The reset key you provided is invalid."
 msgstr "Неверный ключ смены пароля."
 
-#: basket/admin.py:26 basket/admin.py:36 users/models.py:35
+#: basket/admin.py:27 basket/admin.py:43 users/models.py:35
 msgid "User"
 msgstr "Пользователь"
 
-#: basket/admin.py:40
+#: basket/admin.py:42 basket/models.py:34
+msgid "Anonymous"
+msgstr "Аноним"
+
+#: basket/admin.py:51
 msgid "User Email"
 msgstr "Email покупателя"
 
-#: basket/admin.py:46
+#: basket/admin.py:57
 msgid "Delivery"
 msgstr "Доставка"
 
-#: basket/admin.py:52
-#, fuzzy
-#| msgid "Delivery"
+#: basket/admin.py:63
 msgid "Delivery price"
-msgstr "Доставка"
+msgstr "Стоимость доставки"
 
-#: basket/admin.py:64 products/models.py:159
+#: basket/admin.py:75 products/models.py:184
 msgid "Products"
 msgstr "Товары"
 
-#: basket/admin.py:70
+#: basket/admin.py:81
 msgid "City"
 msgstr "Город"
 
@@ -199,16 +201,16 @@ msgid "Basket App"
 msgstr "Магазин"
 
 #: basket/models.py:17 basket/models.py:75 contacts/models.py:9
-#: general/models.py:15 general/models.py:64 general/models.py:194
-#: general/models.py:232 products/models.py:15 products/models.py:34
-#: products/models.py:99 products/models.py:319
+#: general/models.py:16 general/models.py:77 general/models.py:200
+#: general/models.py:250 products/models.py:15 products/models.py:34
+#: products/models.py:111 products/models.py:437
 msgid "created"
 msgstr "создано"
 
 #: basket/models.py:18 basket/models.py:76 contacts/models.py:10
-#: general/models.py:16 general/models.py:195 general/models.py:233
-#: products/models.py:16 products/models.py:35 products/models.py:100
-#: products/models.py:320
+#: general/models.py:17 general/models.py:201 general/models.py:251
+#: products/models.py:16 products/models.py:35 products/models.py:112
+#: products/models.py:438
 msgid "modified"
 msgstr "изменено"
 
@@ -216,8 +218,8 @@ msgstr "изменено"
 msgid "products"
 msgstr "товары"
 
-#: basket/models.py:21 basket/models.py:78 general/models.py:91
-#: general/models.py:253 products/models.py:349 users/models.py:56
+#: basket/models.py:21 basket/models.py:78 general/models.py:104
+#: general/models.py:305 products/models.py:467 users/models.py:56
 msgid "user"
 msgstr "пользователь"
 
@@ -238,10 +240,6 @@ msgstr "Корзина"
 msgid "Baskets"
 msgstr "Корзины"
 
-#: basket/models.py:34
-msgid "Anonymous"
-msgstr "Аноним"
-
 #: basket/models.py:41
 msgid "Active basket for current user already exists."
 msgstr "Корзина для текущего пользователя уже создана."
@@ -254,8 +252,8 @@ msgstr "Активная корзина уже существует."
 msgid "basket"
 msgstr "корзина"
 
-#: basket/models.py:51 products/models.py:221 products/models.py:264
-#: products/models.py:348 sale/models.py:67
+#: basket/models.py:51 products/models.py:312 products/models.py:393
+#: products/models.py:466 sale/models.py:76
 msgid "product"
 msgstr "товар"
 
@@ -264,7 +262,7 @@ msgid "quantity"
 msgstr "количество"
 
 #: basket/models.py:54 basket/models.py:93 basket/models.py:120
-#: products/models.py:141
+#: products/models.py:163
 msgid "price"
 msgstr "цена"
 
@@ -272,7 +270,7 @@ msgstr "цена"
 msgid "promo_price"
 msgstr "промо цена"
 
-#: basket/models.py:57 products/models.py:346
+#: basket/models.py:57 products/models.py:464
 msgid "added"
 msgstr "добавлено"
 
@@ -361,7 +359,7 @@ msgstr "Курьер"
 msgid "Transport company"
 msgstr "Транспортная компания"
 
-#: basket/models.py:112 basket/models.py:148 products/models.py:247
+#: basket/models.py:112 basket/models.py:148 products/models.py:338
 msgid "type"
 msgstr "тип"
 
@@ -381,7 +379,7 @@ msgstr "город получателя"
 msgid "to address"
 msgstr "адрес получателя"
 
-#: basket/models.py:119 general/models.py:97
+#: basket/models.py:119 general/models.py:110
 msgid "comment"
 msgstr "комментарий"
 
@@ -454,7 +452,7 @@ msgid "middle name"
 msgstr "отчество"
 
 #: basket/models.py:177 contacts/models.py:34 contacts/models.py:53
-#: general/models.py:95 users/models.py:57
+#: general/models.py:108 users/models.py:57
 msgid "phone"
 msgstr "телефон"
 
@@ -490,21 +488,19 @@ msgstr "Скидка фиксированная"
 msgid "code"
 msgstr "код"
 
-#: basket/models.py:205 general/models.py:24 general/models.py:75
-#: general/models.py:203 sale/models.py:29
+#: basket/models.py:205 general/models.py:28 general/models.py:88
+#: general/models.py:212 sale/models.py:29
 msgid "start date"
 msgstr "дата начала"
 
-#: basket/models.py:206 general/models.py:28 general/models.py:77
-#: general/models.py:207 sale/models.py:33
+#: basket/models.py:206 general/models.py:32 general/models.py:90
+#: general/models.py:216 sale/models.py:33
 msgid "deadline"
 msgstr "дата окончания"
 
 #: basket/models.py:207
-#, fuzzy
-#| msgid "products"
 msgid "For all products"
-msgstr "товары"
+msgstr "Для всех товаров"
 
 #: basket/models.py:208 sale/models.py:42
 #, fuzzy
@@ -512,17 +508,18 @@ msgstr "товары"
 msgid "categories"
 msgstr "Категории"
 
-#: basket/models.py:210 general/models.py:33 general/models.py:212
-#: products/models.py:131 sale/models.py:46
+#: basket/models.py:210 general/models.py:37 general/models.py:221
+#: products/models.py:150 sale/models.py:46
 msgid "tags"
 msgstr "Теги"
 
 #: basket/models.py:211 contacts/models.py:21 contacts/models.py:37
 #: contacts/models.py:56 contacts/models.py:72 contacts/models.py:88
-#: general/models.py:37 general/models.py:78 general/models.py:119
-#: general/models.py:175 general/models.py:216 general/models.py:240
-#: products/models.py:22 products/models.py:48 products/models.py:151
-#: products/models.py:225 sale/models.py:48 tags/models.py:7 users/models.py:60
+#: general/models.py:41 general/models.py:91 general/models.py:132
+#: general/models.py:188 general/models.py:225 general/models.py:261
+#: general/models.py:284 products/models.py:22 products/models.py:51
+#: products/models.py:179 products/models.py:316 sale/models.py:48
+#: tags/models.py:7 users/models.py:60
 msgid "activity"
 msgstr "активность"
 
@@ -530,7 +527,7 @@ msgstr "активность"
 msgid "discount type"
 msgstr "тип скидки"
 
-#: basket/models.py:215 sale/models.py:40 sale/models.py:70
+#: basket/models.py:215 sale/models.py:40 sale/models.py:79
 msgid "discount amount"
 msgstr "размер скидки"
 
@@ -542,37 +539,36 @@ msgstr "Промокод"
 msgid "Promo Codes"
 msgstr "Промокоды"
 
-#: basket/serializers.py:33
+#: basket/serializers.py:36
 msgid "You must agree to the delivery terms."
 msgstr "Подтвердите согласие с условиями доставки."
 
-#: basket/serializers.py:39
+#: basket/serializers.py:42
 msgid ""
 "You must agree that you are informed that the order is packaged in Moscow."
-msgstr ""
-"Подтвердите информированность о том, что заказ формируется в Москве."
+msgstr "Подтвердите информированность о том, что заказ формируется в Москве."
 
-#: basket/views.py:191
+#: basket/views.py:192
 msgid "Order step is not provided"
 msgstr "Шаг заказа не предоставлен"
 
-#: basket/views.py:250
+#: basket/views.py:253
 msgid "No promo products in the basket."
 msgstr "В корзине нет продуктов, на которые действует промокод."
 
-#: basket/views.py:253
+#: basket/views.py:256
 msgid "Promocode is not valid."
 msgstr "Неверный промокод"
 
-#: basket/views.py:321
+#: basket/views.py:324
 msgid "Order already has a linked delivery info model"
 msgstr "Для заказа уже есть связанная модель данных о доставке"
 
-#: basket/views.py:380
+#: basket/views.py:383
 msgid "Order already has a linked payment info model"
 msgstr "Для заказа уже есть связанная модель данных об оплате"
 
-#: basket/views.py:431
+#: basket/views.py:434
 msgid "Order already has a linked private info model"
 msgstr "Для заказа уже есть связанная модель персональных данных"
 
@@ -580,26 +576,26 @@ msgstr "Для заказа уже есть связанная модель пе
 msgid "Contacts App"
 msgstr "Контакты"
 
-#: contacts/models.py:11 contacts/models.py:68 general/models.py:65
-#: general/models.py:93 general/models.py:117 general/models.py:153
-#: general/models.py:237 products/models.py:17 products/models.py:39
-#: products/models.py:104 products/models.py:246 products/models.py:321
-#: products/models.py:335 sale/models.py:22 tags/models.py:6
+#: contacts/models.py:11 contacts/models.py:68 general/models.py:78
+#: general/models.py:106 general/models.py:130 general/models.py:166
+#: general/models.py:258 products/models.py:17 products/models.py:42
+#: products/models.py:119 products/models.py:335 products/models.py:439
+#: products/models.py:453 sale/models.py:22 tags/models.py:6
 msgid "name"
 msgstr "наименование"
 
-#: contacts/models.py:12 general/models.py:30 general/models.py:154
-#: general/models.py:209 general/models.py:238 products/models.py:18
-#: products/models.py:40 products/models.py:105 products/models.py:322
-#: sale/models.py:23
+#: contacts/models.py:12 general/models.py:34 general/models.py:167
+#: general/models.py:218 general/models.py:259 products/models.py:18
+#: products/models.py:43 products/models.py:120 products/models.py:336
+#: products/models.py:440 sale/models.py:23
 msgid "slug"
 msgstr "ссылка"
 
-#: contacts/models.py:13 users/models.py:24
+#: contacts/models.py:13
 msgid "country"
 msgstr "страна"
 
-#: contacts/models.py:14 products/models.py:81 users/models.py:25
+#: contacts/models.py:14 products/models.py:93 users/models.py:25
 msgid "city"
 msgstr "город"
 
@@ -616,14 +612,14 @@ msgid "map"
 msgstr "карта"
 
 #: contacts/models.py:19 contacts/models.py:36 contacts/models.py:71
-#: contacts/models.py:87 general/models.py:69 general/models.py:159
-#: products/models.py:21 products/models.py:46 products/models.py:150
-#: products/models.py:224 users/models.py:59
+#: contacts/models.py:87 general/models.py:82 general/models.py:172
+#: products/models.py:21 products/models.py:49 products/models.py:178
+#: products/models.py:315 users/models.py:59
 msgid "order"
 msgstr "порядок"
 
-#: contacts/models.py:20 general/models.py:36 general/models.py:68
-#: general/models.py:215 general/models.py:239 sale/models.py:35
+#: contacts/models.py:20 general/models.py:40 general/models.py:81
+#: general/models.py:224 general/models.py:260 sale/models.py:35
 msgid "content"
 msgstr "контент"
 
@@ -667,7 +663,7 @@ msgstr "Рабочий"
 msgid "Enter the phone in the format +7(XXX)XXX-XX-XX"
 msgstr "Введите телефон в формате +7(XXX)XXX-XX-XX"
 
-#: contacts/models.py:55 contacts/models.py:84 products/models.py:223
+#: contacts/models.py:55 contacts/models.py:84 products/models.py:314
 msgid "label"
 msgstr "наименование / бирка"
 
@@ -679,9 +675,9 @@ msgstr "Телефон"
 msgid "Phones"
 msgstr "Телефоны"
 
-#: contacts/models.py:69 general/models.py:32 general/models.py:66
-#: general/models.py:211 products/models.py:44 products/models.py:222
-#: products/models.py:276 sale/models.py:34
+#: contacts/models.py:69 general/models.py:36 general/models.py:79
+#: general/models.py:220 products/models.py:47 products/models.py:313
+#: sale/models.py:34
 msgid "image"
 msgstr "изображение"
 
@@ -701,7 +697,7 @@ msgstr "время"
 msgid "Working Hours"
 msgstr "Часы работы"
 
-#: general/admin.py:7
+#: general/admin.py:9
 msgid "Klio Site Administration"
 msgstr "Панель администратора сайта КЛИО"
 
@@ -709,34 +705,43 @@ msgstr "Панель администратора сайта КЛИО"
 msgid "General Info App"
 msgstr "Основные и статичные данные"
 
-#: general/models.py:17 general/models.py:196 general/models.py:234
-#: products/models.py:36 products/models.py:101 sale/models.py:19
-#, fuzzy
-#| msgid "title"
+#: general/models.py:18 general/models.py:202 general/models.py:252
+#: products/models.py:36 products/models.py:113 sale/models.py:19
 msgid "meta title"
-msgstr "Заголовок"
+msgstr "SEO заголовок"
 
-#: general/models.py:18 general/models.py:197 general/models.py:235
-#: products/models.py:37 products/models.py:102 sale/models.py:20
-#, fuzzy
-#| msgid "description"
+#: general/models.py:19 general/models.py:21 general/models.py:203
+#: general/models.py:205 general/models.py:253 general/models.py:255
+#: products/models.py:37 products/models.py:39 products/models.py:114
+#: products/models.py:116
+msgid "Leave blank to fill automatically with name."
+msgstr "Оставьте пустым для автоматического заполнения на основе наименования"
+
+#: general/models.py:20 general/models.py:204 general/models.py:254
+#: products/models.py:38 products/models.py:115 sale/models.py:20
 msgid "meta description"
-msgstr "описание"
+msgstr "SEO описание"
 
-#: general/models.py:19 general/models.py:198 general/models.py:236
-#: products/models.py:38 products/models.py:103 sale/models.py:21
+#: general/models.py:22 general/models.py:206 general/models.py:256
+#: products/models.py:40 products/models.py:117 sale/models.py:21
 msgid "meta keywords"
-msgstr ""
+msgstr "SEO ключевые слова"
 
-#: general/models.py:20
+#: general/models.py:23 general/models.py:207 general/models.py:257
+#: products/models.py:41 products/models.py:118
+msgid "Leave blank to fill automatically with words taken from name."
+msgstr ""
+"Оставьте пустым для автоматического заполнения словами на основе наименования"
+
+#: general/models.py:24
 msgid "Date to be shown in article."
 msgstr "Дата, указанная в статье"
 
-#: general/models.py:20 sale/models.py:25
+#: general/models.py:24 sale/models.py:25
 msgid "published"
 msgstr "опубликовано"
 
-#: general/models.py:22
+#: general/models.py:26
 msgid ""
 "Date to make article visible on site.\n"
 "                                                  Leave this blank to show "
@@ -745,7 +750,7 @@ msgstr ""
 "Опубликовать статью с этого времени.Оставьте поле пустым, если хотите "
 "немедленной публикации."
 
-#: general/models.py:26
+#: general/models.py:30
 msgid ""
 "Show article until this date.\n"
 "                                                Article will appear forever "
@@ -754,131 +759,131 @@ msgstr ""
 "Показывать статью до этого времени.Оставьте поле пустым, если не хотите "
 "ограничивать публикацию новости по времени."
 
-#: general/models.py:29 general/models.py:208
+#: general/models.py:33 general/models.py:217
 msgid "title"
 msgstr "Заголовок"
 
-#: general/models.py:31 general/models.py:210
+#: general/models.py:35 general/models.py:219
 msgid "author"
 msgstr "автор"
 
-#: general/models.py:33 general/models.py:212
+#: general/models.py:37 general/models.py:221
 msgid "At least 1 tag is required."
 msgstr "Укажите не менее 1 тега"
 
-#: general/models.py:34 general/models.py:213
+#: general/models.py:38 general/models.py:222
 msgid "abstract"
 msgstr "краткое описание"
 
-#: general/models.py:35 general/models.py:214
+#: general/models.py:39 general/models.py:223
 msgid "Short description - 256 symbols max."
 msgstr "Краткое описание - не более 256 символов."
 
-#: general/models.py:41 general/models.py:147
+#: general/models.py:45 general/models.py:160
 msgid "Article"
 msgstr "Статья"
 
-#: general/models.py:42
+#: general/models.py:46
 msgid "Articles"
 msgstr "Статьи"
 
-#: general/models.py:49 general/models.py:228 sale/models.py:60
+#: general/models.py:53 general/models.py:237 sale/models.py:60
 msgid "Deadline must be more than start date"
 msgstr "Дата завершения должна быть после даты начала"
 
-#: general/models.py:58
+#: general/models.py:71
 msgid "Yellow"
 msgstr "Желтый"
 
-#: general/models.py:59
+#: general/models.py:72
 msgid "Red"
 msgstr "Красный"
 
-#: general/models.py:60
+#: general/models.py:73
 msgid "White"
 msgstr "Белый"
 
-#: general/models.py:61
+#: general/models.py:74
 msgid "Black"
 msgstr "Черный"
 
-#: general/models.py:67
+#: general/models.py:80
 msgid "Upload image 1200x675 px."
 msgstr "Загрузите изображение 1200x675 пикс."
 
-#: general/models.py:70
+#: general/models.py:83
 msgid "link"
 msgstr "Ссылка"
 
-#: general/models.py:71
+#: general/models.py:84
 msgid "button is on"
 msgstr "Кнопка включена"
 
-#: general/models.py:72
+#: general/models.py:85
 msgid "button text"
 msgstr "Текст кнопки"
 
-#: general/models.py:73
+#: general/models.py:86
 msgid "button color"
 msgstr "Цвет кнопки"
 
-#: general/models.py:74
+#: general/models.py:87
 msgid "From what date banner should be visible on a site?"
 msgstr "Когда сделать баннер видимым на сайте?"
 
-#: general/models.py:76
+#: general/models.py:89
 msgid "When banner should disappear from a site?"
 msgstr "Когда убрать баннер с сайта?"
 
-#: general/models.py:82
+#: general/models.py:95
 msgid "Banner"
 msgstr "Баннер"
 
-#: general/models.py:83
+#: general/models.py:96
 msgid "Banners"
 msgstr "Баннеры"
 
-#: general/models.py:90 general/models.py:199 general/models.py:252
+#: general/models.py:103 general/models.py:208 general/models.py:304
 msgid "date"
 msgstr "дата"
 
-#: general/models.py:96
+#: general/models.py:109
 msgid "Enter the phone in the format +7(XXX)XXX-XX-XX."
 msgstr "Введите телефон в формате +7(XXX)XXX-XX-XX."
 
-#: general/models.py:101 general/models.py:102
+#: general/models.py:114 general/models.py:115
 msgid "Callback info"
 msgstr "Данные об обратном звонке"
 
-#: general/models.py:105
+#: general/models.py:118
 msgid "Callback"
 msgstr "Обратный звонок"
 
-#: general/models.py:111
+#: general/models.py:124
 msgid "Header"
 msgstr "Шапка сайта"
 
-#: general/models.py:112
+#: general/models.py:125
 msgid "Subheader"
 msgstr "Подменю в шапке сайта"
 
-#: general/models.py:113
+#: general/models.py:126
 msgid "Footer"
 msgstr "Футер сайта"
 
-#: general/models.py:114
+#: general/models.py:127
 msgid "Leftbar"
 msgstr "Боковая панель"
 
-#: general/models.py:118
+#: general/models.py:131
 msgid "position"
 msgstr "расположение"
 
-#: general/models.py:124 general/models.py:125
+#: general/models.py:137 general/models.py:138
 msgid "Menu"
 msgstr "Меню"
 
-#: general/models.py:134
+#: general/models.py:147
 #, fuzzy
 #| msgid ""
 #| "Active menu for selected position is already exists.\n"
@@ -890,57 +895,57 @@ msgstr ""
 "В системе уже существует активное меню с тем же расположением.Пожалуйста, "
 "сначала сделайте уже существующее меню неактивным."
 
-#: general/models.py:143
+#: general/models.py:156
 msgid "Root object"
 msgstr "Базовый объект"
 
-#: general/models.py:144 products/models.py:52
+#: general/models.py:157 products/admin.py:157 products/models.py:55
 msgid "Category"
 msgstr "Категория"
 
-#: general/models.py:145
+#: general/models.py:158
 msgid "Product list"
 msgstr "Список товаров"
 
-#: general/models.py:146
+#: general/models.py:159
 msgid "Info page"
 msgstr "Информационная (статичная) страница"
 
-#: general/models.py:148 general/models.py:221
+#: general/models.py:161 general/models.py:230
 msgid "News"
 msgstr "Новости"
 
-#: general/models.py:149 sale/models.py:52
+#: general/models.py:162 sale/models.py:52
 msgid "Special"
 msgstr "Акция"
 
-#: general/models.py:150 general/models.py:174
+#: general/models.py:163 general/models.py:187
 msgid "External link"
 msgstr "Ссылка на внешний ресурс"
 
-#: general/models.py:156 products/models.py:42
+#: general/models.py:169 products/models.py:45
 msgid "parent"
 msgstr "родитель"
 
-#: general/models.py:157
+#: general/models.py:170
 msgid "icon"
 msgstr "Пиктограмма"
 
-#: general/models.py:158
+#: general/models.py:171
 msgid "Pay attention! Visible ONLY in HEADER SUBMENU! Preferred format - SVG."
 msgstr ""
 "Внимание! Пиктограмма отображается ТОЛЬКО в ВЕРХНЕМ ПОДМЕНЮ! Рекомендуемый "
 "формат – SVG."
 
-#: general/models.py:160
+#: general/models.py:173
 msgid "menu"
 msgstr "меню"
 
-#: general/models.py:162
+#: general/models.py:175
 msgid "related type"
 msgstr "связанный тип"
 
-#: general/models.py:163
+#: general/models.py:176
 #, fuzzy, python-brace-format
 #| msgid ""
 #| "        Root object - /{object}\n"
@@ -972,19 +977,19 @@ msgstr ""
 "        Акция - /specials/{object}\n"
 "        Ссылка на внешний ресурс - {link}\n"
 
-#: general/models.py:179
+#: general/models.py:192
 msgid "Menu item"
 msgstr "Пункт меню"
 
-#: general/models.py:180
+#: general/models.py:193
 msgid "Menu items"
 msgstr "Пункты меню"
 
-#: general/models.py:199
+#: general/models.py:208
 msgid "Date to be shown in news."
 msgstr "Дата, указанная в новости."
 
-#: general/models.py:201
+#: general/models.py:210
 #, fuzzy
 #| msgid ""
 #| "Date to make news visible on site.\n"
@@ -997,7 +1002,7 @@ msgstr ""
 "Опубликовать новость с этого времени.Оставьте поле пустым, если хотите "
 "немедленной публикации."
 
-#: general/models.py:205
+#: general/models.py:214
 #, fuzzy
 #| msgid ""
 #| "Show news item until this date.\n"
@@ -1010,29 +1015,48 @@ msgstr ""
 "Показывать новость до этого времени.Оставьте поле пустым, если не хотите "
 "ограничивать публикацию новости по времени."
 
-#: general/models.py:220
+#: general/models.py:229
 msgid "News item"
 msgstr "Новость"
 
-#: general/models.py:244
+#: general/models.py:265
 msgid "Page"
 msgstr "Страница"
 
-#: general/models.py:245
+#: general/models.py:266
 msgid "Pages"
 msgstr "Страницы"
 
-#: general/models.py:259 general/models.py:260
+#: general/models.py:283 products/models.py:20 products/models.py:48
+#: products/models.py:121
+msgid "description"
+msgstr "описание"
+
+#: general/models.py:288 general/models.py:289
+msgid "Site settings"
+msgstr "Настройки сайта"
+
+#: general/models.py:311 general/models.py:312
 msgid "Subscriber info"
 msgstr "Данные подписки"
 
-#: general/models.py:263
+#: general/models.py:315
 msgid "Subscription"
 msgstr "Подписка"
 
-#: general/views.py:190
+#: general/views.py:224
 msgid "Your Request Received!"
 msgstr "Ваш запрос получен!"
+
+#: products/admin.py:140
+msgid "CSV file was successfully uploaded."
+msgstr "СSV файл успешно загружен."
+
+#: products/admin.py:163
+#, fuzzy
+#| msgid "Product type"
+msgid "Product Type"
+msgstr "Тип товара"
 
 #: products/apps.py:7
 msgid "Products App"
@@ -1042,10 +1066,6 @@ msgstr "Товары"
 msgid "logo"
 msgstr "логотип"
 
-#: products/models.py:20 products/models.py:45 products/models.py:106
-msgid "description"
-msgstr "описание"
-
 #: products/models.py:29
 msgid "Brand"
 msgstr "Бренд"
@@ -1054,283 +1074,399 @@ msgstr "Бренд"
 msgid "Brands"
 msgstr "Бренды"
 
-#: products/models.py:43
+#: products/models.py:46
 msgid "group"
 msgstr "группа"
 
-#: products/models.py:47 sale/models.py:68
+#: products/models.py:50 sale/models.py:77
 msgid "on main"
 msgstr "на главную"
 
-#: products/models.py:53
+#: products/models.py:56
 msgid "Categories"
 msgstr "Категории"
 
-#: products/models.py:80 products/models.py:126
+#: products/models.py:92 products/models.py:142
 msgid "category"
 msgstr "категория"
 
-#: products/models.py:82
+#: products/models.py:94
 msgid "rating"
 msgstr "рейтинг"
 
-#: products/models.py:88
+#: products/models.py:100
 msgid "Unique product"
 msgstr "Уникальный товар"
 
-#: products/models.py:89
-msgid "Child product"
-msgstr "Дочерний товар"
-
-#: products/models.py:90 products/models.py:118
+#: products/models.py:101 products/models.py:133
 msgid "Parent product"
 msgstr "Родительский товар"
 
-#: products/models.py:94
+#: products/models.py:102
+msgid "Child product"
+msgstr "Дочерний товар"
+
+#: products/models.py:106
 msgid "New"
 msgstr "Новинка"
 
-#: products/models.py:95
+#: products/models.py:107
 msgid "Calculated"
 msgstr "Рассчитывается"
 
-#: products/models.py:96
+#: products/models.py:108
 msgid "Not new"
 msgstr "Не новинка"
 
-#: products/models.py:116
+#: products/models.py:131
 msgid "kind"
 msgstr "вид"
 
-#: products/models.py:123
+#: products/models.py:134
+msgid "Leave blank if this is a unique product"
+msgstr "Оставьте пустым для уникального товара"
+
+#: products/models.py:137
 msgid "product type"
 msgstr "Тип товара"
 
-#: products/models.py:128
+#: products/models.py:138
+msgid ""
+"Choose the product type. Properties will be inherited after saving.Click "
+"'Save & Continue' button."
+msgstr ""
+"Выберите тип товара. Свойства загрузятся после сохранения. Нажмите "
+"'Сохранить и продолжить редактирование'."
+
+#: products/models.py:142
+msgid "Choose the most detailed category"
+msgstr "Выберите наиболее точную категорию."
+
+#: products/models.py:144
 msgid "brand"
 msgstr "бренд"
 
-#: products/models.py:130
+#: products/models.py:145
+msgid ""
+"If this field is empty for child product, Brand will be inherited fromparent."
+msgstr ""
+"Оставьте пустым для дочернего элемента, чтобы унаследовать бренд родителя."
+
+#: products/models.py:148
 msgid "vendor code"
 msgstr "артикул"
 
-#: products/models.py:133 products/models.py:323
+#: products/models.py:149
+msgid "Do not set article number for parent product."
+msgstr "Не указывайте артикул для родительского товара."
+
+#: products/models.py:151
+msgid "If not provided for child product, tags will be inherited from parent."
+msgstr ""
+"Оставьте пустым для дочернего элемента, чтобы унаследовать теги родителя."
+
+#: products/models.py:153 products/models.py:441
 msgid "properties"
 msgstr "свойства"
 
-#: products/models.py:137
+#: products/models.py:154
+msgid ""
+"Properties should be set on Product Type level, but you canprovide single-"
+"product property as well."
+msgstr ""
+"Свойства присваиваются типу товара, но Вы также можете указать уникальные "
+"свойства для конкретного товара."
+
+#: products/models.py:158
+msgid "For parents it will be calculated automatically"
+msgstr "Для родительских товаров будет рассчитано автоматически"
+
+#: products/models.py:159
 msgid "In_stock"
 msgstr "Наличие на складе"
 
-#: products/models.py:139 products/models.py:249
+#: products/models.py:161 products/models.py:340
 msgid "units"
 msgstr "единицы измерения"
 
-#: products/models.py:143
+#: products/models.py:164
+msgid "Do not set the price on a parent product."
+msgstr "Не указывайте цену для родительского товара."
+
+#: products/models.py:166
 msgid "base amount"
 msgstr "базовое количество"
 
-#: products/models.py:144
+#: products/models.py:167
+msgid ""
+"Used for correct displaying and calculating the amount and the price of a "
+"product."
+msgstr ""
+"Используется для правильного расчета и отображения количества и стоимости "
+"товара."
+
+#: products/models.py:169
 msgid "wholesale threshold"
 msgstr "оптовое количество"
 
-#: products/models.py:146
+#: products/models.py:171
 msgid "wholesale price"
 msgstr "оптовая цена"
 
-#: products/models.py:147
+#: products/models.py:172
 msgid "recommended"
 msgstr "рекомендуемые"
 
-#: products/models.py:149
+#: products/models.py:173
+msgid "Choose only unique or child products."
+msgstr "Выберите только уникальный или дочерний товар."
+
+#: products/models.py:175
 msgid "is new"
 msgstr "новинка?"
 
-#: products/models.py:158
+#: products/models.py:176
+msgid ""
+"If set to 'Calculated', the product will be valued as new for 2 months "
+"fromthe date of adding"
+msgstr ""
+"Если выбрано 'рассчитывается', то продукт будет считаться Новинкой в течение "
+"2 месяцев с момента загрузки. "
+
+#: products/models.py:183
 msgid "Product"
 msgstr "Товар"
 
-#: products/models.py:164
+#: products/models.py:194
 msgid "Amount in stock can not be negative."
 msgstr "Количество на складе не может быть отрицательным"
 
-#: products/models.py:167
+#: products/models.py:197
 msgid "Product price can not be negative."
 msgstr "Цена товара не может быть отрицательной"
 
-#: products/models.py:172
+#: products/models.py:203
 msgid "Unique product should not have a parent"
 msgstr "Уникальный товар не должен иметь родителя"
 
-#: products/models.py:174
+#: products/models.py:205
 msgid "Unique product should contain a category"
 msgstr "Уникальный товар должен быть отнесен к категории"
 
-#: products/models.py:176
+#: products/models.py:207
+msgid "Unique product should contain a product type"
+msgstr "Уникальный товар должен иметь тип товара."
+
+#: products/models.py:209
 msgid "Unique product should contain an article number"
 msgstr "Уникальный товар должен иметь артикул"
 
-#: products/models.py:178
+#: products/models.py:211
 msgid "Unique product should contain a price"
 msgstr "Уникальный товар должен иметь цену"
 
-#: products/models.py:180
+#: products/models.py:213
 msgid "Unique product should contain a base amount"
 msgstr "Уникальный товар должен иметь бозовое количество"
 
-#: products/models.py:185
+#: products/models.py:217
 msgid "Parent product should not have a parent"
 msgstr "Родительский товар не может иметь родителя"
 
-#: products/models.py:187
+#: products/models.py:219
 msgid "Parent product should contain a category"
 msgstr "Родительский товар должен быть отнесен к категории"
 
-#: products/models.py:189
+#: products/models.py:221
+msgid "Parent product should contain a product type"
+msgstr "Родительский товар должен иметь тип товара."
+
+#: products/models.py:223
 msgid "Parent product should not have an article number"
 msgstr "Родительский товар не может иметь артукула"
 
-#: products/models.py:191
+#: products/models.py:225
 msgid "Parent product should not have a number of items in stock. Set it to 0."
-msgstr "Родительский товар не может иметь значение количества на складе. Установите значение 0."
+msgstr ""
+"Родительский товар не может иметь значение количества на складе. Установите "
+"значение 0."
 
-#: products/models.py:193
+#: products/models.py:227
 msgid "Parent product should not have a price"
 msgstr "Родительский товар не может иметь цену"
 
-#: products/models.py:195
+#: products/models.py:229
 msgid "Parent product should contain a base amount"
 msgstr "Родительский товар должен иметь базовое количество"
 
-#: products/models.py:200
+#: products/models.py:233
 msgid "Child product must have a parent"
 msgstr "Дочерний товар должен иметь родителя"
 
-#: products/models.py:202
-msgid "Child product inherit its parent category"
+#: products/models.py:235
+msgid "Selected parent is not valid - no product type found."
+msgstr ""
+
+#: products/models.py:237
+#, fuzzy
+#| msgid "Child product inherit its parent category"
+msgid ""
+"Child product inherit its parent category. Leave it blank or choose parents."
 msgstr "Дочерний товар наследует категорию родителя"
 
-#: products/models.py:204
+#: products/models.py:239
 msgid "Child product inherit its parent product type"
 msgstr "Дочерний товар наследует тип родителя"
 
-#: products/models.py:206
+#: products/models.py:241
 msgid "Child product inherit its parent brand"
 msgstr "Дочерний товар наследует бренд родителя"
 
-#: products/models.py:208
-msgid "Child product inherit its parent tags"
-msgstr "Дочерний товар наследует теги родителя"
-
-#: products/models.py:210
+#: products/models.py:243
 msgid "Child product inherit its parent units"
 msgstr "Дочерний товар наследует единицы измерения родителя"
 
-#: products/models.py:212
+#: products/models.py:245
 msgid "Child product inherit its parent base amount"
 msgstr "Дочерний товар наследует базовое значение родителя"
 
-#: products/models.py:214
+#: products/models.py:247
 msgid "Child product must have a price"
 msgstr "Дочерний товар должен иметь цену"
 
-#: products/models.py:216
+#: products/models.py:249
 msgid "Child product must have an article number"
 msgstr "Дочерний товар должен иметь артикул"
 
-#: products/models.py:229
-msgid "Product image"
-msgstr "Изображение товара"
-
-#: products/models.py:230
-msgid "Product images"
-msgstr "Изображения товара"
-
-#: products/models.py:237 products/models.py:266
-msgid "Text"
-msgstr "Текст"
-
-#: products/models.py:238 products/models.py:267
-msgid "Integer"
-msgstr "Целое число"
-
-#: products/models.py:239
-msgid "True / False"
-msgstr "Да / Нет"
-
-#: products/models.py:240 products/models.py:269
-msgid "Float"
-msgstr "Число с плавающей точкой"
-
-#: products/models.py:241
-msgid "Rich Text"
-msgstr "Расширенный текст"
-
-#: products/models.py:242 products/models.py:271
-msgid "Date"
-msgstr "Дата"
-
-#: products/models.py:243
-msgid "Datetime"
-msgstr "Дата и время"
-
-#: products/models.py:250
-msgid "required"
-msgstr "обязательное поле"
-
-#: products/models.py:256
-msgid "Property"
-msgstr "Свойство"
-
-#: products/models.py:257
-msgid "Properties"
-msgstr "Свойства"
-
-#: products/models.py:261
-msgid "property"
-msgstr "свойство"
-
-#: products/models.py:268
-msgid "Boolean"
-msgstr "Булево значение"
-
-#: products/models.py:270
-msgid "Richtext"
-msgstr "Расширенный текст"
-
-#: products/models.py:272
-msgid "DateTime"
-msgstr "Дата и Время"
-
-#: products/models.py:274
-msgid "file"
-msgstr "файл"
-
-#: products/models.py:294
-msgid "Product property value"
-msgstr "Значение свойства товара"
-
-#: products/models.py:295
-msgid "Product property values"
-msgstr "Значения свойств товара"
-
-#: products/models.py:330
+#: products/models.py:288 products/models.py:448
 msgid "Product type"
 msgstr "Тип товара"
 
-#: products/models.py:331
+#: products/models.py:320
+msgid "Product image"
+msgstr "Изображение товара"
+
+#: products/models.py:321
+msgid "Product images"
+msgstr "Изображения товара"
+
+#: products/models.py:328 products/models.py:395
+msgid "Text"
+msgstr "Текст"
+
+#: products/models.py:329 products/models.py:396
+msgid "Integer"
+msgstr "Целое число"
+
+#: products/models.py:330
+msgid "True / False"
+msgstr "Да / Нет"
+
+#: products/models.py:331 products/models.py:398
+msgid "Float"
+msgstr "Число с плавающей точкой"
+
+#: products/models.py:337
+msgid "Slug is used for filtration purposes. Use only symbols [a-z,0-9,-]"
+msgstr ""
+"Ссылка используется для целей фильтрования. Используйте символы [a-z,0-9,-]."
+
+#: products/models.py:341
+msgid "property interval"
+msgstr "Интервал значений"
+
+#: products/models.py:343
+msgid ""
+"Accuracy between two neighbour values during searching. Used for integer or "
+"float types only."
+msgstr ""
+
+#: products/models.py:345
+msgid "required"
+msgstr "обязательное поле"
+
+#: products/models.py:351
+msgid "Property"
+msgstr "Свойство"
+
+#: products/models.py:352
+msgid "Properties"
+msgstr "Свойства"
+
+#: products/models.py:356
+msgid "Integer and float properties should have interval."
+msgstr "Целые и дробные числа должны иметь определенный интервал значений."
+
+#: products/models.py:358
+msgid "Slug can not contain _ symbol."
+msgstr "Ссылка не может содержать символ '_'"
+
+#: products/models.py:366
+msgid "Must be str"
+msgstr "Должно быть строкой"
+
+#: products/models.py:372
+msgid "Must be a float"
+msgstr "Должно быть числом с плавающей точкой"
+
+#: products/models.py:378
+msgid "Must be an integer"
+msgstr "Должно быть целым числом"
+
+#: products/models.py:386
+msgid "Must be a boolean"
+msgstr "Должно быть булевым значением"
+
+#: products/models.py:390
+msgid "property"
+msgstr "свойство"
+
+#: products/models.py:397
+msgid "Boolean"
+msgstr "Булево значение"
+
+#: products/models.py:403
+msgid "Product property value"
+msgstr "Значение свойства товара"
+
+#: products/models.py:404
+msgid "Product property values"
+msgstr "Значения свойств товара"
+
+#: products/models.py:433
+msgid "Value"
+msgstr "Значение"
+
+#: products/models.py:433
+msgid "is required"
+msgstr "обязательно"
+
+#: products/models.py:449
 msgid "Product types"
 msgstr "Типы товаров"
 
-#: products/models.py:338
+#: products/models.py:456
 msgid "Unit"
 msgstr "единица измерения"
 
-#: products/models.py:339
-#, fuzzy
-#| msgid "units"
+#: products/models.py:457
 msgid "Units"
 msgstr "единицы измерения"
+
+#: products/product_properties.py:33
+#, python-format
+msgid "%(obj)s has no property named '%(prop)s'"
+msgstr ""
+
+#: products/product_properties.py:42
+#, python-format
+msgid "%(prop)s property cannot be blank"
+msgstr ""
+
+#: products/product_properties.py:49
+#, python-format
+msgid "%(prop)s property %(err)s"
+msgstr ""
 
 #: sale/apps.py:7
 msgid "Sale App"
@@ -1382,15 +1518,15 @@ msgstr "Укажите не менее 1 товара"
 msgid "Specials"
 msgstr "Акции"
 
-#: sale/models.py:65
+#: sale/models.py:74
 msgid "special"
 msgstr "акция"
 
-#: sale/models.py:75
+#: sale/models.py:84
 msgid "Special Product"
 msgstr "Товар по акции"
 
-#: sale/models.py:76
+#: sale/models.py:85
 msgid "Special Products"
 msgstr "Товары по акции"
 
@@ -1445,6 +1581,30 @@ msgstr "Телефон пользователя"
 #: users/models.py:65
 msgid "User Phones"
 msgstr "Телефоны пользователя"
+
+#~ msgid "Value {0} is required"
+#~ msgstr "Требуется значение"
+
+#~ msgid "Child product inherit its parent tags"
+#~ msgstr "Дочерний товар наследует теги родителя"
+
+#~ msgid "Rich Text"
+#~ msgstr "Расширенный текст"
+
+#~ msgid "Date"
+#~ msgstr "Дата"
+
+#~ msgid "Datetime"
+#~ msgstr "Дата и время"
+
+#~ msgid "Richtext"
+#~ msgstr "Расширенный текст"
+
+#~ msgid "DateTime"
+#~ msgstr "Дата и Время"
+
+#~ msgid "file"
+#~ msgstr "файл"
 
 #~ msgid "selected"
 #~ msgstr "избранное"

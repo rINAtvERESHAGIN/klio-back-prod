@@ -6,6 +6,7 @@ from django.db import models
 from django.forms import FileField, Form, Textarea
 from django.shortcuts import redirect, render
 from django.urls import path
+from django.utils.translation import gettext_lazy as _
 
 from slugify import slugify
 
@@ -103,7 +104,7 @@ class ProductAdmin(admin.ModelAdmin):
             csv_file = request.FILES["csv_file"]
             csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
             for row in csv_data:
-                categories_str, name, art, price, images_str = row
+                categories_str, name, art, description, price, images_str = row
 
                 categories_names = categories_str.split(',')
                 parent_category = None
@@ -120,22 +121,23 @@ class ProductAdmin(admin.ModelAdmin):
                 if product:
                     product.category = parent_category
                     product.name = name
+                    product.description = description
                     product.price = Decimal(price.replace(" ", ""))
                     product.save()
 
                 else:
                     product = Product.objects.create(name=name, slug=slugify(name, replacements=CYRILLIC),
                                                      category=parent_category, kind=Product.UNIQUE, art=art,
-                                                     price=Decimal(price.replace(" ", "")))
+                                                     description=description, price=Decimal(price.replace(" ", "")))
 
                 images_names = images_str.split(',')
                 for index, image_name in enumerate(images_names):
-                    prod_img, _ = ProductImage.objects.get_or_create(product=product,
-                                                                     img='products/{0}'.format(image_name))
+                    prod_img, created = ProductImage.objects.get_or_create(product=product,
+                                                                           img='products/{0}'.format(image_name))
                     prod_img.label = '{0} - Изображение #{1}'.format(product.name, index + 1)
                     prod_img.save()
 
-            self.message_user(request, "CSV файл был успешно загружен.")
+            self.message_user(request, _("CSV file was successfully uploaded."))
             return redirect("..")
         form = CsvImportForm()
         payload = {"form": form}
@@ -152,13 +154,13 @@ class ProductAdmin(admin.ModelAdmin):
     def get_category(self, obj):
         return obj.get_category()
 
-    get_category.short_description = 'Category'
+    get_category.short_description = _('Category')
     get_category.admin_order_field = 'category__name'
 
     def get_type(self, obj):
         return obj.get_product_type()
 
-    get_type.short_description = 'Product Type'
+    get_type.short_description = _('Product Type')
     get_type.admin_order_field = 'product_type__name'
 
 
