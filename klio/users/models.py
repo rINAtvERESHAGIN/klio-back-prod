@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from cities_light.models import City, Country
+from cities_light.models import City
 
 from contacts.models import Phone
 
@@ -21,7 +21,7 @@ class User(AbstractUser):
     birthday = models.DateField(null=True, blank=True, default=None, verbose_name=_('birthday'))
     phones = models.ManyToManyField(Phone, through='UserPhone', related_name='users', verbose_name=_('phones'))
     email = models.EmailField(unique=True)
-    country = models.ForeignKey(Country, on_delete=models.PROTECT, blank=True, null=True, verbose_name=_('country'))
+    # country = models.ForeignKey(Country, on_delete=models.PROTECT, blank=True, null=True, verbose_name=_('country'))
     city = models.ForeignKey(City, on_delete=models.PROTECT, blank=True, null=True, verbose_name=_('city'))
     address = models.CharField(max_length=256, blank=True, verbose_name=_('address'))
     avatar = models.ImageField(blank=True, verbose_name=_('avatar'))

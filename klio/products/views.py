@@ -159,7 +159,10 @@ class FavoriteListView(ListAPIView):
 class ProductDetailView(RetrieveAPIView):
     lookup_field = 'slug'
     serializer_class = ProductSerializer
-    queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD])
+
+    def get_queryset(self):
+        return Product.objects.filter(activity=True, category_slug=self.kwargs.get('category_slug'),
+                                      kind__in=[Product.UNIQUE, Product.CHILD])
 
 
 class ProductMainNewListView(ListAPIView):
@@ -199,17 +202,6 @@ class SearchProductListView(ListAPIView):
             ).filter(
                 Q(similarity__gt=0.1) | Q(art__icontains=text)
             ).order_by('-similarity')
-            # queryset = queryset.filter(
-            #     Q(
-            #         name__icontains=text
-            #     ) | Q(
-            #         art__icontains=text
-            #     ) | Q(
-            #         category__name__icontains=text
-            #     ) | Q(
-            #         parent__category__name__icontains=text
-            #     ),
-            # )
         if tags:
             tags_list = tags.split(',')
             queryset = queryset.filter(tags__name__in=tags_list)
