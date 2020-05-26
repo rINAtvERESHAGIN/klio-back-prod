@@ -161,7 +161,7 @@ class ProductDetailView(RetrieveAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        return Product.objects.filter(activity=True, category_slug=self.kwargs.get('category_slug'),
+        return Product.objects.filter(activity=True, category__slug=self.kwargs.get('category_slug'),
                                       kind__in=[Product.UNIQUE, Product.CHILD])
 
 
