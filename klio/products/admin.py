@@ -145,7 +145,7 @@ class ProductAdmin(admin.ModelAdmin):
                     product.save()
 
                 else:
-                    count = Product.objects.filter(slug=slugify(name, replacements=CYRILLIC),
+                    count = Product.objects.filter(slug__startswith=slugify(name, replacements=CYRILLIC),
                                                    category=parent_category).count()
                     count = count if count else ''
                     prod_slug = '{0}-{1}'.format(slugify(name, replacements=CYRILLIC), count)
