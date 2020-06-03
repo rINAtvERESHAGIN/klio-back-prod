@@ -107,25 +107,25 @@ class SearchListView(ViewSet):
             categories = categories.annotate(
                 similarity=TrigramSimilarity('name', text)
             ).filter(
-                similarity__gt=0.1
+                similarity__gt=0.15
             ).order_by('-similarity')
 
             products = products.annotate(
                 similarity=TrigramSimilarity('name', text)
             ).filter(
-                Q(similarity__gt=0.1) | Q(art__icontains=text)
+                Q(art__icontains=text) | Q(similarity__gt=0.15)
             ).order_by('-similarity')
 
             articles = articles.annotate(
                 similarity=TrigramSimilarity('title', text)
             ).filter(
-                similarity__gt=0.1
+                similarity__gt=0.15
             ).order_by('-similarity')
 
             news = news.annotate(
                 similarity=TrigramSimilarity('title', text)
             ).filter(
-                similarity__gt=0.1
+                similarity__gt=0.15
             ).order_by('-similarity')
 
         if tags:
