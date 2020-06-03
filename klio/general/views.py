@@ -99,7 +99,7 @@ class SearchListView(ViewSet):
         direction = self.request.query_params.get('direction')
 
         categories = Category.objects.filter(activity=True)
-        products = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD])
+        products = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).order_by('name')
         articles = Article.objects.filter(activity=True)
         news = News.objects.filter(activity=True)
 
@@ -154,17 +154,18 @@ class SearchListView(ViewSet):
                         categories = categories.order_by('-name')
                 search_data = self.SearchData(categories=categories, products=None, articles=None, news=None)
             if obj_type == 'products':
-                if sort_by == 'name':
-                    if direction == 'asc':
-                        products = products.order_by('name')
-                    if direction == 'desc':
-                        products = products.order_by('-name')
-                if sort_by == 'price':
-                    if direction == 'desc':
-                        products = products.order_by('-price')
-                    else:
-                        products = products.order_by('price')
-                search_data = self.SearchData(categories=None, products=products, articles=None, news=None)
+                # if sort_by == 'name':
+                #     if direction == 'asc':
+                #         products = products.order_by('name')
+                #     if direction == 'desc':
+                #         products = products.order_by('-name')
+                # if sort_by == 'price':
+                #     if direction == 'desc':
+                #         products = products.order_by('-price')
+                #     else:
+                #         products = products.order_by('price')
+                # search_data = self.SearchData(categories=None, products=products, articles=None, news=None)
+                search_data = self.SearchData(categories=None, products=None, articles=None, news=None)
             if obj_type == 'articles':
                 if sort_by == 'title':
                     if direction == 'acs':
