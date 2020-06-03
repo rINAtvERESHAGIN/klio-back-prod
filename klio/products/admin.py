@@ -114,17 +114,21 @@ class ProductAdmin(admin.ModelAdmin):
                         category_name = category_name[1:-1]
                     category_slug = slugify(category_name, replacements=CYRILLIC)
                     same_name_categories = Category.objects.filter(slug__startswith=category_slug)
-                    category = same_name_categories.filter(slug=category_slug).first()
 
-                    if category:
-                        if category.parent != parent_category:
-                            category = None
-                            category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
-                    else:
+                    # Find exact match
+                    category = same_name_categories.filter(slug=category_slug, parent=parent_category).first()
+
+                    if not category:
+
+                        # Find not strict match in same parent
                         category = same_name_categories.filter(parent=parent_category).first()
                         if not category:
-                            if same_name_categories.count():
-                                category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
+
+                            # Find match from other parent categories
+                            in_other_parent = same_name_categories.filter(slug=category_slug).exists()
+                            if in_other_parent:
+                                if same_name_categories.count():
+                                    category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
 
                     if not category:
                         category = Category.objects.create(
