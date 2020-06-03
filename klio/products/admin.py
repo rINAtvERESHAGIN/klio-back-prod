@@ -1,4 +1,5 @@
 import csv
+import re
 from decimal import Decimal
 
 from django.contrib import admin
@@ -106,11 +107,25 @@ class ProductAdmin(admin.ModelAdmin):
             for row in csv_data:
                 categories_str, name, art, description, price, images_str = row
 
-                categories_names = categories_str.split(',')
+                categories_names = re.split(r',(?=")', categories_str)
                 parent_category = None
                 for category_name in categories_names:
+                    if category_name.startswith('"') and category_name.endswith('"'):
+                        category_name = category_name[1:-1]
                     category_slug = slugify(category_name, replacements=CYRILLIC)
-                    category = Category.objects.filter(slug=category_slug).first()
+                    same_name_categories = Category.objects.filter(slug__startswith=category_slug)
+                    category = same_name_categories.filter(slug=category_slug).first()
+
+                    if category:
+                        if category.parent != parent_category:
+                            category = None
+                            category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
+                    else:
+                        category = same_name_categories.filter(parent=parent_category).first()
+                        if not category:
+                            if same_name_categories.count():
+                                category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
+
                     if not category:
                         category = Category.objects.create(
                             name=category_name, slug=category_slug, parent=parent_category
