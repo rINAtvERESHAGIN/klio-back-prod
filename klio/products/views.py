@@ -200,7 +200,7 @@ class SearchProductListView(ListAPIView):
             queryset = queryset.annotate(
                 similarity=TrigramSimilarity('name', text)
             ).filter(
-                Q(similarity__gt=0.1) | Q(art__icontains=text)
+                Q(art__icontains=text) | Q(similarity__gt=0.15)
             ).order_by('-similarity')
         if tags:
             tags_list = tags.split(',')
