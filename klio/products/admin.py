@@ -4,7 +4,6 @@ from decimal import Decimal
 
 from django.contrib import admin
 from django.db import models
-from django.db.utils import IntegrityError
 from django.forms import FileField, Form, Textarea
 from django.shortcuts import redirect, render
 from django.urls import path
@@ -146,21 +145,14 @@ class ProductAdmin(admin.ModelAdmin):
                     product.save()
 
                 else:
-                    try:
-                        product = Product.objects.create(name=name, slug=slugify(name, replacements=CYRILLIC),
-                                                         category=parent_category, kind=Product.UNIQUE, art=art,
-                                                         description=description,
-                                                         price=Decimal(price.replace(" ", "")))
-                    except IntegrityError:
-                        count = Product.objects.filter(slug=slugify(name, replacements=CYRILLIC),
-                                                       category=parent_category).count()
-                        product = Product.objects.create(name=name,
-                                                         slug='{0}{1}'.format(
-                                                             slugify(name, replacements=CYRILLIC), count
-                                                         ),
-                                                         category=parent_category, kind=Product.UNIQUE, art=art,
-                                                         description=description,
-                                                         price=Decimal(price.replace(" ", "")))
+                    count = Product.objects.filter(slug=slugify(name, replacements=CYRILLIC),
+                                                   category=parent_category).count()
+                    count = count if count else ''
+                    prod_slug = '{0}-{1}'.format(slugify(name, replacements=CYRILLIC), count)
+                    product = Product.objects.create(name=name, slug=prod_slug,
+                                                     category=parent_category, kind=Product.UNIQUE, art=art,
+                                                     description=description,
+                                                     price=Decimal(price.replace(" ", "")))
 
                 images_names = images_str.split(',')
                 for index, image_name in enumerate(images_names):
