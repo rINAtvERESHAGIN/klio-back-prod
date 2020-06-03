@@ -138,7 +138,7 @@ class Product(models.Model):
                                      help_text=_("Choose the product type. Properties will be inherited after saving."
                                                  "Click 'Save & Continue' button."))
     """ None for child products, they inherit their parent's product type. """
-    category = models.ForeignKey('Category', on_delete=models.PROTECT, blank=True, null=True,
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, null=True,
                                  verbose_name=_('category'), help_text=_('Choose the most detailed category'))
     """ None for child products, they inherit their parent's product type. """
     brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('brand'),
