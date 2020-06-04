@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from cities_light.models import City, Country
-from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class Contact(models.Model):
@@ -17,7 +17,7 @@ class Contact(models.Model):
     phones = models.ManyToManyField('Phone', through='ContactPhone', related_name='contacts', verbose_name=_('phones'))
     map = models.URLField(blank=True, verbose_name=_('map'))
     order = models.PositiveSmallIntegerField(blank=False, default=1, verbose_name=_('order'))
-    content = RichTextField(blank=True, verbose_name=_('content'))
+    content = RichTextUploadingField(blank=True, verbose_name=_('content'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     class Meta:

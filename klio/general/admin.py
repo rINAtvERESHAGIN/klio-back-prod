@@ -31,7 +31,9 @@ class CallBackInfoAdmin(admin.ModelAdmin):
 
 
 class MenuItemAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'parent', 'menu', 'related_type', 'order', 'activity']
     search_fields = ['name']
+    list_filter = ['parent', 'menu']
 
 
 class MenuItemInline(admin.TabularInline):
