@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from .models import Basket, BasketProduct, Order, OrderPrivateInfo, OrderDeliveryInfo, OrderPaymentInfo, PromoCode
+from .utils import export_orders_csv
 
 
 class HiddenAdmin(admin.ModelAdmin):
@@ -31,8 +32,9 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'received', 'get_user', 'get_email', 'status', 'get_delivery_type', 'get_delivery_price',
                     'is_paid', 'price', 'promo', 'promo_code', 'get_city', 'get_products']
     list_per_page = 25
-    list_filter = ['status', 'is_paid', 'promo']
+    list_filter = ['status', 'is_paid', 'promo', 'received']
     search_fields = ['user__first_name', 'user__last_name', 'user__middle_name', 'user__username', 'user__email']
+    actions = [export_orders_csv]
 
     def get_user(self, obj):
         if obj.user:
