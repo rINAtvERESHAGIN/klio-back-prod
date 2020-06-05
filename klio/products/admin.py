@@ -228,7 +228,10 @@ class ProductAdmin(admin.ModelAdmin):
                 if not brand:
                     brand = Brand.objects.create(name=brand_name, slug=brand_slug, activity=False)
 
-                Product.objects.filter(art=art).update(category=parent_category, description=content, brand=brand)
+                try:
+                    Product.objects.filter(art=art).update(category=parent_category, description=content, brand=brand)
+                except ValueError:
+                    continue
 
             self.message_user(request, _("CSV file was successfully uploaded."))
             return redirect("..")
