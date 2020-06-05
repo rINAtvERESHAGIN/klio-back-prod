@@ -46,7 +46,7 @@ def export_orders_csv(modeladmin, request, queryset):
             smart_str(obj.user if obj.user else (
                 '{0} {1} (без регистрации)'.format(obj.private_info.last_name, obj.private_info.first_name)
             ) if obj.private_info else '-'),
-            smart_str(obj.user.email if obj.user else obj.private_info.email),
+            smart_str(obj.user.email if obj.user else obj.private_info.email if obj.private_info else '-'),
             smart_str(obj.get_status_display()),
             smart_str(obj.delivery_info.get_type_display() if obj.delivery_info else '-'),
             smart_str(delivery_price),
