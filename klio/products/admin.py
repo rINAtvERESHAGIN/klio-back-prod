@@ -97,6 +97,7 @@ class ProductAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         my_urls = [
             path('import-csv/', self.import_csv),
+            path('import-prices/', self.import_prices_csv),
         ]
         return my_urls + urls
 
@@ -160,6 +161,26 @@ class ProductAdmin(admin.ModelAdmin):
                                                                            img='products/{0}'.format(image_name))
                     prod_img.label = '{0} - Изображение #{1}'.format(product.name, index + 1)
                     prod_img.save()
+
+            self.message_user(request, _("CSV file was successfully uploaded."))
+            return redirect("..")
+        form = CsvImportForm()
+        payload = {"form": form}
+        return render(
+            request, "csv_form.html", payload
+        )
+
+    def import_prices_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
+            for row in csv_data:
+                art, price, in_stock = row
+                try:
+                    Product.objects.filter(art=art).update(price=Decimal(price.replace(',', '.')),
+                                                           in_stock=Decimal(in_stock.replace(',', '.')))
+                except ValueError:
+                    continue
 
             self.message_user(request, _("CSV file was successfully uploaded."))
             return redirect("..")
