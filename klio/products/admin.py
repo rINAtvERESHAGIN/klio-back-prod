@@ -196,7 +196,7 @@ class ProductAdmin(admin.ModelAdmin):
             for row in csv_data:
                 category1, category2, category3, category4, art, content, brand_name = row
 
-                category_list = [c for c in [category1, category2, category3, category4] if c is not None]
+                category_list = [c for c in [category1, category2, category3, category4] if c != '']
                 parent_category = None
                 for category_name in category_list:
                     category_slug = slugify(category_name, replacements=CYRILLIC)
