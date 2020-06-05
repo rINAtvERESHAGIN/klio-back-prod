@@ -97,7 +97,8 @@ class ProductAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         my_urls = [
             path('import-csv/', self.import_csv),
-            path('import-prices/', self.import_prices_csv),
+            path('update-prices/', self.update_prices_csv),
+            path('update-category-content/', self.update_category_csv),
         ]
         return my_urls + urls
 
@@ -137,13 +138,11 @@ class ProductAdmin(admin.ModelAdmin):
                         )
                     parent_category = category
 
-                product = Product.objects.filter(art=art).first()
+                product = Product.objects.filter(art=art)
                 if product:
-                    product.category = parent_category
-                    product.name = name
-                    product.description = description
-                    product.price = Decimal(price.replace(" ", ""))
-                    product.save()
+                    product.update(category=parent_category, name=name, description=description,
+                                   price=Decimal(price.replace(" ", "")))
+                    product = product.first()
 
                 else:
                     count = Product.objects.filter(slug__startswith=slugify(name, replacements=CYRILLIC),
@@ -170,7 +169,7 @@ class ProductAdmin(admin.ModelAdmin):
             request, "csv_form.html", payload
         )
 
-    def import_prices_csv(self, request):
+    def update_prices_csv(self, request):
         if request.method == "POST":
             csv_file = request.FILES["csv_file"]
             csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
@@ -181,6 +180,55 @@ class ProductAdmin(admin.ModelAdmin):
                                                            in_stock=Decimal(in_stock.replace(',', '.')))
                 except ValueError:
                     continue
+
+            self.message_user(request, _("CSV file was successfully uploaded."))
+            return redirect("..")
+        form = CsvImportForm()
+        payload = {"form": form}
+        return render(
+            request, "csv_form.html", payload
+        )
+
+    def update_category_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
+            for row in csv_data:
+                category1, category2, category3, category4, art, content, brand_name = row
+
+                category_list = [c for c in [category1, category2, category3, category4] if c is not None]
+                parent_category = None
+                for category_name in category_list:
+                    category_slug = slugify(category_name, replacements=CYRILLIC)
+                    same_name_categories = Category.objects.filter(slug__startswith=category_slug)
+
+                    # Find exact match
+                    category = same_name_categories.filter(slug=category_slug, parent=parent_category).first()
+
+                    if not category:
+
+                        # Find not strict match in same parent
+                        category = same_name_categories.filter(parent=parent_category).first()
+                        if not category:
+
+                            # Find match from other parent categories
+                            in_other_parent = same_name_categories.filter(slug=category_slug).exists()
+                            if in_other_parent:
+                                if same_name_categories.count():
+                                    category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
+
+                    if not category:
+                        category = Category.objects.create(
+                            name=category_name, slug=category_slug, parent=parent_category
+                        )
+                    parent_category = category
+
+                brand_slug = slugify(brand_name, replacements=CYRILLIC)
+                brand = Brand.objects.filter(slug=brand_slug).first()
+                if not brand:
+                    brand = Brand.objects.create(name=brand_name, slug=brand_slug, activity=False)
+
+                Product.objects.filter(art=art).update(category=parent_category, description=content, brand=brand)
 
             self.message_user(request, _("CSV file was successfully uploaded."))
             return redirect("..")

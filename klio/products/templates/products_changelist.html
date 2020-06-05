@@ -1,8 +1,9 @@
 {% extends 'admin/change_list.html' %}
 
 {% block object-tools %}
-    <a href="import-csv/" class="grp-button" style="margin-bottom: 10px;">Import CSV</a>
-    <a href="import-prices/" class="grp-button" style="margin-bottom: 10px;">Import Prices CSV</a>
+    <a href="import-csv/" class="grp-button" style="margin-bottom: 10px;">Загрузить продукты</a>
+    <a href="update-prices/" class="grp-button" style="margin-bottom: 10px;">Обновить цены и кол-ва</a>
+    <a href="update-category-content/" class="grp-button" style="margin-bottom: 10px;">Обновить категорию, контент и бренд</a>
     <br />
     {{ block.super }}
 {% endblock %}
