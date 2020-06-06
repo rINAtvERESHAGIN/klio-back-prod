@@ -146,8 +146,14 @@ class ProductAdmin(admin.ModelAdmin):
 
                 product = Product.objects.filter(art=art)
                 if product:
-                    product.update(category=parent_category, name=name, description=description,
-                                   price=Decimal(price.replace(" ", "")))
+                    try:
+                        product.update(category=parent_category, name=name, description=description,
+                                       price=Decimal(price.replace(" ", "")))
+                    except IntegrityError:
+                        prod_slug = product.values_list('slug', flat=True)
+                        prod_count = Product.objects.filter(slug=prod_slug).count()
+                        product.update(slug='{0}{1}'.format(prod_slug, prod_count), name=name, description=description,
+                                       category=parent_category, price=Decimal(price.replace(" ", "")))
                     product = product.first()
 
                 else:
@@ -246,7 +252,7 @@ class ProductAdmin(admin.ModelAdmin):
                                                                    brand=brand)
                         except IntegrityError:
                             prod_slug = Product.objects.filter(art=art).values_list('slug', flat=True)
-                            prod_count = Product.objects.filter(slug=prod_slug)
+                            prod_count = Product.objects.filter(slug=prod_slug).count()
                             Product.objects.filter(art=art).update(slug='{0}{1}'.format(prod_slug, prod_count),
                                                                    category=parent_category, description=content,
                                                                    brand=brand)
