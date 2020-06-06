@@ -122,14 +122,16 @@ class ProductAdmin(admin.ModelAdmin):
 
                     if not category:
 
-                        # Find not strict match in same parent
-                        category = same_name_categories.filter(parent=parent_category).first()
+                        # Find not strict match in same parent (False for root categories!)
+                        category = same_name_categories.filter(parent=parent_category, parent__isnull=False).first()
+                        if category.slug[-1] not in range(0, 9):
+                            category = None
                         if not category:
 
                             # Find match from other parent categories
                             in_other_parent = same_name_categories.filter(slug=category_slug).exists()
                             if in_other_parent:
-                                if same_name_categories.count():
+                                if same_name_categories.count() > 1:
                                     category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
 
                     if not category:
@@ -207,14 +209,16 @@ class ProductAdmin(admin.ModelAdmin):
 
                     if not category:
 
-                        # Find not strict match in same parent
-                        category = same_name_categories.filter(parent=parent_category).first()
+                        # Find not strict match in same parent (False for root categories!)
+                        category = same_name_categories.filter(parent=parent_category, parent__isnull=False).first()
+                        if category.slug[-1] not in range(0, 9):
+                            category = None
                         if not category:
 
                             # Find match from other parent categories
                             in_other_parent = same_name_categories.filter(slug=category_slug).exists()
                             if in_other_parent:
-                                if same_name_categories.count():
+                                if same_name_categories.count() > 1:
                                     category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
 
                     if not category:
