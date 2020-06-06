@@ -135,7 +135,7 @@ class ProductAdmin(admin.ModelAdmin):
                             # Find match from other parent categories
                             in_other_parent = same_name_categories.filter(slug=category_slug).exists()
                             if in_other_parent:
-                                if same_name_categories.count() > 1:
+                                if same_name_categories.count() > 0:
                                     category_slug = "{0}{1}".format(category_slug, same_name_categories.count())
 
                     if not category:
