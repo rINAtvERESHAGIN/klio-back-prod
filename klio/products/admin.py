@@ -122,8 +122,8 @@ class ProductAdmin(admin.ModelAdmin):
 
                     if not category:
 
-                        # Find not strict match in same parent
-                        category = same_name_categories.filter(parent=parent_category).first()
+                        # Find not strict match in same parent (False for root categories!)
+                        category = same_name_categories.filter(parent=parent_category, parent__isnull=False).first()
                         if not category:
 
                             # Find match from other parent categories
@@ -207,8 +207,8 @@ class ProductAdmin(admin.ModelAdmin):
 
                     if not category:
 
-                        # Find not strict match in same parent
-                        category = same_name_categories.filter(parent=parent_category).first()
+                        # Find not strict match in same parent (False for root categories!)
+                        category = same_name_categories.filter(parent=parent_category, parent__isnull=False).first()
                         if not category:
 
                             # Find match from other parent categories
