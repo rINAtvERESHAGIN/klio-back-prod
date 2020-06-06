@@ -126,7 +126,9 @@ class ProductAdmin(admin.ModelAdmin):
                         # Find not strict match in same parent (False for root categories!)
                         category = same_name_categories.filter(parent=parent_category, parent__isnull=False).first()
                         if category:
-                            if category.slug[-1] not in range(0, 9):
+                            try:
+                                int(category.slug[-1])
+                            except ValueError:
                                 category = None
                         if not category:
 
@@ -214,7 +216,9 @@ class ProductAdmin(admin.ModelAdmin):
                         # Find not strict match in same parent (False for root categories!)
                         category = same_name_categories.filter(parent=parent_category, parent__isnull=False).first()
                         if category:
-                            if category.slug[-1] not in range(0, 9):
+                            try:
+                                int(category.slug[-1])
+                            except ValueError:
                                 category = None
                         if not category:
 
