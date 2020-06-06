@@ -148,7 +148,7 @@ class ProductAdmin(admin.ModelAdmin):
                     count = Product.objects.filter(slug__startswith=slugify(name, replacements=CYRILLIC),
                                                    category=parent_category).count()
                     count = count if count else ''
-                    prod_slug = '{0}-{1}'.format(slugify(name, replacements=CYRILLIC), count)
+                    prod_slug = '{0}{1}'.format(slugify(name, replacements=CYRILLIC), count)
                     product = Product.objects.create(name=name, slug=prod_slug,
                                                      category=parent_category, kind=Product.UNIQUE, art=art,
                                                      description=description,
@@ -229,7 +229,11 @@ class ProductAdmin(admin.ModelAdmin):
                     brand = Brand.objects.create(name=brand_name, slug=brand_slug, activity=False)
 
                 try:
-                    Product.objects.filter(art=art).update(category=parent_category, description=content, brand=brand)
+                    if content:
+                        Product.objects.filter(art=art).update(category=parent_category, description=content,
+                                                               brand=brand)
+                    else:
+                        Product.objects.filter(art=art).update(category=parent_category, brand=brand)
                 except ValueError:
                     continue
 
