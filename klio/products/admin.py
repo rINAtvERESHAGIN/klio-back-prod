@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.contrib import admin
 from django.db import models
+from django.db import IntegrityError
 from django.forms import FileField, Form, Textarea
 from django.shortcuts import redirect, render
 from django.urls import path
@@ -236,10 +237,24 @@ class ProductAdmin(admin.ModelAdmin):
 
                 try:
                     if content:
-                        Product.objects.filter(art=art).update(category=parent_category, description=content,
-                                                               brand=brand)
+                        try:
+                            Product.objects.filter(art=art).update(category=parent_category, description=content,
+                                                                   brand=brand)
+                        except IntegrityError:
+                            prod_slug = Product.objects.filter(art=art).values_list('slug', flat=True)
+                            prod_count = Product.objects.filter(slug=prod_slug)
+                            Product.objects.filter(art=art).update(slug='{0}{1}'.format(prod_slug, prod_count),
+                                                                   category=parent_category, description=content,
+                                                                   brand=brand)
+
                     else:
-                        Product.objects.filter(art=art).update(category=parent_category, brand=brand)
+                        try:
+                            Product.objects.filter(art=art).update(category=parent_category, brand=brand)
+                        except IntegrityError:
+                            prod_slug = Product.objects.filter(art=art).values_list('slug', flat=True)
+                            prod_count = Product.objects.filter(slug=prod_slug)
+                            Product.objects.filter(art=art).update(slug='{0}{1}'.format(prod_slug, prod_count),
+                                                                   category=parent_category, brand=brand)
                 except ValueError:
                     continue
 
