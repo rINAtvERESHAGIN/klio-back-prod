@@ -142,7 +142,7 @@ class Menu(models.Model):
 
     def clean(self):
         if self.activity:
-            active_menus = Menu.objects.filter(activity=True, position=self.position).exclude(name=self.name)
+            active_menus = Menu.objects.filter(activity=True, position=self.position).exclude(id=self.id)
             if active_menus.exists():
                 raise ValidationError(_("""Active menu for selected position is already exists.
                                         Please, deactivate it first."""))
