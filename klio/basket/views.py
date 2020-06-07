@@ -290,14 +290,19 @@ class OrderActiveUpdateView(UpdateAPIView):
             # Refresh delivery price
             delivery = order.delivery_info
             order_price, delivery_price = 0, 0
-            if delivery.to_city.name in ['Moscow', 'Kostroma']:
-                for basket_product in order.basket.inside.all():
-                    order_price += basket_product.price * basket_product.quantity
-                delivery_price = 350 if order_price < 3000 else 0
-            if delivery.to_city.name == 'Saint Petersburg':
-                for basket_product in order.basket.inside.all():
-                    order_price += basket_product.price * basket_product.quantity
-                delivery_price = 500 if order_price < 5000 else 0
+
+            if delivery.type == 'courier':
+                # if delivery.to_city.name in ['Moscow', 'Kostroma']:
+                if delivery.to_city.name == 'Moscow':
+                    for basket_product in order.basket.inside.all():
+                        order_price += basket_product.price * basket_product.quantity
+                    delivery_price = 350 if order_price < 3000 else 0
+
+                if delivery.to_city.name == 'Saint Petersburg':
+                    for basket_product in order.basket.inside.all():
+                        order_price += basket_product.price * basket_product.quantity
+                    delivery_price = 500 if order_price < 5000 else 0
+
             delivery.price = delivery_price
             delivery.save()
 
