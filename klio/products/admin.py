@@ -100,6 +100,7 @@ class ProductAdmin(admin.ModelAdmin):
             path('import-csv/', self.import_csv),
             path('update-prices/', self.update_prices_csv),
             path('update-category-content/', self.update_category_csv),
+            path('update-properties/', self.update_properties_csv),
         ]
         return my_urls + urls
 
@@ -267,6 +268,71 @@ class ProductAdmin(admin.ModelAdmin):
                                                                    category=parent_category, brand=brand)
                 except ValueError:
                     continue
+
+            self.message_user(request, _("CSV file was successfully uploaded."))
+            return redirect("..")
+        form = CsvImportForm()
+        payload = {"form": form}
+        return render(
+            request, "csv_form.html", payload
+        )
+
+    def update_properties_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
+            header = next(csv_data)
+            props_names = header[1:]
+            for row in csv_data:
+                art, props_values = row[0], row[1:]
+
+                if not props_values or not art:
+                    continue
+
+                try:
+                    product_id = Product.objects.filter(art=art).values_list('id', flat=True)[0]
+                except IndexError:
+                    continue
+
+                for index, pv in enumerate(props_values):
+
+                    if not pv:
+                        continue
+
+                    if '.' in pv:
+                        try:
+                            pv = float(pv)
+                        except ValueError:
+                            value_type, interval = 'text', None
+                        else:
+                            value_type, interval = 'float', 0.01
+
+                    else:
+                        try:
+                            pv = int(pv)
+                        except ValueError:
+                            value_type, interval = 'text', None
+                        else:
+                            value_type, interval = 'integer', 1
+
+                    prop_slug = slugify(props_names[index], replacements=CYRILLIC)
+                    try:
+                        prop_id = ProductProperty.objects.filter(slug=prop_slug).values_list('id', flat=True)[0]
+                    except IndexError:
+                        prop = ProductProperty.objects.create(name=props_names[index], slug=prop_slug,
+                                                              interval=interval, type=value_type)
+                        prop_id = prop.id
+
+                    value, is_new_value = ProductPropertyValue.objects.get_or_create(product_id=product_id,
+                                                                                     prop_id=prop_id)
+                    if value_type == 'integer':
+                        value.value_integer = pv
+                    if value_type == 'float':
+                        value.value_float = pv
+                    if value_type == 'text':
+                        value.value_text = pv
+
+                    value.save()
 
             self.message_user(request, _("CSV file was successfully uploaded."))
             return redirect("..")
