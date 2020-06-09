@@ -20,13 +20,18 @@ class SubCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'slug', 'parent')
+        fields = ('id', 'name', 'slug', 'parent', 'img', 'has_children')
 
     def get_parent(self, obj):
         if obj.parent:
             return SubCategorySerializer(obj.parent).data
         else:
             return None
+
+    def get_has_children(self, obj):
+        if obj.children.count():
+            return True
+        return False
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -35,11 +40,11 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'img', 'description',
-                  'children', 'parent')
+                  'with_filters', 'children', 'parent')
 
     def get_fields(self):
         fields = super(CategorySerializer, self).get_fields()
-        fields['children'] = CategorySerializer(many=True)
+        fields['children'] = SubCategorySerializer(many=True)
         return fields
 
 
