@@ -39,7 +39,7 @@ class BrandAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'get_parent', 'group', 'order', 'on_main', 'activity']
-    list_per_page = 50
+    list_per_page = 25
     list_editable = ['order', 'on_main', 'activity']
     search_fields = ['name']
     list_filter = ['on_main', 'activity']

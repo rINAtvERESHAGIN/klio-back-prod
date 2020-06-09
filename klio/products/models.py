@@ -47,6 +47,7 @@ class Category(models.Model):
     img = models.ImageField(blank=True, verbose_name=_('image'), upload_to='categories')
     description = RichTextField(blank=True, verbose_name=_('description'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
+    with_filters = models.BooleanField(default=False, verbose_name=_('show filters'))
     on_main = models.BooleanField(default=False, verbose_name=_('on main'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
@@ -85,6 +86,11 @@ class Category(models.Model):
 
     def get_parent_name(self):
         return self.parent.name
+
+    def has_children(self):
+        if self.children.count():
+            return True
+        return False
 
 
 class CategoryCityRating(models.Model):
@@ -338,8 +344,8 @@ class ProductProperty(models.Model):
     type = models.CharField(choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0], max_length=20, verbose_name=_("type"))
     units = models.ForeignKey('Unit', on_delete=models.SET_NULL, null=True, blank=True, related_name='properties',
                               verbose_name=_('units'))
-    interval = models.DecimalField(blank=True, null=True, max_digits=6, verbose_name=_('property interval'),
-                                   decimal_places=3,
+    interval = models.DecimalField(blank=True, null=True, max_digits=8, verbose_name=_('property interval'),
+                                   decimal_places=5,
                                    help_text=_("Accuracy between two neighbour values during searching. Used for "
                                                "integer or float types only."))
     required = models.BooleanField(default=False, verbose_name=_('required'))

@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Brand, Category, Product, ProductProperty, UserProduct
+from .models import Brand, Category, Product, ProductProperty, ProductPropertyValue, UserProduct
 from .serializers import (BrandListSerializer, CategorySerializer, CategoryListSerializer, FilterListSerializer,
                           ProductSerializer, ProductListSerializer)
 
@@ -43,8 +43,22 @@ class CategoryFilterListView(ListAPIView):
     serializer_class = FilterListSerializer
 
     def get_products_ids(self):
+        # Get the category id
+        categories_ids = list(Category.objects.filter(slug=self.kwargs['slug']).values_list('id', flat=True))
+        if not categories_ids:
+            return None
+
+        # Get all nested categories ids
+        parents = categories_ids
+        children = True
+        while children:
+            children = list(Category.objects.filter(parent_id__in=parents).values_list('id', flat=True))
+            categories_ids += children
+            parents = children
+
+        # Get the products ids
         products_ids = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
-            Q(category__slug=self.kwargs['slug']) | Q(parent__category__slug=self.kwargs['slug'])
+            Q(category_id__in=categories_ids) | Q(parent__category_id__in=categories_ids)
         ).values_list('id', flat=True)
         return products_ids
 
@@ -71,9 +85,22 @@ class CategoryProductListView(ListAPIView):
             query_dict.pop(k, None)
         prop_filters = query_dict
 
+        # Get the category id
+        categories_ids = list(Category.objects.filter(slug=self.kwargs['slug']).values_list('id', flat=True))
+        if not categories_ids:
+            return []
+
+        # Get all nested categories ids
+        parents = categories_ids
+        children = True
+        while children:
+            children = list(Category.objects.filter(parent_id__in=parents).values_list('id', flat=True))
+            categories_ids += children
+            parents = children
+
         queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
-            Q(category__slug=self.kwargs['slug']) | Q(parent__category__slug=self.kwargs['slug'])
-        ).order_by('name')
+            Q(category_id__in=categories_ids) | Q(parent__category_id__in=categories_ids)
+        )
 
         # Filtering block
         if in_stock:
@@ -83,28 +110,41 @@ class CategoryProductListView(ListAPIView):
             [prop_name, prop_type] = key.split("_")
 
             value = query_dict.get(key)
-            value = True if value == 'true' else value.split(",")
+            value = True if value == 'true' else False if value == 'false' else value.split(",")
 
             # Filter by boolean type properties
             if prop_type == 'b' and value:
-                ids = [product.id for product in queryset if
-                       product.get_actual_value_by_property_slug(prop_name)]
-                queryset = queryset.filter(id__in=ids)
+                pvs_ids = list(ProductPropertyValue.objects.filter(
+                    prop__slug=prop_name, value_boolean=value).values_list('id', flat=True))
+                queryset = queryset.filter(property_values__in=pvs_ids)
+
+                # ids = [product.id for product in queryset if
+                #        product.get_actual_value_by_property_slug(prop_name)]
+                # queryset = queryset.filter(id__in=ids)
 
             # Filter by text (choices) type properties. Example: prop=['var1', 'var2', ...]
             if prop_type == 't':
-                ids = [product.id for product in queryset if
-                       product.get_actual_value_by_property_slug(prop_name) in value]
-                queryset = queryset.filter(id__in=ids)
+                pvs_ids = list(ProductPropertyValue.objects.filter(
+                    prop__slug=prop_name, value_text__in=value).values_list('id', flat=True))
+                queryset = queryset.filter(property_values__in=pvs_ids)
+
+                # ids = [product.id for product in queryset if
+                #        product.get_actual_value_by_property_slug(prop_name) in value]
+                # queryset = queryset.filter(id__in=ids)
 
             # Filter by digit (int/float) type properties. Example: prop=[100, 1090]
             if prop_type == 'd' and isinstance(value, list):
+                # pvs_ids = list(ProductPropertyValue.objects.filter(
+                #     Q(value_integer=value) | Q(value_float=value), prop__slug=prop_name).values_list('id', flat=True))
+                # queryset = queryset.filter(property_values__in=pvs_ids)
                 ids = [product.id for product in queryset if
                        float(value[0]) <= product.get_actual_value_by_property_slug(prop_name) <= float(value[1])]
                 queryset = queryset.filter(id__in=ids)
 
         # Sorting block
         if sort_by == 'name':
+            if direction == 'asc':
+                queryset = queryset.order_by('name')
             if direction == 'desc':
                 queryset = queryset.order_by('-name')
         if sort_by == 'price':
