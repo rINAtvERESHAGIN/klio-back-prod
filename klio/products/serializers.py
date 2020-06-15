@@ -40,7 +40,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'img', 'description',
-                  'with_filters', 'children', 'parent')
+                  'with_general_img', 'with_filters', 'children', 'parent')
 
     def get_fields(self):
         fields = super(CategorySerializer, self).get_fields()

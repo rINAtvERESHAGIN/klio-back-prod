@@ -47,6 +47,7 @@ class Category(models.Model):
     img = models.ImageField(blank=True, verbose_name=_('image'), upload_to='categories')
     description = RichTextField(blank=True, verbose_name=_('description'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
+    with_general_img = models.BooleanField(default=False, verbose_name=_('show general image'))
     with_filters = models.BooleanField(default=False, verbose_name=_('show filters'))
     on_main = models.BooleanField(default=False, verbose_name=_('on main'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
