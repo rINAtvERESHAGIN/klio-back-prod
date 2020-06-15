@@ -10,7 +10,7 @@ User = get_user_model()
 class UserDetailSerializer(serializers.ModelSerializer):
     registered = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     last_login = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
-    birthday = serializers.DateField(format="%Y-%m-%d")
+    birthday = serializers.DateField(format="%Y-%m-%d", required=False, allow_null=True)
     # country = serializers.SerializerMethodField('get_country')
     phones = PhoneSerializer(many=True)
 
