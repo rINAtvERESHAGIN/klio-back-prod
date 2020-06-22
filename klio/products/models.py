@@ -145,8 +145,8 @@ class Product(models.Model):
                                      help_text=_("Choose the product type. Properties will be inherited after saving."
                                                  "Click 'Save & Continue' button."))
     """ None for child products, they inherit their parent's product type. """
-    categories = models.ManyToManyField('Category', blank=True, verbose_name=_('categories'), related_name='products',
-                                        help_text=_('Choose the most detailed categories'))
+    category = models.ForeignKey('Category', blank=True, verbose_name=_('category'), related_name='products',
+                                 help_text=_('Choose the most detailed categories'))
     """ None for child products, they inherit their parent's product type. """
     brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('brand'),
                               help_text=_("If this field is empty for child product, Brand will be inherited from"
