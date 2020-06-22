@@ -146,7 +146,7 @@ class Product(models.Model):
                                                  "Click 'Save & Continue' button."))
     """ None for child products, they inherit their parent's product type. """
     category = models.ForeignKey('Category', blank=True, verbose_name=_('category'), related_name='products',
-                                 help_text=_('Choose the most detailed categories'))
+                                 help_text=_('Choose the most detailed categories'), on_delete=models.CASCADE)
     """ None for child products, they inherit their parent's product type. """
     brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('brand'),
                               help_text=_("If this field is empty for child product, Brand will be inherited from"
