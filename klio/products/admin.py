@@ -15,6 +15,7 @@ from slugify import slugify
 from sale.models import SpecialProduct
 from .models import (Brand, Category, Product, ProductImage, ProductProperty, ProductPropertyValue,
                      ProductType, Unit)
+from .utils import export_product_categories_csv
 
 CYRILLIC = [
     (u'ё', u'yo'),
@@ -73,19 +74,20 @@ class CsvImportForm(Form):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'kind', 'get_type', 'get_category', 'art', 'in_stock', 'price', 'order', 'modified',
+    list_display = ['__str__', 'kind', 'get_type', 'art', 'in_stock', 'price', 'order', 'modified',
                     'activity']
     list_per_page = 25
     list_editable = ['in_stock', 'price', 'order', 'activity']
     search_fields = ['name', 'art']
     list_filter = ['kind', 'product_type', 'activity']
     prepopulated_fields = {"slug": ("name",)}
-    autocomplete_fields = ['parent', 'category', 'product_type', 'tags', 'units', 'recommended']
+    autocomplete_fields = ['parent', 'categories', 'product_type', 'tags', 'units', 'recommended']
     inlines = [
         ProductPropertyValueInline,
         ProductImageInline,
         SpecialProductInline,
     ]
+    actions = [export_product_categories_csv]
     save_on_top = True
     change_list_template = "products_changelist.html"
 
@@ -148,22 +150,22 @@ class ProductAdmin(admin.ModelAdmin):
                 product = Product.objects.filter(art=art)
                 if product:
                     try:
-                        product.update(category=parent_category, name=name, description=description,
+                        product.update(categories=parent_category, name=name, description=description,
                                        price=Decimal(price.replace(" ", "")))
                     except IntegrityError:
                         prod_slug = product.values_list('slug', flat=True)[0]
                         prod_count = Product.objects.filter(slug=prod_slug).count()
                         product.update(slug='{0}{1}'.format(prod_slug, prod_count), name=name, description=description,
-                                       category=parent_category, price=Decimal(price.replace(" ", "")))
+                                       categories=parent_category, price=Decimal(price.replace(" ", "")))
                     product = product.first()
 
                 else:
                     count = Product.objects.filter(slug__startswith=slugify(name, replacements=CYRILLIC),
-                                                   category=parent_category).count()
+                                                   categories=parent_category).count()
                     count = count if count else ''
                     prod_slug = '{0}{1}'.format(slugify(name, replacements=CYRILLIC), count)
                     product = Product.objects.create(name=name, slug=prod_slug,
-                                                     category=parent_category, kind=Product.UNIQUE, art=art,
+                                                     categories=parent_category, kind=Product.UNIQUE, art=art,
                                                      description=description,
                                                      price=Decimal(price.replace(" ", "")))
 
@@ -249,23 +251,23 @@ class ProductAdmin(admin.ModelAdmin):
                 try:
                     if content:
                         try:
-                            Product.objects.filter(art=art).update(category=parent_category, description=content,
+                            Product.objects.filter(art=art).update(categories=parent_category, description=content,
                                                                    brand=brand)
                         except IntegrityError:
                             prod_slug = Product.objects.filter(art=art).values_list('slug', flat=True)[0]
                             prod_count = Product.objects.filter(slug=prod_slug).count()
                             Product.objects.filter(art=art).update(slug='{0}{1}'.format(prod_slug, prod_count),
-                                                                   category=parent_category, description=content,
+                                                                   categories=parent_category, description=content,
                                                                    brand=brand)
 
                     else:
                         try:
-                            Product.objects.filter(art=art).update(category=parent_category, brand=brand)
+                            Product.objects.filter(art=art).update(categories=parent_category, brand=brand)
                         except IntegrityError:
                             prod_slug = Product.objects.filter(art=art).values_list('slug', flat=True)
                             prod_count = Product.objects.filter(slug=prod_slug)
                             Product.objects.filter(art=art).update(slug='{0}{1}'.format(prod_slug, prod_count),
-                                                                   category=parent_category, brand=brand)
+                                                                   categories=parent_category, brand=brand)
                 except ValueError:
                     continue
 
@@ -348,11 +350,11 @@ class ProductAdmin(admin.ModelAdmin):
             form.base_fields['recommended'].queryset = Product.objects.exclude(id__exact=obj.id)
         return form
 
-    def get_category(self, obj):
-        return obj.get_category()
+    def get_categories(self, obj):
+        return obj.get_categories()
 
-    get_category.short_description = _('Category')
-    get_category.admin_order_field = 'category__name'
+    get_categories.short_description = _('Categories')
+    get_categories.admin_order_field = 'categories__name'
 
     def get_type(self, obj):
         return obj.get_product_type()

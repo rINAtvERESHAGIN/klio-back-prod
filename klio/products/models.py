@@ -145,8 +145,8 @@ class Product(models.Model):
                                      help_text=_("Choose the product type. Properties will be inherited after saving."
                                                  "Click 'Save & Continue' button."))
     """ None for child products, they inherit their parent's product type. """
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, null=True,
-                                 verbose_name=_('category'), help_text=_('Choose the most detailed category'))
+    categories = models.ManyToManyField('Category', blank=True, verbose_name=_('categories'), related_name='products',
+                                        help_text=_('Choose the most detailed categories'))
     """ None for child products, they inherit their parent's product type. """
     brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('brand'),
                               help_text=_("If this field is empty for child product, Brand will be inherited from"
@@ -189,7 +189,6 @@ class Product(models.Model):
         ordering = ['-activity', 'product_type', 'order']
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
-        unique_together = ('category', 'slug')
 
     def __str__(self):
         return self.name
@@ -208,8 +207,8 @@ class Product(models.Model):
     def _clean_unique(self):
         if self.parent:
             raise ValidationError(_('Unique product should not have a parent'))
-        if not self.category:
-            raise ValidationError(_('Unique product should contain a category'))
+        if not self.categories.filter(activity=True):
+            raise ValidationError(_('Unique product should contain at least one category'))
         if not self.product_type:
             raise ValidationError(_('Unique product should contain a product type'))
         if not self.art:
@@ -222,8 +221,8 @@ class Product(models.Model):
     def _clean_parent(self):
         if self.parent:
             raise ValidationError(_('Parent product should not have a parent'))
-        if not self.category:
-            raise ValidationError(_('Parent product should contain a category'))
+        if not self.categories.filter(activity=True):
+            raise ValidationError(_('Parent product should contain at least one category'))
         if not self.product_type:
             raise ValidationError(_('Parent product should contain a product type'))
         if self.art:
@@ -240,7 +239,7 @@ class Product(models.Model):
             raise ValidationError(_('Child product must have a parent'))
         if not self.parent.product_type:
             raise ValidationError(_('Selected parent is not valid - no product type found.'))
-        if self.category:
+        if self.categories.filter(activity=True):
             raise ValidationError(_('Child product inherit its parent category. Leave it blank or choose parents.'))
         if self.product_type:
             raise ValidationError(_('Child product inherit its parent product type'))
@@ -287,8 +286,12 @@ class Product(models.Model):
     def get_base_amount(self):
         return self.parent.base_amount if self.is_child else self.base_amount
 
-    def get_category(self):
-        return self.parent.category if self.is_child else self.category
+    def get_categories(self):
+        if self.is_child:
+            categories = self.parent.categories.filter(activity=True)
+        else:
+            categories = self.categories.filter(activity=True)
+        return ', '.join([c.name for c in categories])
 
     def get_product_type(self):
         return self.parent.product_type if self.is_child else self.product_type

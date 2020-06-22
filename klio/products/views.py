@@ -44,7 +44,9 @@ class CategoryFilterListView(ListAPIView):
 
     def get_products_ids(self):
         # Get the category id
-        categories_ids = list(Category.objects.filter(slug=self.kwargs['slug']).values_list('id', flat=True))
+        categories_ids = list(Category.objects.filter(
+            slug=self.kwargs['slug'], activity=True
+        ).values_list('id', flat=True))
         if not categories_ids:
             return None
 
@@ -52,13 +54,13 @@ class CategoryFilterListView(ListAPIView):
         parents = categories_ids
         children = True
         while children:
-            children = list(Category.objects.filter(parent_id__in=parents).values_list('id', flat=True))
+            children = list(Category.objects.filter(activity=True, parent_id__in=parents).values_list('id', flat=True))
             categories_ids += children
             parents = children
 
         # Get the products ids
         products_ids = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
-            Q(category_id__in=categories_ids) | Q(parent__category_id__in=categories_ids)
+            Q(categories__in=categories_ids) | Q(parent__categories__in=categories_ids)
         ).values_list('id', flat=True)
         return products_ids
 
@@ -86,7 +88,9 @@ class CategoryProductListView(ListAPIView):
         prop_filters = query_dict
 
         # Get the category id
-        categories_ids = list(Category.objects.filter(slug=self.kwargs['slug']).values_list('id', flat=True))
+        categories_ids = list(Category.objects.filter(
+            activity=True, slug=self.kwargs['slug']
+        ).values_list('id', flat=True))
         if not categories_ids:
             return []
 
@@ -94,13 +98,19 @@ class CategoryProductListView(ListAPIView):
         parents = categories_ids
         children = True
         while children:
-            children = list(Category.objects.filter(parent_id__in=parents).values_list('id', flat=True))
+            children = list(Category.objects.filter(activity=True, parent_id__in=parents).values_list('id', flat=True))
             categories_ids += children
             parents = children
 
+        if not categories_ids:
+            return []
+
         queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
-            Q(category_id__in=categories_ids) | Q(parent__category_id__in=categories_ids)
+            Q(categories__in=categories_ids) | Q(parent__categories__in=categories_ids)
         )
+
+        if not queryset:
+            return []
 
         # Filtering block
         if in_stock:
@@ -201,27 +211,69 @@ class ProductDetailView(RetrieveAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        return Product.objects.filter(activity=True, category__slug=self.kwargs.get('category_slug'),
-                                      kind__in=[Product.UNIQUE, Product.CHILD])
+        return Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD])
 
 
 class ProductMainNewListView(ListAPIView):
     serializer_class = ProductListSerializer
-    new_product_period = datetime.today() - timedelta(days=60)
-    queryset = Product.objects.filter(
-        Q(activity=True, is_new='new', kind__in=[Product.UNIQUE, Product.CHILD]) | Q(
-            activity=True, is_new='calculated', created__gte=new_product_period,
-            kind__in=[Product.UNIQUE, Product.CHILD]
+
+    # def list(self, request, *args, **kwargs):
+    #     return Response(self.get_queryset())
+
+    def get_queryset(self):
+
+        # Get all active categories with only active parents ids
+        categories_ids = list(Category.objects.filter(
+            activity=True, parent__isnull=True
+        ).distinct().values_list('id', flat=True))
+        parents = categories_ids
+        children = True
+        while children:
+            children = list(Category.objects.filter(
+                activity=True, parent_id__in=parents
+            ).distinct().values_list('id', flat=True))
+            categories_ids += children
+            parents = children
+
+        active_child_categories_ids = list(Category.objects.filter(
+            id__in=categories_ids, children__isnull=True
+        ).distinct().values_list('id', flat=True))
+
+        new_product_period = datetime.today() - timedelta(days=60)
+
+        queryset = Product.objects.filter(
+            Q(is_new='new') | Q(is_new='calculated', created__gte=new_product_period),
+            activity=True, kind__in=[Product.UNIQUE, Product.CHILD], categories__in=active_child_categories_ids
         )
-    )[:20]
+        return queryset[:20]
 
 
 class ProductMainSpecialListView(ListAPIView):
     serializer_class = ProductListSerializer
-    queryset = Product.objects.filter(activity=True,
-                                      kind__in=[Product.UNIQUE, Product.CHILD],
-                                      special_relations__special__activity=True,
-                                      special_relations__on_main=True)[:20]
+
+    def get_queryset(self):
+
+        # Get all active categories with only active parents ids
+        categories_ids = list(Category.objects.filter(activity=True, parent__isnull=True).values_list('id', flat=True))
+        parents = categories_ids
+        children = True
+        while children:
+            children = list(Category.objects.filter(activity=True, parent_id__in=parents).values_list('id', flat=True))
+            categories_ids += children
+            parents = children
+
+        active_child_categories_ids = list(Category.objects.filter(
+            id__in=categories_ids, children__isnull=True
+        ).values_list('id', flat=True))
+
+        queryset = Product.objects.filter(
+            activity=True, kind__in=[Product.UNIQUE, Product.CHILD],
+            special_relations__special__activity=True,
+            special_relations__on_main=True
+        ).filter(
+            Q(categories__in=active_child_categories_ids) | Q(parent__categories__in=active_child_categories_ids)
+        )
+        return queryset[:20]
 
 
 class SearchProductListView(ListAPIView):
@@ -234,7 +286,22 @@ class SearchProductListView(ListAPIView):
         text = self.request.query_params.get('text')
         sort_by = self.request.query_params.get('sortby')
 
-        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).order_by('name')
+        # Get all active categories with only active parents ids
+        categories_ids = list(Category.objects.filter(activity=True, parent__isnull=True).values_list('id', flat=True))
+        parents = categories_ids
+        children = True
+        while children:
+            children = list(Category.objects.filter(activity=True, parent_id__in=parents).values_list('id', flat=True))
+            categories_ids += children
+            parents = children
+
+        active_child_categories_ids = list(Category.objects.filter(
+            id__in=categories_ids, children__isnull=True
+        ).values_list('id', flat=True))
+
+        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
+            Q(categories__in=active_child_categories_ids) | Q(parent__categories__in=active_child_categories_ids)
+        ).order_by('name')
 
         if text:
             queryset = queryset.annotate(
