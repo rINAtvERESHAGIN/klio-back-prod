@@ -89,7 +89,7 @@ class ProductPropertySerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     base_amount = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     is_new = serializers.SerializerMethodField()
     special = serializers.SerializerMethodField()
@@ -97,14 +97,14 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'slug', 'category', 'image', 'in_stock', 'art', 'base_amount', 'units', 'price',
+        fields = ('id', 'name', 'slug', 'categories', 'image', 'in_stock', 'art', 'base_amount', 'units', 'price',
                   'wholesale_threshold', 'wholesale_price', 'is_new', 'special')
 
     def get_base_amount(self, obj):
         return obj.get_base_amount()
 
-    def get_category(self, obj):
-        return obj.get_category().slug if obj.get_category() else 'no-category'
+    def get_categories(self, obj):
+        return obj.get_categories().slug if obj.get_categories() else 'no-categories'
 
     def get_image(self, obj):
         return ProductImageSerializer(instance=obj.images.filter().first(),
@@ -121,8 +121,10 @@ class ProductListSerializer(serializers.ModelSerializer):
             special = special_relation.special
         # Else get special via category
         if not special:
-            if obj.get_category():
-                special = Special.objects.filter(categories__in=[obj.get_category().id]).first()
+            if obj.get_categories():
+                special = Special.objects.filter(
+                    categories__in=[obj.get_categories().values_list('id', flat=True)]
+                ).first()
         # Or via tags
         if not special:
             tags_ids = [tag.id for tag in obj.tags.filter(activity=True)]
@@ -221,7 +223,7 @@ class FilterListSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     base_amount = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
     images = ProductImageSerializer(many=True)
     is_new = serializers.SerializerMethodField()
     properties = serializers.SerializerMethodField()
@@ -232,16 +234,16 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'meta_title', 'meta_description', 'meta_keywords', 'name', 'description', 'category', 'images',
-                  'in_stock', 'art', 'tags', 'base_amount', 'price', 'units', 'wholesale_threshold', 'wholesale_price',
-                  'is_new', 'special', 'properties', 'recommended')
+        fields = ('id', 'meta_title', 'meta_description', 'meta_keywords', 'name', 'description', 'categories',
+                  'images', 'in_stock', 'art', 'tags', 'base_amount', 'price', 'units', 'wholesale_threshold',
+                  'wholesale_price', 'is_new', 'special', 'properties', 'recommended')
 
     def get_base_amount(self, obj):
         return obj.get_base_amount()
 
-    def get_category(self, obj):
-        if obj.get_category():
-            return SubCategorySerializer(obj.get_category()).data
+    def get_categories(self, obj):
+        if obj.get_categories():
+            return SubCategorySerializer(obj.get_categories()).data
         else:
             return None
 
@@ -275,8 +277,10 @@ class ProductSerializer(serializers.ModelSerializer):
             special = special_relation.special
         # Else get special via category
         if not special:
-            if obj.get_category():
-                special = Special.objects.filter(categories__in=[obj.get_category().id]).first()
+            if obj.get_categories():
+                special = Special.objects.filter(
+                    categories__in=[obj.get_categories().values_list('id', flat=True)]
+                ).first()
         # Or via tags
         if not special:
             tags_ids = [tag.id for tag in obj.tags.filter(activity=True)]
