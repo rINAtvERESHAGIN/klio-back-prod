@@ -23,7 +23,7 @@ class SpecialListView(generics.ListAPIView):
 class SpecialDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
     serializer_class = SpecialDetailSerializer
-    queryset = Special.objects.all()
+    queryset = Special.objects.filter(activity=True)
 
 
 class SpecialProductListView(generics.ListAPIView):
@@ -39,9 +39,9 @@ class SpecialProductListView(generics.ListAPIView):
             Q(
                 specials__in=[special.id]
             ) | Q(
-                category__in=special.categories.filter(activity=True)
+                categories__in=special.categories.filter(activity=True)
             ) | Q(
-                parent__category__in=special.categories.filter(activity=True)
+                parent__categories__in=special.categories.filter(activity=True)
             ) | Q(
                 tags__in=special_tags_ids
             )

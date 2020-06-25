@@ -103,8 +103,9 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_base_amount(self, obj):
         return obj.get_base_amount()
 
+    # TODO: choose category!
     def get_categories(self, obj):
-        return obj.get_categories().slug if obj.get_categories() else 'no-categories'
+        return obj.get_categories().first().slug if obj.get_categories() else 'no-categories'
 
     def get_image(self, obj):
         return ProductImageSerializer(instance=obj.images.filter().first(),
@@ -123,7 +124,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         if not special:
             if obj.get_categories():
                 special = Special.objects.filter(
-                    categories__in=[obj.get_categories().values_list('id', flat=True)]
+                    categories__in=obj.get_categories().distinct().values_list('id', flat=True)
                 ).first()
         # Or via tags
         if not special:
@@ -243,7 +244,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_categories(self, obj):
         if obj.get_categories():
-            return SubCategorySerializer(obj.get_categories()).data
+            slug = self.context.get('category_slug')
+            if not slug or slug == 'undefined':
+                return SubCategorySerializer(obj.get_categories().first()).data
+            return SubCategorySerializer(obj.get_categories().filter(slug=slug).first()).data
         else:
             return None
 
@@ -279,7 +283,7 @@ class ProductSerializer(serializers.ModelSerializer):
         if not special:
             if obj.get_categories():
                 special = Special.objects.filter(
-                    categories__in=[obj.get_categories().values_list('id', flat=True)]
+                    categories__in=obj.get_categories().values_list('id', flat=True)
                 ).first()
         # Or via tags
         if not special:

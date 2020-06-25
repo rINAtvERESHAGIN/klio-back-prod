@@ -98,8 +98,23 @@ class SearchListView(ViewSet):
         sort_by = self.request.query_params.get('sortby')
         direction = self.request.query_params.get('direction')
 
+        # Get all active categories with only active parents ids
+        categories_ids = list(Category.objects.filter(activity=True, parent__isnull=True).values_list('id', flat=True))
+        parents = categories_ids
+        children = True
+        while children:
+            children = list(Category.objects.filter(activity=True, parent_id__in=parents).values_list('id', flat=True))
+            categories_ids += children
+            parents = children
+
+        active_child_categories_ids = list(Category.objects.filter(
+            id__in=categories_ids, children__isnull=True
+        ).values_list('id', flat=True))
+
         categories = Category.objects.filter(activity=True)
-        products = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).order_by('name')
+        products = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
+            Q(categories__in=active_child_categories_ids) | Q(parent__categories__in=active_child_categories_ids)
+        ).order_by('name')
         articles = Article.objects.filter(activity=True)
         news = News.objects.filter(activity=True)
 
