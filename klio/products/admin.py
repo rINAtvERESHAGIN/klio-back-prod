@@ -15,7 +15,6 @@ from slugify import slugify
 from sale.models import SpecialProduct
 from .models import (Brand, Category, Product, ProductImage, ProductProperty, ProductPropertyValue,
                      ProductType, Unit)
-from .utils import export_product_categories_csv
 
 CYRILLIC = [
     (u'ё', u'yo'),
@@ -74,7 +73,7 @@ class CsvImportForm(Form):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'kind', 'get_type', 'art', 'in_stock', 'price', 'order', 'modified',
+    list_display = ['__str__', 'kind', 'get_type', 'get_categories', 'art', 'in_stock', 'price', 'order', 'modified',
                     'activity']
     list_per_page = 25
     list_editable = ['in_stock', 'price', 'order', 'activity']
@@ -87,7 +86,6 @@ class ProductAdmin(admin.ModelAdmin):
         ProductImageInline,
         SpecialProductInline,
     ]
-    actions = [export_product_categories_csv]
     save_on_top = True
     change_list_template = "products_changelist.html"
 
@@ -103,6 +101,7 @@ class ProductAdmin(admin.ModelAdmin):
             path('update-prices/', self.update_prices_csv),
             path('update-category-content/', self.update_category_csv),
             path('update-properties/', self.update_properties_csv),
+            path('move-category-fk-m2m/', self.categories_FK_to_M2M_csv),
         ]
         return my_urls + urls
 
@@ -344,6 +343,27 @@ class ProductAdmin(admin.ModelAdmin):
             request, "csv_form.html", payload
         )
 
+    def categories_FK_to_M2M_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=',')
+            for row in csv_data:
+                art, category_id = row
+                try:
+                    product = Product.objects.filter(art=art).first()
+                    if product:
+                        product.categories.add(category_id)
+                except ValueError:
+                    continue
+
+            self.message_user(request, _("CSV file was successfully uploaded."))
+            return redirect("..")
+        form = CsvImportForm()
+        payload = {"form": form}
+        return render(
+            request, "csv_form.html", payload
+        )
+
     def get_form(self, request, obj=None, **kwargs):
         form = super(ProductAdmin, self).get_form(request, obj, **kwargs)
         if obj:
@@ -351,7 +371,7 @@ class ProductAdmin(admin.ModelAdmin):
         return form
 
     def get_categories(self, obj):
-        return obj.get_categories()
+        return ', '.join(c.name for c in obj.get_categories())
 
     get_categories.short_description = _('Categories')
     get_categories.admin_order_field = 'categories__name'

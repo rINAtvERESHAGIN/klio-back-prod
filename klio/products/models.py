@@ -145,8 +145,8 @@ class Product(models.Model):
                                      help_text=_("Choose the product type. Properties will be inherited after saving."
                                                  "Click 'Save & Continue' button."))
     """ None for child products, they inherit their parent's product type. """
-    category = models.ForeignKey('Category', blank=True, verbose_name=_('category'), related_name='products',
-                                 help_text=_('Choose the most detailed categories'), on_delete=models.CASCADE)
+    categories = models.ManyToManyField('Category', blank=True, verbose_name=_('categories'), related_name='products',
+                                        help_text=_('Choose the most detailed categories'))
     """ None for child products, they inherit their parent's product type. """
     brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('brand'),
                               help_text=_("If this field is empty for child product, Brand will be inherited from"
@@ -287,11 +287,7 @@ class Product(models.Model):
         return self.parent.base_amount if self.is_child else self.base_amount
 
     def get_categories(self):
-        if self.is_child:
-            categories = self.parent.categories.filter(activity=True)
-        else:
-            categories = self.categories.filter(activity=True)
-        return ', '.join([c.name for c in categories])
+        return self.parent.categories.filter(activity=True) if self.is_child else self.categories.filter(activity=True)
 
     def get_product_type(self):
         return self.parent.product_type if self.is_child else self.product_type

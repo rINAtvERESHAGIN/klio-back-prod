@@ -213,6 +213,13 @@ class ProductDetailView(RetrieveAPIView):
     def get_queryset(self):
         return Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD])
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.serializer_class(
+            instance, context={'request': self.request, 'category_slug': self.kwargs.get('category_slug')}
+        )
+        return Response(serializer.data)
+
 
 class ProductMainNewListView(ListAPIView):
     serializer_class = ProductListSerializer
@@ -244,7 +251,7 @@ class ProductMainNewListView(ListAPIView):
         queryset = Product.objects.filter(
             Q(is_new='new') | Q(is_new='calculated', created__gte=new_product_period),
             activity=True, kind__in=[Product.UNIQUE, Product.CHILD], categories__in=active_child_categories_ids
-        )
+        ).distinct()
         return queryset[:20]
 
 
@@ -272,7 +279,7 @@ class ProductMainSpecialListView(ListAPIView):
             special_relations__on_main=True
         ).filter(
             Q(categories__in=active_child_categories_ids) | Q(parent__categories__in=active_child_categories_ids)
-        )
+        ).distinct()
         return queryset[:20]
 
 
