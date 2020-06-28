@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from slugify import slugify
 
 from sale.models import SpecialProduct
+from .forms import ProductForm
 from .models import (Brand, Category, Product, ProductImage, ProductProperty, ProductPropertyValue,
                      ProductType, Unit)
 
@@ -73,6 +74,7 @@ class CsvImportForm(Form):
 
 
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductForm
     list_display = ['__str__', 'kind', 'get_type', 'get_categories', 'art', 'in_stock', 'price', 'order', 'modified',
                     'activity']
     list_per_page = 25
