@@ -75,11 +75,11 @@ class CsvImportForm(Form):
 
 class ProductAdmin(admin.ModelAdmin):
     form = ProductForm
-    list_display = ['__str__', 'kind', 'get_type', 'get_categories', 'art', 'in_stock', 'price', 'order', 'modified',
-                    'activity']
+    list_display = ['__str__', 'slug', 'kind', 'get_type', 'get_categories', 'art', 'in_stock', 'price', 'order',
+                    'modified', 'activity']
     list_per_page = 25
-    list_editable = ['in_stock', 'price', 'order', 'activity']
-    search_fields = ['name', 'art']
+    list_editable = ['slug', 'in_stock', 'price', 'order', 'activity']
+    search_fields = ['name', 'slug', 'art']
     list_filter = ['kind', 'product_type', 'activity']
     prepopulated_fields = {"slug": ("name",)}
     autocomplete_fields = ['parent', 'categories', 'product_type', 'tags', 'units', 'recommended']

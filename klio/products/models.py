@@ -124,7 +124,7 @@ class Product(models.Model):
     meta_keywords = models.CharField(max_length=512, blank=True, null=True, verbose_name=_('meta keywords'),
                                      help_text=_('Leave blank to fill automatically with words taken from name.'))
     name = models.CharField(max_length=128, blank=False, null=False, verbose_name=_('name'))
-    slug = models.SlugField(max_length=128, blank=False, verbose_name=_('slug'))
+    slug = models.SlugField(unique=True, max_length=128, blank=False, verbose_name=_('slug'))
     description = RichTextField(blank=True, verbose_name=_('description'))
 
     """
