@@ -44,7 +44,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def get_fields(self):
         fields = super(CategorySerializer, self).get_fields()
-        fields['children'] = SubCategorySerializer(many=True)
+        fields['children'] = SubCategorySerializer(many=True, source="active_children")
         return fields
 
 
