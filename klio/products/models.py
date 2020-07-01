@@ -85,6 +85,9 @@ class Category(models.Model):
             self = self.parent
         return full_name
 
+    def active_children(self):
+        return Category.objects.filter(activity=True, parent=self)
+
     def get_parent_name(self):
         return self.parent.name
 
