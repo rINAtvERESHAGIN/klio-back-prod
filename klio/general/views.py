@@ -114,7 +114,7 @@ class SearchListView(ViewSet):
         categories = Category.objects.filter(activity=True)
         products = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
             Q(categories__in=active_child_categories_ids) | Q(parent__categories__in=active_child_categories_ids)
-        ).order_by('name')
+        ).distinct().order_by('name')
         articles = Article.objects.filter(activity=True)
         news = News.objects.filter(activity=True)
 
