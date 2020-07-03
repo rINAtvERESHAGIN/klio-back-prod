@@ -16,6 +16,7 @@ from sale.models import SpecialProduct
 from .forms import ProductForm
 from .models import (Brand, Category, Product, ProductImage, ProductProperty, ProductPropertyValue,
                      ProductType, Unit)
+from .utils import export_products_names_csv
 
 CYRILLIC = [
     (u'ё', u'yo'),
@@ -88,6 +89,7 @@ class ProductAdmin(admin.ModelAdmin):
         ProductImageInline,
         SpecialProductInline,
     ]
+    actions = [export_products_names_csv]
     save_on_top = True
     change_list_template = "products_changelist.html"
 
@@ -100,10 +102,11 @@ class ProductAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         my_urls = [
             path('import-csv/', self.import_csv),
+            path('update-names/', self.update_names_csv),
             path('update-prices/', self.update_prices_csv),
-            path('update-category-content/', self.update_category_csv),
             path('update-properties/', self.update_properties_csv),
-            path('move-category-fk-m2m/', self.categories_FK_to_M2M_csv),
+            # path('update-category-content/', self.update_category_csv),
+            # path('move-category-fk-m2m/', self.categories_FK_to_M2M_csv),
         ]
         return my_urls + urls
 
@@ -176,6 +179,34 @@ class ProductAdmin(admin.ModelAdmin):
                                                                            img='products/{0}'.format(image_name))
                     prod_img.label = '{0} - Изображение #{1}'.format(product.name, index + 1)
                     prod_img.save()
+
+            self.message_user(request, _("CSV file was successfully uploaded."))
+            return redirect("..")
+        form = CsvImportForm()
+        payload = {"form": form}
+        return render(
+            request, "csv_form.html", payload
+        )
+
+    def update_names_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
+            next(csv_data)
+            for row in csv_data:
+                art, name = row
+                slug = slugify(name, replacements=CYRILLIC)
+                try:
+                    product = Product.objects.filter(art=art)
+                except ValueError:
+                    continue
+                if product:
+                    if product.first().name != name:
+                        try:
+                            product.update(name=name, slug=slug)
+                        except IntegrityError:
+                            prod_count = Product.objects.filter(slug__startswith=slug).count()
+                            product.update(slug='{0}-{1}'.format(slug, prod_count + 1), name=name)
 
             self.message_user(request, _("CSV file was successfully uploaded."))
             return redirect("..")
