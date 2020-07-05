@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from cities_light.models import City
 from ckeditor.fields import RichTextField
 from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill
+from imagekit.processors import ResizeToFit
 
 from tags.models import Tag
 
@@ -322,7 +322,7 @@ class ProductImage(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False, related_name='images',
                                 verbose_name=_('product'))
     img = models.ImageField(verbose_name=_('image'), upload_to='products')
-    thumbnail = ImageSpecField(source='img', processors=[ResizeToFill(300, 300)], format='JPEG',
+    thumbnail = ImageSpecField(source='img', processors=[ResizeToFit(300)], format='JPEG',
                                options={'quality': 60})
     label = models.CharField(max_length=128, blank=True, verbose_name=_('label'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
