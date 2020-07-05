@@ -311,11 +311,13 @@ class SearchProductListView(ListAPIView):
         ).distinct().order_by('name')
 
         if text:
-            queryset = queryset.annotate(
+            queryset_art = queryset.annotate(
                 similarity=TrigramSimilarity('name', text)
-            ).filter(
-                Q(art__icontains=text) | Q(similarity__gt=0.15)
-            ).order_by('-similarity')
+            ).filter(art__icontains=text)
+            queryset_trgm = queryset.annotate(
+                similarity=TrigramSimilarity('name', text)
+            ).filter(similarity__gt=0.15).order_by('-similarity')
+            queryset = queryset_art | queryset_trgm
         if tags:
             tags_list = tags.split(',')
             queryset = queryset.filter(tags__name__in=tags_list)
