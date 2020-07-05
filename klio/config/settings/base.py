@@ -48,6 +48,7 @@ class Base(Configuration):
         'corsheaders',
         'ckeditor',
         'ckeditor_uploader',
+        'imagekit',
         'rest_framework',
 
         # Own Packages

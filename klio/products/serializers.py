@@ -56,11 +56,16 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    thumbnail = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductImage
-        fields = ('id', 'label', 'url')
+        fields = ('id', 'label', 'url', 'thumbnail')
+
+    def get_thumbnail(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.thumbnail.url)
 
     def get_url(self, obj):
         request = self.context.get('request')
@@ -224,6 +229,7 @@ class FilterListSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     base_amount = serializers.SerializerMethodField()
+    brand = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
     images = ProductImageSerializer(many=True)
     is_new = serializers.SerializerMethodField()
@@ -236,11 +242,14 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'meta_title', 'meta_description', 'meta_keywords', 'name', 'description', 'categories',
-                  'images', 'in_stock', 'art', 'tags', 'base_amount', 'price', 'units', 'wholesale_threshold',
+                  'images', 'in_stock', 'art', 'brand', 'tags', 'base_amount', 'price', 'units', 'wholesale_threshold',
                   'wholesale_price', 'is_new', 'special', 'properties', 'recommended')
 
     def get_base_amount(self, obj):
         return obj.get_base_amount()
+
+    def get_brand(self, obj):
+        return obj.brand.name if obj.brand else None
 
     def get_categories(self, obj):
         if obj.get_categories():
