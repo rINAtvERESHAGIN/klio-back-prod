@@ -315,7 +315,7 @@ class SearchProductListView(ListAPIView):
             queryset_trgm = queryset.exclude(id__in=queryset_art.values_list('id', flat=True)).annotate(
                 similarity=TrigramSimilarity('name', text)
             ).filter(Q(art__icontains=text) | Q(similarity__gt=0.15))
-            queryset = (queryset_art | queryset_trgm).distinct().order_by('similarity')
+            queryset = (queryset_art | queryset_trgm).distinct().order_by('-similarity')
         if tags:
             tags_list = tags.split(',')
             queryset = queryset.filter(tags__name__in=tags_list)
