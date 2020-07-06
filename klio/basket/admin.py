@@ -14,6 +14,8 @@ class HiddenAdmin(admin.ModelAdmin):
 
 class BasketProductInline(admin.TabularInline):
     model = BasketProduct
+    fields = ['product', 'quantity', 'price', 'promo_price']
+    raw_id_fields = ('product',)
 
 
 class BasketAdmin(admin.ModelAdmin):
