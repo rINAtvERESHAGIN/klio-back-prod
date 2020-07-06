@@ -130,8 +130,8 @@ class SearchListView(ViewSet):
             ).filter(art__icontains=text)
             products_trgm = products.exclude(id__in=products_art.values_list('id', flat=True)).annotate(
                 similarity=TrigramSimilarity('name', text)
-            ).filter(similarity__gt=0.15).order_by('-similarity')
-            products = products_art | products_trgm
+            ).filter(similarity__gt=0.15)
+            products = (products_art | products_trgm).order_by('-similarity')
 
             articles = articles.annotate(
                 similarity=TrigramSimilarity('title', text)
