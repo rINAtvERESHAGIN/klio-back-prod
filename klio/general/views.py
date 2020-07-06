@@ -1,7 +1,8 @@
 from collections import namedtuple
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.mail import EmailMessage
-from django.db.models import FloatField, Q, Value
+from django.db.models import CharField, Q
+from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -114,7 +115,7 @@ class SearchListView(ViewSet):
         categories = Category.objects.filter(activity=True)
         products = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
             Q(categories__in=active_child_categories_ids) | Q(parent__categories__in=active_child_categories_ids)
-        ).distinct().order_by('name')
+        ).distinct()
         articles = Article.objects.filter(activity=True)
         news = News.objects.filter(activity=True)
 
@@ -125,13 +126,13 @@ class SearchListView(ViewSet):
                 similarity__gt=0.15
             ).order_by('-similarity')
 
-            products_art = products.filter(art=text).annotate(
-                similarity=Value(1.0, output_field=FloatField())
-            ).order_by('-similarity')
+            products_art = products.annotate(
+                similarity=TrigramSimilarity(Cast('art', CharField()), text)
+            ).filter(similarity__gt=0.3)
             products_trgm = products.exclude(id__in=products_art.values_list('id', flat=True)).annotate(
                 similarity=TrigramSimilarity('name', text)
-            ).filter(Q(art__icontains=text) | Q(similarity__gt=0.15)).order_by('-similarity')
-            products = (products_art | products_trgm)
+            ).filter(similarity__gt=0.15)
+            products = (products_art | products_trgm).order_by('-similarity')
 
             articles = articles.annotate(
                 similarity=TrigramSimilarity('title', text)

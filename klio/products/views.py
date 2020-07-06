@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import IntegerField, Q, Value
+from django.db.models import CharField, Q
+from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404
 
 from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView
@@ -311,11 +312,14 @@ class SearchProductListView(ListAPIView):
         ).distinct().order_by('name')
 
         if text:
-            queryset_art = queryset.filter(art=text).annotate(similarity=Value(1, IntegerField()))
+            queryset_art = queryset.annotate(
+                similarity=TrigramSimilarity(Cast('art', CharField()), text)
+            ).filter(similarity__gt=0.3)
             queryset_trgm = queryset.exclude(id__in=queryset_art.values_list('id', flat=True)).annotate(
                 similarity=TrigramSimilarity('name', text)
-            ).filter(Q(art__icontains=text) | Q(similarity__gt=0.15))
-            queryset = (queryset_art | queryset_trgm).distinct().order_by('-similarity')
+            ).filter(similarity__gt=0.15)
+            queryset = (queryset_art | queryset_trgm).order_by('-similarity')
+
         if tags:
             tags_list = tags.split(',')
             queryset = queryset.filter(tags__name__in=tags_list)
