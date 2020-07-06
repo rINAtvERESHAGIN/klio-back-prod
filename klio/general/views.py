@@ -1,7 +1,7 @@
 from collections import namedtuple
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.mail import EmailMessage
-from django.db.models import IntegerField, Q, Value
+from django.db.models import FloatField, Q, Value
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -125,19 +125,13 @@ class SearchListView(ViewSet):
                 similarity__gt=0.15
             ).order_by('-similarity')
 
-            # products_art = products.annotate(
-            #     similarity=Value(1, IntegerField())
-            # ).filter(art__icontains=text)
-            # products_trgm = products.exclude(id__in=products_art.values_list('id', flat=True)).annotate(
-            #     similarity=TrigramSimilarity('name', text)
-            # ).filter(similarity__gt=0.15)
-            # products = (products_art | products_trgm).order_by('-similarity')
-
-            products_art = products.filter(art=text).annotate(similarity=Value(1, IntegerField()))
+            products_art = products.filter(art=text).annotate(
+                similarity=Value(1.0, output_field=FloatField())
+            ).order_by('-similarity')
             products_trgm = products.exclude(id__in=products_art.values_list('id', flat=True)).annotate(
                 similarity=TrigramSimilarity('name', text)
-            ).filter(Q(art__icontains=text) | Q(similarity__gt=0.15))
-            products = (products_art | products_trgm).distinct().order_by('-similarity')
+            ).filter(Q(art__icontains=text) | Q(similarity__gt=0.15)).order_by('-similarity')
+            products = (products_art | products_trgm)
 
             articles = articles.annotate(
                 similarity=TrigramSimilarity('title', text)
@@ -177,17 +171,6 @@ class SearchListView(ViewSet):
                         categories = categories.order_by('-name')
                 search_data = self.SearchData(categories=categories, products=None, articles=None, news=None)
             if obj_type == 'products':
-                # if sort_by == 'name':
-                #     if direction == 'asc':
-                #         products = products.order_by('name')
-                #     if direction == 'desc':
-                #         products = products.order_by('-name')
-                # if sort_by == 'price':
-                #     if direction == 'desc':
-                #         products = products.order_by('-price')
-                #     else:
-                #         products = products.order_by('price')
-                # search_data = self.SearchData(categories=None, products=products, articles=None, news=None)
                 search_data = self.SearchData(categories=None, products=None, articles=None, news=None)
             if obj_type == 'articles':
                 if sort_by == 'title':
