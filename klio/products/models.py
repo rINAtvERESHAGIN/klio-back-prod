@@ -172,7 +172,7 @@ class Product(models.Model):
     units = models.ForeignKey('Unit', on_delete=models.SET_NULL, null=True, blank=True, related_name='products',
                               verbose_name=_('units'))
     """ Not required for parent products. """
-    price = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2, verbose_name=_('price'),
+    price = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=2, verbose_name=_('price'),
                                 help_text=_("Do not set the price on a parent product."))
     base_amount = models.DecimalField(blank=True, null=True, default=1, max_digits=10, decimal_places=4,
                                       verbose_name=_('base amount'),
