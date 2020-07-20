@@ -217,11 +217,21 @@ class ProductAdmin(admin.ModelAdmin):
         )
 
     def update_prices_csv(self, request):
+        """
+        Loads new data about products amount and prices.
+        The uploaded file should be of the next format:
+
+        articule;amount;price
+
+        accepted amount format: 5,00
+        accepted price format: 150,00
+
+        """
         if request.method == "POST":
             csv_file = request.FILES["csv_file"]
             csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
             for row in csv_data:
-                art, price, in_stock = row
+                art, in_stock, price = row
                 try:
                     Product.objects.filter(art=art).update(price=Decimal(price.replace(',', '.')),
                                                            in_stock=Decimal(in_stock.replace(',', '.')))
