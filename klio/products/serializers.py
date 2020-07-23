@@ -65,11 +65,19 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     def get_thumbnail(self, obj):
         request = self.context.get('request')
-        return request.build_absolute_uri(obj.thumbnail.url)
+        try:
+            thumbnail = request.build_absolute_uri(obj.thumbnail.url)
+        except FileNotFoundError:
+            thumbnail = None
+        return thumbnail
 
     def get_url(self, obj):
         request = self.context.get('request')
-        return request.build_absolute_uri(obj.img.url)
+        try:
+            image_url = request.build_absolute_uri(obj.img.url)
+        except FileNotFoundError:
+            image_url = None
+        return image_url
 
 
 class ProductPropertySerializer(serializers.ModelSerializer):

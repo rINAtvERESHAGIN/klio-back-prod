@@ -160,7 +160,9 @@ class ProductAdmin(admin.ModelAdmin):
                         prod_slug = product.values_list('slug', flat=True)[0]
                         prod_count = Product.objects.filter(slug=prod_slug).count()
                         product.update(slug='{0}{1}'.format(prod_slug, prod_count), name=name, description=description,
-                                       categories=parent_category, price=Decimal(price.replace(" ", "")))
+                                       price=Decimal(price.replace(" ", "")))
+                        product.categories.clear()
+                        product.categories.add(parent_category)
                     product = product.first()
 
                 else:
@@ -168,10 +170,9 @@ class ProductAdmin(admin.ModelAdmin):
                                                    categories=parent_category).count()
                     count = count if count else ''
                     prod_slug = '{0}{1}'.format(slugify(name, replacements=CYRILLIC), count)
-                    product = Product.objects.create(name=name, slug=prod_slug,
-                                                     categories=parent_category, kind=Product.UNIQUE, art=art,
-                                                     description=description,
-                                                     price=Decimal(price.replace(" ", "")))
+                    product = Product.objects.create(name=name, slug=prod_slug, kind=Product.UNIQUE, art=art,
+                                                     description=description, price=Decimal(price.replace(" ", "")))
+                    product.categories.add(parent_category)
 
                 images_names = images_str.split(',')
                 for index, image_name in enumerate(images_names):
@@ -220,18 +221,18 @@ class ProductAdmin(admin.ModelAdmin):
         """
         Loads new data about products amount and prices.
         The uploaded file should be of the next format:
-
-        articule;amount;price
+        article;amount;price
 
         accepted amount format: 5,00
         accepted price format: 150,00
-
+        automatically removes spaces from prices.
         """
         if request.method == "POST":
             csv_file = request.FILES["csv_file"]
             csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines(), delimiter=';')
             for row in csv_data:
                 art, in_stock, price = row
+                in_stock, price = in_stock.replace(u'\xa0', u''), price.replace(u'\xa0', u'')
                 try:
                     Product.objects.filter(art=art).update(price=Decimal(price.replace(',', '.')),
                                                            in_stock=Decimal(in_stock.replace(',', '.')))
@@ -293,23 +294,33 @@ class ProductAdmin(admin.ModelAdmin):
                 try:
                     if content:
                         try:
-                            Product.objects.filter(art=art).update(categories=parent_category, description=content,
-                                                                   brand=brand)
+                            product = Product.objects.filter(art=art)
+                            product.update(description=content, brand=brand)
+                            product.categories.clear()
+                            product.categories.add(parent_category)
+
                         except IntegrityError:
-                            prod_slug = Product.objects.filter(art=art).values_list('slug', flat=True)[0]
+                            product = Product.objects.filter(art=art)
+                            prod_slug = product.values_list('slug', flat=True)[0]
                             prod_count = Product.objects.filter(slug=prod_slug).count()
-                            Product.objects.filter(art=art).update(slug='{0}{1}'.format(prod_slug, prod_count),
-                                                                   categories=parent_category, description=content,
-                                                                   brand=brand)
+                            product.update(slug='{0}{1}'.format(prod_slug, prod_count),
+                                           description=content, brand=brand)
+                            product.categories.clear()
+                            product.categories.add(parent_category)
 
                     else:
                         try:
-                            Product.objects.filter(art=art).update(categories=parent_category, brand=brand)
+                            product = Product.objects.filter(art=art)
+                            product.update(brand=brand)
+                            product.categories.clear()
+                            product.categories.add(parent_category)
                         except IntegrityError:
-                            prod_slug = Product.objects.filter(art=art).values_list('slug', flat=True)
+                            product = Product.objects.filter(art=art)
+                            prod_slug = product.values_list('slug', flat=True)
                             prod_count = Product.objects.filter(slug=prod_slug)
-                            Product.objects.filter(art=art).update(slug='{0}{1}'.format(prod_slug, prod_count),
-                                                                   categories=parent_category, brand=brand)
+                            product.update(slug='{0}{1}'.format(prod_slug, prod_count), brand=brand)
+                            product.categories.clear()
+                            product.categories.add(parent_category)
                 except ValueError:
                     continue
 
