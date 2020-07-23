@@ -220,12 +220,11 @@ class ProductAdmin(admin.ModelAdmin):
         """
         Loads new data about products amount and prices.
         The uploaded file should be of the next format:
-
-        articule;amount;price
+        article;amount;price
 
         accepted amount format: 5,00
         accepted price format: 150,00
-
+        automatically removes spaces from prices.
         """
         if request.method == "POST":
             csv_file = request.FILES["csv_file"]
@@ -233,7 +232,7 @@ class ProductAdmin(admin.ModelAdmin):
             for row in csv_data:
                 art, in_stock, price = row
                 try:
-                    Product.objects.filter(art=art).update(price=Decimal(price.replace(',', '.')),
+                    Product.objects.filter(art=art).update(price=Decimal(price.replace(' ', '').replace(',', '.')),
                                                            in_stock=Decimal(in_stock.replace(',', '.')))
                 except ValueError:
                     continue
