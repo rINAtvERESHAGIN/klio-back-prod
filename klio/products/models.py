@@ -356,6 +356,7 @@ class ProductProperty(models.Model):
                                    help_text=_("Accuracy between two neighbour values during searching. Used for "
                                                "integer or float types only."))
     required = models.BooleanField(default=False, verbose_name=_('required'))
+    activity = models.BooleanField(default=True, verbose_name=_('activity'))
 
     def __str__(self):
         return self.name
