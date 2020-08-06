@@ -66,7 +66,9 @@ class CategoryFilterListView(ListAPIView):
         return products_ids
 
     def get_queryset(self):
-        queryset = ProductProperty.objects.filter(values__product__in=self.get_products_ids()).distinct()
+        queryset = ProductProperty.objects.filter(
+            values__product__in=self.get_products_ids(), activity=True
+        ).distinct()
         return queryset
 
     def list(self, request, *args, **kwargs):
