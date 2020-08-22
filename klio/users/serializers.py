@@ -4,7 +4,20 @@ from rest_framework import serializers
 
 from contacts.serializers import PhoneSerializer
 
+from cities_light.models import City
 User = get_user_model()
+
+
+class CityRelatedField(serializers.RelatedField):
+
+    def to_internal_value(self, data):
+        print(data)
+        return self.get_queryset().get(pk=data)
+
+    def to_representation(self, value):
+        # print(type(value))
+        return value.alternate_names
+
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -13,6 +26,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     birthday = serializers.DateField(format="%Y-%m-%d", required=False, allow_null=True)
     # country = serializers.SerializerMethodField('get_country')
     phones = PhoneSerializer(many=True)
+    city = CityRelatedField(queryset=City.objects.all())
 
     class Meta:
         model = User
