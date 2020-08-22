@@ -123,7 +123,7 @@ class CategoryProductListView(ListAPIView):
             [prop_name, prop_type] = key.split("_")
 
             value = query_dict.get(key)
-            value = True if value == 'true' else False if value == 'false' else value.split(",")
+            value = True if value == 'true' else False if value == 'false' else value.split("|;|")
 
             # Filter by boolean type properties
             if prop_type == 'b' and value:
