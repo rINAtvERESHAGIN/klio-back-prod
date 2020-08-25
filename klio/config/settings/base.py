@@ -14,14 +14,6 @@ class Base(Configuration):
 
     ADMINS = ('pythonchem1st@gmail.com',)
 
-    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
-
-    EMAIL_HOST = os.getenv('EMAIL_HOST')
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-
     INSTALLED_APPS = [
         'grappelli',  # should appear before 'django.contrib.admin'
 
