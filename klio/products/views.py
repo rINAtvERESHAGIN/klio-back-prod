@@ -147,6 +147,7 @@ class CategoryProductListView(ListAPIView):
 
             # Filter by digit (int/float) type properties. Example: prop=[100, 1090]
             if prop_type == 'd' and isinstance(value, list):
+                value = value[0].split(',')
                 # pvs_ids = list(ProductPropertyValue.objects.filter(
                 #     Q(value_integer=value) | Q(value_float=value), prop__slug=prop_name).values_list('id', flat=True))
                 # queryset = queryset.filter(property_values__in=pvs_ids)
