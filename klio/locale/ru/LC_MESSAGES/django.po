@@ -840,7 +840,6 @@ msgid "Upload image 1200x675 px."
 msgstr "Загрузите изображение 1200x675 пикс."
 
 #: general/models.py:82
-#, fuzzy
 msgid "content is on"
 msgstr "Текст на баннере включен"
 
