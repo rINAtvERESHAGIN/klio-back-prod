@@ -79,6 +79,7 @@ class Banner(models.Model):
     img = models.ImageField(blank=False, upload_to='banners', verbose_name=_('image'),
                             help_text=_('Upload image 1200x675 px.'))
     content = models.TextField(blank=True, verbose_name=_('content'))
+    show_content = models.BooleanField(default=True, verbose_name=_('content is on'))
     order = models.PositiveIntegerField(default=1, verbose_name=_('order'))
     link = models.URLField(blank=True, verbose_name=_('link'))
     btn = models.BooleanField(default=True, verbose_name=_('button is on'))
