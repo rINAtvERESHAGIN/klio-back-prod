@@ -2,6 +2,7 @@ from django.db.models import Max, Min
 from django.utils.timezone import now, timedelta
 
 from rest_framework import serializers
+from rest_framework_recursive.fields import RecursiveField
 
 from sale.models import Special
 from tags.serializers import TagSerializer
@@ -107,11 +108,12 @@ class ProductListSerializer(serializers.ModelSerializer):
     is_new = serializers.SerializerMethodField()
     special = serializers.SerializerMethodField()
     units = serializers.SerializerMethodField()
+    child_list = serializers.ListField(source='get_child_list', child=RecursiveField())
 
     class Meta:
         model = Product
         fields = ('id', 'name', 'slug', 'categories', 'image', 'in_stock', 'art', 'base_amount', 'units', 'price',
-                  'wholesale_threshold', 'wholesale_price', 'is_new', 'special')
+                  'wholesale_threshold', 'wholesale_price', 'is_new', 'special', 'child_list')
 
     def get_base_amount(self, obj):
         return obj.get_base_amount()
