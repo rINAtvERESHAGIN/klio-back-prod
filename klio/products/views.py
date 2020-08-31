@@ -108,7 +108,7 @@ class CategoryProductListView(ListAPIView):
         if not categories_ids:
             return []
 
-        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.CHILD]).filter(
+        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.PARENT]).filter(
             Q(categories__in=categories_ids) | Q(parent__categories__in=categories_ids)
         )
 
@@ -166,7 +166,7 @@ class CategoryProductListView(ListAPIView):
                 queryset = queryset.order_by('-price')
             else:
                 queryset = queryset.order_by('price')
-        return queryset
+        return queryset.order_by('-order')
 
 
 class FavoriteCreateView(CreateAPIView):

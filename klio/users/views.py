@@ -29,8 +29,7 @@ class CurrentUserUpdateView(UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         data = json.loads(request.body.decode('utf-8'))
-        if not data['username']:
-
+        if 'username' not in data or not data['username']:
             return Response({'username': ValidationError(_('Username can not be empty.'))},
                             status=HTTP_400_BAD_REQUEST)
 

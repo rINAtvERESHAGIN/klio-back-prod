@@ -317,6 +317,9 @@ class Product(models.Model):
             return self.get_product_type().properties.all()
         return []
 
+    def get_child_list(self):
+        return self.__class__.objects.filter(parent=self)
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False, related_name='images',
