@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.core import signing
+from django.core.mail import EmailMessage
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
@@ -137,6 +138,7 @@ class PasswordResetView(UpdateAPIView):
         scheme = "https" if request.is_secure() else "http"
         return {
             "scheme": scheme,
+            "user": user,
             "reset_key": reset_key,
             "email": user.email,
             "user_id": user.id,
@@ -242,13 +244,14 @@ class RegistrationView(CreateAPIView):
         """
         return signing.dumps(obj=user.email, salt=settings.REGISTRATION_SALT)
 
-    def get_email_context(self, activation_key):
+    def get_email_context(self, activation_key, user):
         """
         Build the template context used for the activation email.
         """
         scheme = "https" if self.request.is_secure() else "http"
         return {
             "scheme": scheme,
+            "user": user,
             "activation_key": activation_key,
             "expiration_days": settings.ACCOUNT_ACTIVATION_DAYS,
             "site": get_current_site(self.request),
@@ -260,7 +263,7 @@ class RegistrationView(CreateAPIView):
         signed using sha1.
         """
         activation_key = self.get_activation_key(user)
-        context = self.get_email_context(activation_key)
+        context = self.get_email_context(activation_key, user)
         context["user"] = user
         subject = render_to_string(
             template_name="registration/activation_email_subject.txt",
@@ -275,4 +278,8 @@ class RegistrationView(CreateAPIView):
             context=context,
             request=self.request,
         )
-        user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        # user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        from_email, to = 'Kliogem Website <zakaz@kliogem.ru>', [user.email]
+        msg = EmailMessage(subject, message, from_email, to)
+        msg.content_subtype = "html"
+        msg.send()

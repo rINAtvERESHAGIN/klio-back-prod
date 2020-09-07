@@ -18,6 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from django.views.generic import TemplateView
 from general.views import SearchListView
 
 
@@ -36,6 +37,10 @@ urlpatterns = [
     path('api/v1/users/', include('users.urls')),
 
     path('api/v1/search', SearchListView.as_view({'get': 'list'}), name='search_list'),
+]
+
+urlpatterns += [
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'))
 ]
 
 if settings.DEBUG:
