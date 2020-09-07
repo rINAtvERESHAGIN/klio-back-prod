@@ -1,16 +1,16 @@
 {% load i18n %}
 {% blocktrans with sitename=site.name siteurl=site.domain %}
-You (or someone pretending to be you) have asked to register an account at
-{{ sitename }} site.  If this wasn't you, please ignore this email
-and your address will be removed from our records.
+УВАЖАЕМЫЙ ПОЛЬЗОВАТЕЛЬ {{ user.last_name }} {{ user.first_name }}!
 
-To activate this account, please click the following link within the next
-{{ expiration_days }} days:
+Вы зарегистрировались на сайте компании "Клио".
 
+Для активации аккаунта, пожалуйста, перейдите по следующей ссылке в течение {{ expiration_days }} дней:
 http://{{ siteurl }}/register/activate/{{ activation_key }}
 
-You will be able to change your login/password later in the account settings.
+Для того чтобы оформить заказ в нашем Интернет-магазине,
+а так же пользоваться персональным разделом, используйте следующие учетные данные:
 
-Sincerely,
-{{ sitename }} Management
+Логин: {{ user.email }}
+
+С уважением, администрация сайта {{ sitename }}
 {% endblocktrans %}
