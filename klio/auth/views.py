@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.core import signing
-from django.core.mail import EmailMessage
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
@@ -278,8 +277,4 @@ class RegistrationView(CreateAPIView):
             context=context,
             request=self.request,
         )
-        # user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-        from_email, to = 'Kliogem Website <zakaz@kliogem.ru>', [user.email]
-        msg = EmailMessage(subject, message, from_email, to)
-        msg.content_subtype = "html"
-        msg.send()
+        user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
