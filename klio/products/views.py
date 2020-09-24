@@ -166,7 +166,7 @@ class CategoryProductListView(ListAPIView):
                 queryset = queryset.order_by('-price')
             else:
                 queryset = queryset.order_by('price')
-        return queryset.order_by('-order')
+        return queryset.order_by('order')
 
 
 class FavoriteCreateView(CreateAPIView):
