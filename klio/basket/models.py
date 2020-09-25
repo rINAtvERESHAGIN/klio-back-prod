@@ -1,11 +1,13 @@
+import requests
+from xml.etree import ElementTree
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext, gettext_lazy as _
-
 from cities_light.models import City, Country
 
+from config.b2p_utils import get_sector, generate_signature, get_authorize_url, get_register_url, get_fail_url, get_success_url
 from contacts.models import Contact
 from products.models import Category, Product
 from tags.models import Tag
@@ -161,6 +163,99 @@ class OrderPaymentInfo(models.Model):
         current_order_other_payment = OrderPaymentInfo.objects.filter(order=self.order).exists()
         if current_order_other_payment:
             raise ValidationError(_('There is a payment info for this order already.'))
+
+#
+class OrderPaymentB2PInfo(models.Model):
+    B2P_PROGRESS, B2P_FAIL, B2P_SUCCESS = 'progress', 'fail', 'success'
+    B2P_ORDER_STATUS_CHOICES = [
+        (B2P_PROGRESS, _('In progress')),
+        (B2P_FAIL, _('Fail')),
+        (B2P_SUCCESS, _('Success')),
+    ]
+
+    payment_info = models.OneToOneField(to=OrderPaymentInfo, on_delete=models.CASCADE, related_name='b2p')
+    b2p_order_number = models.CharField(max_length=100, verbose_name=_('best2pay order number'))# default='0'
+    b2p_order_register_status = models.CharField(max_length=10, choices=B2P_ORDER_STATUS_CHOICES, default=B2P_PROGRESS,
+                                        verbose_name=_('best2pay order register status'))
+    b2p_order_status = models.CharField(max_length=10, choices=B2P_ORDER_STATUS_CHOICES, default=B2P_PROGRESS,
+                                        verbose_name=_('best2pay order status'))
+    b2p_last_operation_number = models.IntegerField(verbose_name=_('best2pay last ended operation number'), default=-1)
+    b2p_last_operation_code = models.IntegerField(verbose_name=_('best2pay last ended operation result code'), default=-1)
+
+    class Meta:
+        verbose_name = _('Order B2P Registered Payment Info')
+        verbose_name_plural = _('Order B2P Registered Payment Data')
+
+    def __str__(self):
+        try:
+            return gettext('Order') + '#{0}'.format(self.payment_info.order.id) + ' - ' + gettext('Payment Info')
+        except Order.DoesNotExist:
+            return gettext('Payment Info') + '#{0}'.format(self.id)
+
+    @staticmethod
+    def get_order_b2p_register_data(payment_info: OrderPaymentInfo):
+        return {
+            'amount': int(payment_info.order.price * 100),
+            'currency': 643,
+            'reference': payment_info.order.id,
+            'description': f'Оплата заказа №{payment_info.order.id} на сайте kliogem.ru',
+            'sector': get_sector(),
+            'url': get_success_url(payment_info.order.id),
+            'failurl': get_fail_url(payment_info.order.id),
+            'email': payment_info.order.private_info.email,
+            'phone': payment_info.order.private_info.phone,
+            'signature': generate_signature([int(payment_info.order.price * 100), 643]),
+            'first_name': payment_info.order.private_info.first_name,
+            'last_name': payment_info.order.private_info.last_name
+        }
+
+    @staticmethod
+    def get_order_b2p_register_url():
+        return f'{get_register_url()}'
+
+    def get_order_b2p_redirected_authorize_url(self):
+        return f'{get_authorize_url()}?' \
+               f'sector={get_sector()}&' \
+               f'id={self.payment_info.b2p.b2p_order_number}&' \
+               f'signature={generate_signature([self.payment_info.b2p.b2p_order_number]).decode("utf-8")}'
+
+    @classmethod
+    def make_register_request(cls, payment_info: OrderPaymentInfo):
+        # if created.type == OrderPaymentInfo.CARD:
+        if not hasattr(payment_info, 'order'):
+            raise AttributeError('Can make processing registration request to non ordered payment info')
+        resp = requests.post(
+            url=cls.get_order_b2p_register_url(),
+            data=cls.get_order_b2p_register_data(payment_info)
+        )
+        if hasattr(payment_info, 'b2p'):
+            self = payment_info.b2p
+        else:
+            self = None
+        if resp.status_code == 200:
+            data = ElementTree.fromstring(resp.content)
+            if self is None:
+                self = cls.objects.create(
+                    payment_info=payment_info,
+                    b2p_order_register_status=cls.B2P_SUCCESS,
+                    b2p_order_number=data.findall('id')[0].text
+                )
+            else:
+                self.b2p_order_register_status = cls.B2P_SUCCESS
+                self.b2p_order_number = data.findall('id')[0].text
+                self.save()
+        else:
+            if self is None:
+                self = cls.objects.create(
+                    payment_info=payment_info,
+                    b2p_order_register_status=cls.B2P_FAIL,
+                    b2p_order_number='None'
+                )
+            else:
+                self.b2p_order_register_status = cls.B2P_FAIL
+                self.b2p_order_number = 'None'
+                self.save()
+        return self
 
 
 class OrderPrivateInfo(models.Model):
