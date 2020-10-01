@@ -214,3 +214,9 @@ class Base(Configuration):
     }
 
     CKEDITOR_UPLOAD_PATH = "ckeditor_uploads/"
+    # Best 2 Pay Settings:
+    B2P_SECTOR = os.getenv('B2P_SECTOR')
+    B2P_SECRET = os.getenv('B2P_SECRET')
+    B2P_BASE_URL = os.getenv('B2P_BASE_URL')
+    B2P_FAIL_REDIRECT = os.getenv('B2P_FAIL_REDIRECT')
+    B2P_SUCCESS_REDIRECT = os.getenv('B2P_SUCCESS_REDIRECT')

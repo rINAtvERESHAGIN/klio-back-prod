@@ -9,12 +9,13 @@ from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, 
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.exceptions import ValidationError
 
 from products.models import Product
-from .models import Basket, BasketProduct, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPrivateInfo, PromoCode
+from .models import Basket, BasketProduct, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPaymentB2PInfo, OrderPrivateInfo, PromoCode
 from .serializers import (BasketDetailSerializer, OrderDeliveryInfoSerializer, OrderDetailSerializer,
                           OrderDetailShortSerializer, OrderListSerializer, OrderPaymentInfoSerializer,
-                          OrderPrivateInfoSerializer)
+                          OrderPrivateInfoSerializer, OrderPaymentInfoB2PSerializer)
 
 
 class BasketAddProductView(CreateAPIView):
@@ -173,6 +174,8 @@ class OrderActiveToPendingView(UpdateAPIView):
         order.status = Order.PENDING
         order.received = timezone.localtime()
         order.save()
+        if order.payment_info.type == order.payment_info.CARD:
+            OrderPaymentB2PInfo.make_register_request(payment_info=order.payment_info)
         serializer = self.serializer_class(order, context={'request': self.request})
         return Response(serializer.data)
 
@@ -391,10 +394,9 @@ class OrderPaymentInfoCreateView(CreateAPIView):
 
         serializer = OrderPaymentInfoSerializer(data=data, context={'request': self.request})
         if serializer.is_valid(raise_exception=True):
-            new_payment_info = serializer.create(validated_data=serializer.validated_data)
+            new_payment_info: OrderPaymentInfo = serializer.create(validated_data=serializer.validated_data)
             order.payment_info = new_payment_info
             order.save()
-
             order_serializer = self.serializer_class(order, context={'request': self.request})
             return Response(order_serializer.data, status=HTTP_200_OK)
 
@@ -417,9 +419,40 @@ class OrderPaymentInfoUpdateView(UpdateAPIView):
                                                 context={'request': self.request})
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-
             order_serializer = self.serializer_class(order, context={'request': self.request})
             return Response(order_serializer.data, status=HTTP_200_OK)
+
+
+
+class OrderPaymentB2PInfoGetRedirectToPayView(RetrieveAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = OrderPaymentInfoB2PSerializer
+    lookup_url_kwarg = 'id'
+    lookup_field = 'id'
+
+    def retrieve(self, request, *args, **kwargs):
+        order = get_object_or_404(Order, id=self.kwargs['id'])
+        payment_info = get_object_or_404(OrderPaymentInfo, order=order)
+        serializer: OrderPaymentInfoB2PSerializer = self.get_serializer(instance=payment_info.b2p)
+        return Response({
+            **serializer.data,
+            "redirect": payment_info.b2p.get_order_b2p_redirected_authorize_url()
+        }, status=HTTP_200_OK)
+
+
+class OrderPaymentB2PInfoChangeStatusUpdateView(UpdateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = OrderPaymentInfoB2PSerializer
+    lookup_url_kwarg = 'id'
+    lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        order = get_object_or_404(Order, id=self.kwargs['id'])
+        payment_info = get_object_or_404(OrderPaymentInfo, order=order)
+        serializer: OrderPaymentInfoB2PSerializer = self.get_serializer(instance=payment_info.b2p, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.update(instance=payment_info.b2p, validated_data=serializer.validated_data)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class OrderPrivateInfoCreateView(CreateAPIView):

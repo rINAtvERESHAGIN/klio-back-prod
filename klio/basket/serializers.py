@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from products.models import Product
 from products.serializers import BasketProductListSerializer
-from .models import Basket, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPrivateInfo
+from .models import Basket, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPrivateInfo, OrderPaymentB2PInfo
 
 
 class BasketDetailSerializer(serializers.ModelSerializer):
@@ -49,6 +49,18 @@ class OrderPaymentInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderPaymentInfo
         fields = ('type',)
+
+
+class OrderPaymentInfoB2PSerializer(serializers.ModelSerializer):
+    order = serializers.IntegerField(source='payment_info.order.id', read_only=True, required=False)
+    status = serializers.ChoiceField(choices=OrderPaymentB2PInfo.B2P_ORDER_STATUS_CHOICES, source='b2p_order_register_status')
+    operation = serializers.IntegerField(source='b2p_last_operation_number')
+    result_code = serializers.IntegerField(source='b2p_last_operation_code')
+
+    class Meta:
+        model = OrderPaymentB2PInfo
+        fields = ('order', 'status', 'operation', 'result_code')
+        read_only_fields = ('order',)
 
 
 class OrderPrivateInfoSerializer(serializers.ModelSerializer):

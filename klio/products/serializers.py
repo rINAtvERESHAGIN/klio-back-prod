@@ -70,6 +70,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
             thumbnail = request.build_absolute_uri(obj.thumbnail.url)
         except FileNotFoundError:
             thumbnail = None
+        except IsADirectoryError:
+            thumbnail = None
         return thumbnail
 
     def get_url(self, obj):

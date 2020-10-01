@@ -4,7 +4,8 @@ from .views import (BasketAddProductView, BasketDeleteProductView, BasketUpdateP
                     CurrentBasketInactivateView, OrderCreateView, OrderActiveRetrieveView, OrderActiveToPendingView,
                     OrderActiveUpdateView, OrderDeliveryInfoCreateView, OrderDeliveryInfoUpdateView, OrderListView,
                     OrderPaymentInfoCreateView, OrderPaymentInfoUpdateView, OrderPrivateInfoCreateView,
-                    OrderPrivateInfoUpdateView)
+                    OrderPrivateInfoUpdateView, OrderPaymentB2PInfoGetRedirectToPayView,
+                    OrderPaymentB2PInfoChangeStatusUpdateView)
 
 
 urlpatterns = [
@@ -17,6 +18,9 @@ urlpatterns = [
     path('order/list', OrderListView.as_view(), name='orders'),
     path('order/payment/create', OrderPaymentInfoCreateView.as_view(), name='order_payment_create'),
     path('order/payment/update', OrderPaymentInfoUpdateView.as_view(), name='order_payment_update'),
+    path('order/payment/<int:id>/processing/redirect', OrderPaymentB2PInfoGetRedirectToPayView.as_view(), name='order_payment_b2p_get_redirect'),
+    path('order/payment/<int:id>/processing/status', OrderPaymentB2PInfoChangeStatusUpdateView.as_view(),
+         name='order_payment_b2p_status_update'),
     path('order/private/create', OrderPrivateInfoCreateView.as_view(), name='order_private_create'),
     path('order/private/update', OrderPrivateInfoUpdateView.as_view(), name='order_private_update'),
     path('current', CurrentBasketView.as_view(), name='current_basket'),

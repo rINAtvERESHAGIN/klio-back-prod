@@ -3,7 +3,7 @@ from django.utils.html import linebreaks
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from .models import Basket, BasketProduct, Order, OrderPrivateInfo, OrderDeliveryInfo, OrderPaymentInfo, PromoCode
+from .models import Basket, BasketProduct, Order, OrderPrivateInfo, OrderDeliveryInfo, OrderPaymentInfo, PromoCode, OrderPaymentB2PInfo
 from .utils import export_orders_csv
 
 
@@ -95,4 +95,5 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderPrivateInfo)
 admin.site.register(OrderDeliveryInfo, HiddenAdmin)
 admin.site.register(OrderPaymentInfo, HiddenAdmin)
+admin.site.register(OrderPaymentB2PInfo, HiddenAdmin)
 admin.site.register(PromoCode, PromoCodeAdmin)
