@@ -156,17 +156,23 @@ class CategoryProductListView(ListAPIView):
                 queryset = queryset.filter(id__in=ids)
 
         # Sorting block
+        ordering = []
         if sort_by == 'name':
             if direction == 'asc':
-                queryset = queryset.order_by('name')
+                # queryset = queryset.order_by('name')
+                ordering.append('name')
             if direction == 'desc':
-                queryset = queryset.order_by('-name')
+                # queryset = queryset.order_by('-name')
+                ordering.append('-name')
         if sort_by == 'price':
             if direction == 'desc':
-                queryset = queryset.order_by('-price')
+                # queryset = queryset.order_by('-price')
+                ordering.append('-price')
             else:
-                queryset = queryset.order_by('price')
-        return queryset.order_by('order')
+                # queryset = queryset.order_by('price')
+                ordering.append('price')
+        ordering.append('order')
+        return queryset.order_by(*ordering)
 
 
 class FavoriteCreateView(CreateAPIView):
