@@ -29,4 +29,5 @@ class Production(Base):
     CORS_ORIGIN_WHITELIST = [
         "http://45.80.71.10:8081",
         "http://kliogem.ru",
+        "https://kliogem.ru",
     ]
