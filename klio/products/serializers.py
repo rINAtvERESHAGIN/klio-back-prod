@@ -56,6 +56,19 @@ class CategoryListSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'slug', 'img', 'children')
 
 
+class CategoryCatalogSerializer(serializers.ModelSerializer):
+    has_children = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'slug', 'img', 'has_children', 'meta_keywords')
+
+    def get_has_children(self, obj):
+        if obj.children.count():
+            return True
+        return False
+
+
 class ProductImageSerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()

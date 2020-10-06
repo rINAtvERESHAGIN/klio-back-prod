@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Brand, Category, Product, ProductProperty, ProductPropertyValue, UserProduct
-from .serializers import (BrandListSerializer, CategorySerializer, CategoryListSerializer, FilterListSerializer,
+from .serializers import (BrandListSerializer, CategoryCatalogSerializer, CategorySerializer, CategoryListSerializer, FilterListSerializer,
                           ProductSerializer, ProductListSerializer)
 
 
@@ -31,8 +31,8 @@ class CategoryDetailView(RetrieveAPIView):
 
 
 class CategoryListView(ListAPIView):
-    serializer_class = CategoryListSerializer
-    queryset = Category.objects.filter(activity=True)
+    serializer_class = CategoryCatalogSerializer
+    queryset = Category.objects.filter(activity=True, parent__isnull=True)
 
 
 class CategoryMainListView(ListAPIView):
