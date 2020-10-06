@@ -53,7 +53,7 @@ class OrderPaymentInfoSerializer(serializers.ModelSerializer):
 
 class OrderPaymentInfoB2PSerializer(serializers.ModelSerializer):
     order = serializers.IntegerField(source='payment_info.order.id', read_only=True, required=False)
-    status = serializers.ChoiceField(choices=OrderPaymentB2PInfo.B2P_ORDER_STATUS_CHOICES, source='b2p_order_register_status')
+    status = serializers.ChoiceField(choices=OrderPaymentB2PInfo.B2P_ORDER_STATUS_CHOICES, source='b2p_order_status')
     operation = serializers.IntegerField(source='b2p_last_operation_number')
     result_code = serializers.IntegerField(source='b2p_last_operation_code')
 
@@ -61,6 +61,20 @@ class OrderPaymentInfoB2PSerializer(serializers.ModelSerializer):
         model = OrderPaymentB2PInfo
         fields = ('order', 'status', 'operation', 'result_code')
         read_only_fields = ('order',)
+
+    def validate_status(self, value):
+        if self.instance is not None and self.instance.b2p_order_status == OrderPaymentB2PInfo.B2P_SUCCESS:
+            raise serializers.ValidationError(
+                _('You cant change status when order is paid.')
+            )
+        return value
+
+    def update(self, instance, validated_data):
+        instance: OrderPaymentB2PInfo = super().update(instance, validated_data)
+        if instance.b2p_order_status == OrderPaymentB2PInfo.B2P_SUCCESS:
+            instance.payment_info.order.is_paid = True
+            instance.payment_info.order.save()
+        return instance
 
 
 class OrderPrivateInfoSerializer(serializers.ModelSerializer):
