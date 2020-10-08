@@ -175,6 +175,90 @@ class CategoryProductListView(ListAPIView):
         return queryset.order_by(*ordering)
 
 
+class BrandDetailView(RetrieveAPIView):
+    lookup_field = 'slug'
+    serializer_class = BrandListSerializer
+    queryset = Brand.objects.filter(activity=True)
+
+
+class BrandFilterListView(ListAPIView):
+    serializer_class = FilterListSerializer
+
+    def get_products_ids(self):
+        # Get the products ids
+        products_ids = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.PARENT]).filter(
+            brand__activity=True, brand__slug=self.kwargs['slug']
+        ).values_list('id', flat=True)
+        return products_ids
+
+    def get_queryset(self):
+        queryset = ProductProperty.objects.filter(
+            values__product__in=self.get_products_ids(), activity=True
+        ).distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.serializer_class(self.get_queryset(), many=True,
+                                           context={'request': self.request, 'products_ids': self.get_products_ids()})
+        return Response(serializer.data)
+
+
+class BrandProductListView(ListAPIView):
+    serializer_class = ProductListSerializer
+    pagination_class = DynamicPageNumberPagination
+
+    def get_queryset(self):
+        query_dict = self.request.query_params.copy()
+        sort_by = query_dict.get('sortby')
+        direction = query_dict.get('direction', None)
+        in_stock = query_dict.get('in_stock', None)
+        for k in ('sortby', 'direction', 'size', 'page', 'in_stock'):
+            query_dict.pop(k, None)
+        prop_filters = query_dict
+        queryset = Product.objects.filter(activity=True, kind__in=[Product.UNIQUE, Product.PARENT]).filter(
+            brand__activity=True, brand__slug=self.kwargs['slug']
+        )
+        if not queryset:
+            return []
+        # Filtering block
+        if in_stock:
+            queryset = queryset.filter(in_stock__gt=0)
+        for key, value in prop_filters.items():
+            [prop_name, prop_type] = key.split("_")
+            value = query_dict.get(key)
+            value = True if value == 'true' else False if value == 'false' else value.split("|;|")
+            # Filter by boolean type properties
+            if prop_type == 'b' and value:
+                pvs_ids = list(ProductPropertyValue.objects.filter(
+                    prop__slug=prop_name, value_boolean=value).values_list('id', flat=True))
+                queryset = queryset.filter(property_values__in=pvs_ids)
+            # Filter by text (choices) type properties. Example: prop=['var1', 'var2', ...]
+            if prop_type == 't':
+                pvs_ids = list(ProductPropertyValue.objects.filter(
+                    prop__slug=prop_name, value_text__in=value).values_list('id', flat=True))
+                queryset = queryset.filter(property_values__in=pvs_ids)
+            # Filter by digit (int/float) type properties. Example: prop=[100, 1090]
+            if prop_type == 'd' and isinstance(value, list):
+                value = value[0].split(',')
+                ids = [product.id for product in queryset if
+                       float(value[0]) <= product.get_actual_value_by_property_slug(prop_name) <= float(value[1])]
+                queryset = queryset.filter(id__in=ids)
+        # Sorting block
+        ordering = []
+        if sort_by == 'name':
+            if direction == 'asc':
+                ordering.append('name')
+            if direction == 'desc':
+                ordering.append('-name')
+        if sort_by == 'price':
+            if direction == 'desc':
+                ordering.append('-price')
+            else:
+                ordering.append('price')
+        ordering.append('order')
+        return queryset.order_by(*ordering)
+
+
 class FavoriteCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ProductListSerializer
