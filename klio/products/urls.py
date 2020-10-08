@@ -1,7 +1,8 @@
 from django.urls import path
 
 from .views import (BrandListView, CategoryDetailView, CategoryListView, CategoryMainListView, CategoryFilterListView,
-                    CategoryProductListView, BrandDetailView, BrandFilterListView, BrandProductListView, FavoriteCreateView, FavoriteDeleteView, FavoriteListView,
+                    CategoryProductListView, BrandDetailView, BrandFilterListView, BrandProductListView,
+                    NewFilterListView, NewProductListView, FavoriteCreateView, FavoriteDeleteView, FavoriteListView,
                     ProductDetailView, ProductMainNewListView, ProductMainSpecialListView, SearchProductListView)
 
 
@@ -16,6 +17,8 @@ urlpatterns = [
     path('brands/<str:slug>/detail', BrandDetailView.as_view()),
     path('brands/<str:slug>/filters/list', BrandFilterListView.as_view()),
     path('brands/<str:slug>/products/list', BrandProductListView.as_view()),
+    path('new/filters/list', NewFilterListView.as_view()),
+    path('new/products/list', NewProductListView.as_view()),
     path('favorites', FavoriteListView.as_view(), name='favorites'),
     path('favorites/<int:id>/add', FavoriteCreateView.as_view(), name='favorite_add'),
     path('favorites/<int:id>/delete', FavoriteDeleteView.as_view(), name='favorite_delete'),
