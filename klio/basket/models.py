@@ -1,4 +1,5 @@
 import requests
+from num2words import num2words
 from xml.etree import ElementTree
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
@@ -63,6 +64,12 @@ class BasketProduct(models.Model):
         verbose_name_plural = _('Basket products')
         unique_together = ('basket', 'product')
 
+    def full_price(self):
+        if self.promo_price:
+            return self.promo_price * self.quantity
+        else:
+            return self.price * self.quantity
+
 
 class Order(models.Model):
     ACTIVE, PENDING, DELIVERY, COMPLETED, DENIED = 'active', 'pending', 'delivery', 'completed', 'denied'
@@ -101,6 +108,9 @@ class Order(models.Model):
 
     def __str__(self):
         return _('Order') + '#{0}'.format(self.id)
+
+    def price_2_words(self):
+        return f"{num2words(int(self.price), lang='ru')} руб. {int((self.price - int(self.price)) * 100)} коп."
 
 
 class OrderDeliveryInfo(models.Model):
@@ -206,7 +216,8 @@ class OrderPaymentB2PInfo(models.Model):
             'phone': payment_info.order.private_info.phone,
             'signature': generate_signature([int(payment_info.order.price * 100), 643]),
             'first_name': payment_info.order.private_info.first_name,
-            'last_name': payment_info.order.private_info.last_name
+            'last_name': payment_info.order.private_info.last_name,
+            'notify_customer': True
         }
 
     @staticmethod
