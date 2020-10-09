@@ -61,7 +61,7 @@
         {% endif %}
     </p>
     <p>
-        <span style="font-weight: bold;">Платежная система</span>: {{ order.payment_info.get_type_display }}
+        <span style="font-weight: bold;">Способ оплаты</span>: {{ order.payment_info.get_type_display }}
     </p>
     <p>
         <span style="font-weight: bold;">СЧЕТ № {{ order.id }} от {{ order.created|date:'d.m.Y' }}</span>:
@@ -89,9 +89,9 @@
                         <td style="width: 15%">{{ bproduct.quantity }}</td>
                         <td style="width: 15%">
                             {% if bproduct.promo_price %}
-                                {{ bproduct.promo_price }}, руб
+                                {{ bproduct.promo_price }} руб
                             {% else %}
-                                {{ bproduct.price }}, руб
+                                {{ bproduct.price }} руб
                             {% endif %}
                         </td>
                         <td style="width: 15%">{{ bproduct.full_price }}, руб</td>

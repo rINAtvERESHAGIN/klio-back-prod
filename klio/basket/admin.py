@@ -106,11 +106,8 @@ class OrderAdmin(admin.ModelAdmin):
     print_action.short_description = _('Print')
     print_action.allow_tags = True
 
-    def print_form_view(
-            self, request, order_id, *args, **kwargs
-    ):
+    def print_form_view(self, request, order_id, *args, **kwargs):
         order = self.get_object(request, order_id)
-
         context = self.admin_site.each_context(request)
         context['order'] = order
         return TemplateResponse(

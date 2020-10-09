@@ -176,6 +176,8 @@ class OrderActiveToPendingView(UpdateAPIView):
         order.save()
         if order.payment_info.type == order.payment_info.CARD:
             OrderPaymentB2PInfo.make_register_request(payment_info=order.payment_info)
+        order.send_notification_to_admins()
+        order.send_notification_to_customer()
         serializer = self.serializer_class(order, context={'request': self.request})
         return Response(serializer.data)
 
