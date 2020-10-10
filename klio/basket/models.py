@@ -243,7 +243,6 @@ class OrderPaymentB2PInfo(models.Model):
             'signature': generate_signature([int(payment_info.order.price * 100), 643]),
             'first_name': payment_info.order.private_info.first_name,
             'last_name': payment_info.order.private_info.last_name,
-            'notify_customer': True
         }
 
     @staticmethod
