@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /admin
+Disallow: /basket
+Disallow: /favorites
+Disallow: /order/process
+Disallow: /order/process/success
+Disallow: /orders
+Disallow: /pass-change
+Disallow: /profile
+Disallow: /register
+Disallow: /search
+Disallow: /success
+Disallow: /*?*
+
+Host: http://kliogem.ru

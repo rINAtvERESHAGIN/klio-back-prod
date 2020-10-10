@@ -213,6 +213,7 @@ msgid "Products"
 msgstr "Товары"
 
 #: basket/admin.py:87
+
 msgid "City"
 msgstr "Город"
 
@@ -235,6 +236,7 @@ msgstr "создано"
 #: general/models.py:17 general/models.py:201 general/models.py:251
 #: products/models.py:18 products/models.py:37 products/models.py:124
 #: products/models.py:456
+
 msgid "modified"
 msgstr "изменено"
 
@@ -700,7 +702,7 @@ msgid "order"
 msgstr "порядок"
 
 #: contacts/models.py:20 general/models.py:40 general/models.py:81
-#: general/models.py:224 general/models.py:260 sale/models.py:35
+#: general/models.py:225 general/models.py:261 sale/models.py:35
 msgid "content"
 msgstr "контент"
 
@@ -840,27 +842,27 @@ msgstr ""
 "Показывать статью до этого времени.Оставьте поле пустым, если не хотите "
 "ограничивать публикацию новости по времени."
 
-#: general/models.py:33 general/models.py:217
+#: general/models.py:33 general/models.py:218
 msgid "title"
 msgstr "Заголовок"
 
-#: general/models.py:35 general/models.py:219
+#: general/models.py:35 general/models.py:220
 msgid "author"
 msgstr "автор"
 
-#: general/models.py:37 general/models.py:221
+#: general/models.py:37 general/models.py:222
 msgid "At least 1 tag is required."
 msgstr "Укажите не менее 1 тега"
 
-#: general/models.py:38 general/models.py:222
+#: general/models.py:38 general/models.py:223
 msgid "abstract"
 msgstr "краткое описание"
 
-#: general/models.py:39 general/models.py:223
+#: general/models.py:39 general/models.py:224
 msgid "Short description - 256 symbols max."
 msgstr "Краткое описание - не более 256 символов."
 
-#: general/models.py:45 general/models.py:160
+#: general/models.py:45 general/models.py:161
 msgid "Article"
 msgstr "Статья"
 
@@ -868,7 +870,7 @@ msgstr "Статья"
 msgid "Articles"
 msgstr "Статьи"
 
-#: general/models.py:53 general/models.py:237 sale/models.py:60
+#: general/models.py:53 general/models.py:238 sale/models.py:60
 msgid "Deadline must be more than start date"
 msgstr "Дата завершения должна быть после даты начала"
 
@@ -892,79 +894,83 @@ msgstr "Черный"
 msgid "Upload image 1200x675 px."
 msgstr "Загрузите изображение 1200x675 пикс."
 
-#: general/models.py:83
+#: general/models.py:82
+msgid "content is on"
+msgstr "Текст на баннере включен"
+
+#: general/models.py:84
 msgid "link"
 msgstr "Ссылка"
 
-#: general/models.py:84
+#: general/models.py:85
 msgid "button is on"
 msgstr "Кнопка включена"
 
-#: general/models.py:85
+#: general/models.py:86
 msgid "button text"
 msgstr "Текст кнопки"
 
-#: general/models.py:86
+#: general/models.py:87
 msgid "button color"
 msgstr "Цвет кнопки"
 
-#: general/models.py:87
+#: general/models.py:88
 msgid "From what date banner should be visible on a site?"
 msgstr "Когда сделать баннер видимым на сайте?"
 
-#: general/models.py:89
+#: general/models.py:90
 msgid "When banner should disappear from a site?"
 msgstr "Когда убрать баннер с сайта?"
 
-#: general/models.py:95
+#: general/models.py:96
 msgid "Banner"
 msgstr "Баннер"
 
-#: general/models.py:96
+#: general/models.py:97
 msgid "Banners"
 msgstr "Баннеры"
 
-#: general/models.py:103 general/models.py:208 general/models.py:304
+#: general/models.py:104 general/models.py:209 general/models.py:305
 msgid "date"
 msgstr "дата"
 
-#: general/models.py:109
+#: general/models.py:110
 msgid "Enter the phone in the format +7(XXX)XXX-XX-XX."
 msgstr "Введите телефон в формате +7(XXX)XXX-XX-XX."
 
-#: general/models.py:114 general/models.py:115
+#: general/models.py:115 general/models.py:116
 msgid "Callback info"
 msgstr "Данные об обратном звонке"
 
-#: general/models.py:118
+#: general/models.py:119
 msgid "Callback"
 msgstr "Обратный звонок"
 
-#: general/models.py:124
+#: general/models.py:125
 msgid "Header"
 msgstr "Шапка сайта"
 
-#: general/models.py:125
+#: general/models.py:126
 msgid "Subheader"
 msgstr "Подменю в шапке сайта"
 
-#: general/models.py:126
+#: general/models.py:127
 msgid "Footer"
 msgstr "Футер сайта"
 
-#: general/models.py:127
+#: general/models.py:128
 msgid "Leftbar"
 msgstr "Боковая панель"
 
-#: general/models.py:131
+#: general/models.py:132
 msgid "position"
 msgstr "расположение"
 
-#: general/models.py:137 general/models.py:138
+#: general/models.py:138 general/models.py:139
 msgid "Menu"
 msgstr "Меню"
 
-#: general/models.py:147
+#: general/models.py:148
 #, fuzzy
 #| msgid ""
 #| "Active menu for selected position is already exists.\n"
@@ -976,7 +982,7 @@ msgstr ""
 "В системе уже существует активное меню с тем же расположением.Пожалуйста, "
 "сначала сделайте уже существующее меню неактивным."
 
-#: general/models.py:156
+#: general/models.py:157
 msgid "Root object"
 msgstr "Базовый объект"
 
@@ -984,23 +990,23 @@ msgstr "Базовый объект"
 msgid "Category"
 msgstr "Категория"
 
-#: general/models.py:158
+#: general/models.py:159
 msgid "Product list"
 msgstr "Список товаров"
 
-#: general/models.py:159
+#: general/models.py:160
 msgid "Info page"
 msgstr "Информационная (статичная) страница"
 
-#: general/models.py:161 general/models.py:230
+#: general/models.py:162 general/models.py:231
 msgid "News"
 msgstr "Новости"
 
-#: general/models.py:162 sale/models.py:52
+#: general/models.py:163 sale/models.py:52
 msgid "Special"
 msgstr "Акция"
 
-#: general/models.py:163 general/models.py:187
+#: general/models.py:164 general/models.py:188
 msgid "External link"
 msgstr "Ссылка на внешний ресурс"
 
@@ -1008,25 +1014,25 @@ msgstr "Ссылка на внешний ресурс"
 msgid "parent"
 msgstr "родитель"
 
-#: general/models.py:170
+#: general/models.py:171
 msgid "icon"
 msgstr "Пиктограмма"
 
-#: general/models.py:171
+#: general/models.py:172
 msgid "Pay attention! Visible ONLY in HEADER SUBMENU! Preferred format - SVG."
 msgstr ""
 "Внимание! Пиктограмма отображается ТОЛЬКО в ВЕРХНЕМ ПОДМЕНЮ! Рекомендуемый "
 "формат – SVG."
 
-#: general/models.py:173
+#: general/models.py:174
 msgid "menu"
 msgstr "меню"
 
-#: general/models.py:175
+#: general/models.py:176
 msgid "related type"
 msgstr "связанный тип"
 
-#: general/models.py:176
+#: general/models.py:177
 #, fuzzy, python-brace-format
 #| msgid ""
 #| "        Root object - /{object}\n"
@@ -1058,19 +1064,19 @@ msgstr ""
 "        Акция - /specials/{object}\n"
 "        Ссылка на внешний ресурс - {link}\n"
 
-#: general/models.py:192
+#: general/models.py:193
 msgid "Menu item"
 msgstr "Пункт меню"
 
-#: general/models.py:193
+#: general/models.py:194
 msgid "Menu items"
 msgstr "Пункты меню"
 
-#: general/models.py:208
+#: general/models.py:209
 msgid "Date to be shown in news."
 msgstr "Дата, указанная в новости."
 
-#: general/models.py:210
+#: general/models.py:211
 #, fuzzy
 #| msgid ""
 #| "Date to make news visible on site.\n"
@@ -1083,7 +1089,7 @@ msgstr ""
 "Опубликовать новость с этого времени.Оставьте поле пустым, если хотите "
 "немедленной публикации."
 
-#: general/models.py:214
+#: general/models.py:215
 #, fuzzy
 #| msgid ""
 #| "Show news item until this date.\n"
@@ -1096,15 +1102,15 @@ msgstr ""
 "Показывать новость до этого времени.Оставьте поле пустым, если не хотите "
 "ограничивать публикацию новости по времени."
 
-#: general/models.py:229
+#: general/models.py:230
 msgid "News item"
 msgstr "Новость"
 
-#: general/models.py:265
+#: general/models.py:266
 msgid "Page"
 msgstr "Страница"
 
-#: general/models.py:266
+#: general/models.py:267
 msgid "Pages"
 msgstr "Страницы"
 
@@ -1113,15 +1119,15 @@ msgstr "Страницы"
 msgid "description"
 msgstr "описание"
 
-#: general/models.py:288 general/models.py:289
+#: general/models.py:289 general/models.py:290
 msgid "Site settings"
 msgstr "Настройки сайта"
 
-#: general/models.py:311 general/models.py:312
+#: general/models.py:312 general/models.py:313
 msgid "Subscriber info"
 msgstr "Данные подписки"
 
-#: general/models.py:315
+#: general/models.py:316
 msgid "Subscription"
 msgstr "Подписка"
 

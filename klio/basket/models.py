@@ -9,6 +9,7 @@ from django.db import models
 from django.utils.translation import gettext, gettext_lazy as _
 from django.template.loader import render_to_string
 from cities_light.models import City, Country
+from django.conf import settings
 
 from config.b2p_utils import get_sector, generate_signature, get_authorize_url, get_register_url, get_fail_url, get_success_url
 from contacts.models import Contact
@@ -116,7 +117,7 @@ class Order(models.Model):
 
     def send_notification_to_customer(self):
         html_content = render_to_string('messages/user_order_notif.html', {'order': self})
-        from_email, to = 'Klio Website <pythonchem1st@gmail.com>', [self.private_info.email]
+        from_email, to = settings.DEFAULT_FROM_EMAIL, [self.private_info.email]
         msg = EmailMessage(
             f'Заказ {self.id} от {self.created.strftime("%d.%m.%Y")} на сайте kliogem.ru',
             html_content,
@@ -128,11 +129,7 @@ class Order(models.Model):
 
     def send_notification_to_admins(self):
         html_content = render_to_string('admin/basket/print_form.html', {'order': self})
-        from_email, to = 'Klio Website <pythonchem1st@gmail.com>', [
-            'demeshev@kliogem.ru',
-            'kurepkin@kliogem.ru',
-            'yvasilenko@kliogem.ru',
-        ]
+        from_email, to = settings.DEFAULT_FROM_EMAIL, settings.NOTIFIABLE_ADMIN_EMAIL_WHEN_ORDER_CREATED
         msg = EmailMessage(
             f'Заказ {self.id} от {self.created.strftime("%d.%m.%Y")} на сайте kliogem.ru',
             html_content,
