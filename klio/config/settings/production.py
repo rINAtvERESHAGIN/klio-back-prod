@@ -40,3 +40,5 @@ class Production(Base):
         "http://kliogem.ru",
         "https://kliogem.ru",
     ]
+
+    CSRF_TRUSTED_ORIGINS = ['kliogem.ru']
