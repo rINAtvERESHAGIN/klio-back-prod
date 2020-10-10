@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Печать заказа №{{ order.id }}</title>
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                font-size: 10pt;
+            }
+        }
+        body{
+            font-size: 12pt;
+        }
+        table{
+            width: 100%;
+        }
+        thead{
+            background-color: darkgrey;
+        }
+        tbody{
+            background-color: whitesmoke;
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-spacing: 0;
+        }
+        td{
+            padding: 5px 5px;
+        }
+    </style>
+</head>
+<body>
+    <p>
+        <span style="font-weight: bold;">ЗАКАЗЧИК</span>: {{ order.private_info.last_name }} {{ order.private_info.first_name }} {{ order.private_info.middle_name }}
+    </p>
+    <p>
+        <span style="font-weight: bold;">Телефон</span>: {{ order.private_info.phone }}
+    </p>
+    <p>
+        <span style="font-weight: bold;">E-Mail</span>: {{ order.private_info.email }}
+    </p>
+    <p>
+        <span style="font-weight: bold;">Способ доставки</span>: {{ order.delivery_info.get_type_display }}
+    </p>
+    {% if order.delivery_info.type == order.delivery_info.PICKUP %}
+    <p>
+        <span style="font-weight: bold;">Пункт самовывоза</span>: {{ order.delivery_info.from_address }}
+    </p>
+    {% endif %}
+    <p>
+        <span style="font-weight: bold;">Адрес</span>: {{ order.delivery_info.to_city.country.alternate_names }}, {{ order.delivery_info.to_city.alternate_names }}, {{ order.delivery_info.to_address }}
+    </p>
+    <p>
+        <span style="font-weight: bold;">Комментарий</span>:
+        {% if order.delivery_info.comment %}
+            {{ order.delivery_info.comment }}
+        {% else %}
+            Отсутвует
+        {% endif %}
+    </p>
+    <p>
+        <span style="font-weight: bold;">Способ оплаты</span>: {{ order.payment_info.get_type_display }}
+    </p>
+    <p>
+        <span style="font-weight: bold;">СЧЕТ № {{ order.id }} от {{ order.created|date:'d.m.Y' }}</span>:
+        <table>
+            <thead>
+                <tr>
+                    <td>№</td>
+                    <td>Предмет счета</td>
+                    <td>Кол-во</td>
+                    <td>Цена, руб</td>
+                    <td>Сумма, руб</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bproduct in order.basket.inside.all %}
+                    <tr>
+                        <td style="width: 5%">{{ forloop.counter }}</td>
+                        <td style="width: 50%">
+                            {% if bproduct.product.parent %}
+                                {{ bproduct.product.parent.name }}:{{ bproduct.product.name }}
+                            {% else %}
+                                {{ bproduct.product.name }}
+                            {% endif %}
+                        </td>
+                        <td style="width: 15%">{{ bproduct.quantity }}</td>
+                        <td style="width: 15%">
+                            {% if bproduct.promo_price %}
+                                {{ bproduct.promo_price }} руб
+                            {% else %}
+                                {{ bproduct.price }} руб
+                            {% endif %}
+                        </td>
+                        <td style="width: 15%">{{ bproduct.full_price }}, руб</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </p>
+    <p>
+        <span style="font-weight: bold;">Итого к оплате</span>: {{ order.price }} ({{ order.price_2_words }})
+    </p>
+    <script type="text/javascript">
+        print();
+    </script>
+</body>
+</html>

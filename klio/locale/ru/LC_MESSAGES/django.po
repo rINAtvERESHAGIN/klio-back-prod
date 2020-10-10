@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-25 10:07+0300\n"
+"POT-Creation-Date: 2020-10-09 18:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,15 +32,15 @@ msgstr "Подтвердите пароль"
 msgid "Passwords must match."
 msgstr "Пароли должны совпадать."
 
-#: auth/serializers.py:52 basket/models.py:174 users/models.py:19
+#: auth/serializers.py:52 basket/models.py:309 users/models.py:19
 msgid "last name"
 msgstr "фамилия"
 
-#: auth/serializers.py:53 basket/models.py:175 users/models.py:18
+#: auth/serializers.py:53 basket/models.py:310 users/models.py:18
 msgid "first name"
 msgstr "имя"
 
-#: auth/serializers.py:65 basket/serializers.py:62
+#: auth/serializers.py:65 basket/serializers.py:88
 msgid "You must agree to the processing of personal data."
 msgstr "Подтвердите согласие на обработку персональных данных."
 
@@ -188,374 +188,425 @@ msgstr "Ключ для смены истек."
 msgid "The reset key you provided is invalid."
 msgstr "Неверный ключ смены пароля."
 
-#: basket/admin.py:30 basket/admin.py:47 users/models.py:35
+#: basket/admin.py:32 basket/admin.py:49 users/models.py:35
 msgid "User"
 msgstr "Пользователь"
 
-#: basket/admin.py:46 basket/models.py:34
+#: basket/admin.py:48 basket/models.py:39
 msgid "Anonymous"
 msgstr "Аноним"
 
-#: basket/admin.py:55
+#: basket/admin.py:57
 msgid "User Email"
 msgstr "Email покупателя"
 
-#: basket/admin.py:61
+#: basket/admin.py:63
 msgid "Delivery"
 msgstr "Доставка"
 
-#: basket/admin.py:67
+#: basket/admin.py:69
 msgid "Delivery price"
 msgstr "Стоимость доставки"
 
-#: basket/admin.py:79 products/models.py:196
+#: basket/admin.py:81 products/models.py:196
 msgid "Products"
 msgstr "Товары"
 
-#: basket/admin.py:85
+#: basket/admin.py:87
+
 msgid "City"
 msgstr "Город"
+
+#: basket/admin.py:104 basket/admin.py:106
+msgid "Print"
+msgstr "Печать"
 
 #: basket/apps.py:7
 msgid "Basket App"
 msgstr "Магазин"
 
-#: basket/models.py:17 basket/models.py:75 contacts/models.py:9
-#: general/models.py:16 general/models.py:77 general/models.py:201
-#: general/models.py:251 products/models.py:17 products/models.py:36
-#: products/models.py:123 products/models.py:452
+#: basket/models.py:22 basket/models.py:86 contacts/models.py:9
+#: general/models.py:16 general/models.py:77 general/models.py:200
+#: general/models.py:250 products/models.py:17 products/models.py:36
+#: products/models.py:123 products/models.py:455
 msgid "created"
 msgstr "создано"
 
-#: basket/models.py:18 basket/models.py:76 contacts/models.py:10
-#: general/models.py:17 general/models.py:202 general/models.py:252
+#: basket/models.py:23 basket/models.py:87 contacts/models.py:10
+#: general/models.py:17 general/models.py:201 general/models.py:251
 #: products/models.py:18 products/models.py:37 products/models.py:124
-#: products/models.py:453
+#: products/models.py:456
+
 msgid "modified"
 msgstr "изменено"
 
-#: basket/models.py:19 basket/models.py:209 sale/models.py:45
+#: basket/models.py:24 basket/models.py:344 sale/models.py:45
 msgid "products"
 msgstr "товары"
 
-#: basket/models.py:21 basket/models.py:78 general/models.py:105
-#: general/models.py:306 products/models.py:482 users/models.py:56
+#: basket/models.py:26 basket/models.py:89 general/models.py:104
+#: general/models.py:305 products/models.py:485 users/models.py:56
 msgid "user"
 msgstr "пользователь"
 
-#: basket/models.py:22 basket/models.py:79
+#: basket/models.py:27 basket/models.py:90
 msgid "session"
 msgstr "сессия"
 
-#: basket/models.py:23
+#: basket/models.py:28
 msgid "active"
 msgstr "активно"
 
-#: basket/models.py:26 basket/models.py:31 basket/models.py:33
-#: basket/models.py:36
+#: basket/models.py:31 basket/models.py:36 basket/models.py:38
+#: basket/models.py:41
 msgid "Basket"
 msgstr "Корзина"
 
-#: basket/models.py:27
+#: basket/models.py:32
 msgid "Baskets"
 msgstr "Корзины"
 
-#: basket/models.py:41
+#: basket/models.py:46
 msgid "Active basket for current user already exists."
 msgstr "Корзина для текущего пользователя уже создана."
 
-#: basket/models.py:45
+#: basket/models.py:50
 msgid "Active basket already exists."
 msgstr "Активная корзина уже существует."
 
-#: basket/models.py:49 basket/models.py:91
+#: basket/models.py:54 basket/models.py:102
 msgid "basket"
 msgstr "корзина"
 
-#: basket/models.py:51 products/models.py:323 products/models.py:408
-#: products/models.py:481 sale/models.py:76
+#: basket/models.py:56 products/models.py:326 products/models.py:411
+#: products/models.py:484 sale/models.py:76
 msgid "product"
 msgstr "товар"
 
-#: basket/models.py:53
+#: basket/models.py:58
 msgid "quantity"
 msgstr "количество"
 
-#: basket/models.py:54 basket/models.py:93 basket/models.py:120
+#: basket/models.py:59 basket/models.py:104 basket/models.py:161
 #: products/models.py:175
 msgid "price"
 msgstr "цена"
 
-#: basket/models.py:56
+#: basket/models.py:61
 msgid "promo_price"
 msgstr "промо цена"
 
-#: basket/models.py:57 products/models.py:479
+#: basket/models.py:62 products/models.py:482
 msgid "added"
 msgstr "добавлено"
 
-#: basket/models.py:60
+#: basket/models.py:65
 msgid "Basket product"
 msgstr "Товар в корзине"
 
-#: basket/models.py:61
+#: basket/models.py:66
 msgid "Basket products"
 msgstr "Товары в корзине"
 
-#: basket/models.py:68
+#: basket/models.py:79
 msgid "Order is active"
 msgstr "Заказ активен"
 
-#: basket/models.py:69
+#: basket/models.py:80
 msgid "Order pending"
 msgstr "Заказ на ожидании"
 
-#: basket/models.py:70
+#: basket/models.py:81
 msgid "Order on delivery"
 msgstr "Заказ на доставке"
 
-#: basket/models.py:71
+#: basket/models.py:82
 msgid "Order completed"
 msgstr "Заказ выполнен"
 
-#: basket/models.py:72
+#: basket/models.py:83
 msgid "Order denied"
 msgstr "Заказ отменен"
 
-#: basket/models.py:77
+#: basket/models.py:88
 msgid "received"
 msgstr "Получено"
 
-#: basket/models.py:80
+#: basket/models.py:91
 msgid "status"
 msgstr "статус"
 
-#: basket/models.py:81
+#: basket/models.py:92
 msgid "is paid"
 msgstr "Оплачено"
 
-#: basket/models.py:82
+#: basket/models.py:93
 msgid "step"
 msgstr "шаг"
 
-#: basket/models.py:83
+#: basket/models.py:94
 msgid "promo"
 msgstr "промо"
 
-#: basket/models.py:84
+#: basket/models.py:95
 msgid "promo code"
 msgstr "промо код"
 
-#: basket/models.py:86
+#: basket/models.py:97
 msgid "private info"
 msgstr "персональные данные"
 
-#: basket/models.py:88
+#: basket/models.py:99
 msgid "delivery info"
 msgstr "данные о доставке"
 
-#: basket/models.py:90
+#: basket/models.py:101
 msgid "payment info"
 msgstr "данные об оплате"
 
-#: basket/models.py:97 basket/models.py:101 basket/models.py:130
-#: basket/models.py:156 basket/models.py:187
+#: basket/models.py:108 basket/models.py:112 basket/models.py:171
+#: basket/models.py:197 basket/models.py:230 basket/models.py:322
 msgid "Order"
 msgstr "Заказ"
 
-#: basket/models.py:98
+#: basket/models.py:109
 msgid "Orders"
 msgstr "Заказы"
 
-#: basket/models.py:107
+#: basket/models.py:148
 msgid "Pickup"
 msgstr "Самовывоз"
 
-#: basket/models.py:108
+#: basket/models.py:149
 msgid "Courier"
 msgstr "Курьер"
 
-#: basket/models.py:109
+#: basket/models.py:150
 msgid "Transport company"
 msgstr "Транспортная компания"
 
-#: basket/models.py:112 basket/models.py:148 products/models.py:351
+#: basket/models.py:153 basket/models.py:189 products/models.py:354
 msgid "type"
 msgstr "тип"
 
-#: basket/models.py:114
+#: basket/models.py:155
 msgid "from address"
 msgstr "откуда"
 
-#: basket/models.py:116
+#: basket/models.py:157
 msgid "to country"
 msgstr "страна получателя"
 
-#: basket/models.py:117
+#: basket/models.py:158
 msgid "to city"
 msgstr "город получателя"
 
-#: basket/models.py:118
+#: basket/models.py:159
 msgid "to address"
 msgstr "адрес получателя"
 
-#: basket/models.py:119 general/models.py:111
+#: basket/models.py:160 general/models.py:110
 msgid "comment"
 msgstr "комментарий"
 
-#: basket/models.py:121
+#: basket/models.py:162
 msgid "delivery terms"
 msgstr "условия доставки"
 
-#: basket/models.py:122
+#: basket/models.py:163
 msgid "moscow terms"
 msgstr "информирован о формировании заказа в г. Москве"
 
-#: basket/models.py:125
+#: basket/models.py:166
 msgid "Order Delivery Info"
 msgstr "Данные заказа о доставке"
 
-#: basket/models.py:126
+#: basket/models.py:167
 msgid "Order Delivery Data"
 msgstr "Данные заказа о доставке"
 
-#: basket/models.py:130 basket/models.py:132
+#: basket/models.py:171 basket/models.py:173
 msgid "Delivery Info"
 msgstr "Данные о доставке"
 
-#: basket/models.py:137
+#: basket/models.py:178
 msgid "There is a delivery info for this order already."
 msgstr "Для данного заказа данные о доставке уже предоставлены."
 
-#: basket/models.py:143
+#: basket/models.py:184
 msgid "Cash"
 msgstr "Наличные"
 
-#: basket/models.py:144
+#: basket/models.py:185
 msgid "Plastic Card"
 msgstr "Банковская карта"
 
-#: basket/models.py:145
+#: basket/models.py:186
 msgid "Wire transfer"
 msgstr "Денежный перевод"
 
-#: basket/models.py:151
+#: basket/models.py:192
 msgid "Order Payment Info"
 msgstr "Данные заказ об оплате"
 
-#: basket/models.py:152
+#: basket/models.py:193
 msgid "Order Payment Data"
 msgstr "Данные заказ об оплате"
 
-#: basket/models.py:156 basket/models.py:158
+#: basket/models.py:197 basket/models.py:199 basket/models.py:230
+#: basket/models.py:232
 msgid "Payment Info"
 msgstr "Данные об оплате"
 
-#: basket/models.py:163
+#: basket/models.py:204
 msgid "There is a payment info for this order already."
 msgstr "Для данного заказа данные об оплате уже предоставлены."
 
-#: basket/models.py:169
+#: basket/models.py:210
+msgid "In progress"
+msgstr ""
+
+#: basket/models.py:211
+msgid "Fail"
+msgstr ""
+
+#: basket/models.py:212
+msgid "Success"
+msgstr ""
+
+#: basket/models.py:216
+msgid "best2pay order number"
+msgstr ""
+
+#: basket/models.py:218
+msgid "best2pay order register status"
+msgstr ""
+
+#: basket/models.py:220
+msgid "best2pay order status"
+msgstr ""
+
+#: basket/models.py:221
+msgid "best2pay last ended operation number"
+msgstr ""
+
+#: basket/models.py:222
+msgid "best2pay last ended operation result code"
+msgstr ""
+
+#: basket/models.py:225
+#, fuzzy
+#| msgid "Order Payment Info"
+msgid "Order B2P Registered Payment Info"
+msgstr "Данные заказ об оплате"
+
+#: basket/models.py:226
+#, fuzzy
+#| msgid "Order Payment Data"
+msgid "Order B2P Registered Payment Data"
+msgstr "Данные заказ об оплате"
+
+#: basket/models.py:304
 msgid "Individual"
 msgstr "Частное лицо"
 
-#: basket/models.py:170
+#: basket/models.py:305
 msgid "Company"
 msgstr "Компания"
 
-#: basket/models.py:173
+#: basket/models.py:308
 msgid "client type"
 msgstr "тип клиента"
 
-#: basket/models.py:176 users/models.py:20
+#: basket/models.py:311 users/models.py:20
 msgid "middle name"
 msgstr "отчество"
 
-#: basket/models.py:177 contacts/models.py:34 contacts/models.py:53
-#: general/models.py:109 users/models.py:57
+#: basket/models.py:312 contacts/models.py:34 contacts/models.py:53
+#: general/models.py:108 users/models.py:57
 msgid "phone"
 msgstr "телефон"
 
-#: basket/models.py:179 users/models.py:28
+#: basket/models.py:314 users/models.py:28
 msgid "personal data"
 msgstr "персональные данные"
 
-#: basket/models.py:182
+#: basket/models.py:317
 msgid "Order Private Info"
 msgstr "Данные заказчика"
 
-#: basket/models.py:183
+#: basket/models.py:318
 msgid "Order Private Data"
 msgstr "Данные заказчика"
 
-#: basket/models.py:187 basket/models.py:189
+#: basket/models.py:322 basket/models.py:324
 msgid "Private Info"
 msgstr "Персональные данные"
 
-#: basket/models.py:194
+#: basket/models.py:329
 msgid "There is a private info for this order already."
 msgstr "Для данного заказа персональные данные уже предоставлены."
 
-#: basket/models.py:200 sale/models.py:15
+#: basket/models.py:335 sale/models.py:15
 msgid "Percentage discount"
 msgstr "Скидка в процентах"
 
-#: basket/models.py:201 sale/models.py:16
+#: basket/models.py:336 sale/models.py:16
 msgid "Fixed discount"
 msgstr "Скидка фиксированная"
 
-#: basket/models.py:204
+#: basket/models.py:339
 msgid "code"
 msgstr "код"
 
-#: basket/models.py:205 general/models.py:28 general/models.py:89
-#: general/models.py:213 sale/models.py:29
+#: basket/models.py:340 general/models.py:28 general/models.py:88
+#: general/models.py:212 sale/models.py:29
 msgid "start date"
 msgstr "дата начала"
 
-#: basket/models.py:206 general/models.py:32 general/models.py:91
-#: general/models.py:217 sale/models.py:33
+#: basket/models.py:341 general/models.py:32 general/models.py:90
+#: general/models.py:216 sale/models.py:33
 msgid "deadline"
 msgstr "дата окончания"
 
-#: basket/models.py:207
+#: basket/models.py:342
 msgid "For all products"
 msgstr "Для всех товаров"
 
-#: basket/models.py:208 products/models.py:153 sale/models.py:42
+#: basket/models.py:343 products/models.py:153 sale/models.py:42
 #, fuzzy
 #| msgid "Categories"
 msgid "categories"
 msgstr "Категории"
 
-#: basket/models.py:210 general/models.py:37 general/models.py:222
+#: basket/models.py:345 general/models.py:37 general/models.py:221
 #: products/models.py:162 sale/models.py:46
 msgid "tags"
 msgstr "Теги"
 
-#: basket/models.py:211 contacts/models.py:21 contacts/models.py:37
+#: basket/models.py:346 contacts/models.py:21 contacts/models.py:37
 #: contacts/models.py:56 contacts/models.py:72 contacts/models.py:88
-#: general/models.py:41 general/models.py:92 general/models.py:133
-#: general/models.py:189 general/models.py:226 general/models.py:262
-#: general/models.py:285 products/models.py:24 products/models.py:55
-#: products/models.py:191 products/models.py:329 products/models.py:359
+#: general/models.py:41 general/models.py:91 general/models.py:132
+#: general/models.py:188 general/models.py:225 general/models.py:261
+#: general/models.py:284 products/models.py:24 products/models.py:55
+#: products/models.py:191 products/models.py:332 products/models.py:362
 #: sale/models.py:48 tags/models.py:7 users/models.py:60
 msgid "activity"
 msgstr "активность"
 
-#: basket/models.py:213 sale/models.py:38
+#: basket/models.py:348 sale/models.py:38
 msgid "discount type"
 msgstr "тип скидки"
 
-#: basket/models.py:215 sale/models.py:40 sale/models.py:79
+#: basket/models.py:350 sale/models.py:40 sale/models.py:79
 msgid "discount amount"
 msgstr "размер скидки"
 
-#: basket/models.py:219
+#: basket/models.py:354
 msgid "Promo Code"
 msgstr "Промокод"
 
-#: basket/models.py:220
+#: basket/models.py:355
 msgid "Promo Codes"
 msgstr "Промокоды"
 
@@ -568,6 +619,10 @@ msgid ""
 "You must agree that you are informed that the order is packaged in Moscow."
 msgstr "Подтвердите информированность о том, что заказ формируется в Москве."
 
+#: basket/serializers.py:68
+msgid "You cant change status when order is paid."
+msgstr ""
+
 #: basket/utils.py:53 basket/utils.py:55
 msgid "Yes"
 msgstr ""
@@ -576,27 +631,27 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: basket/views.py:192
+#: basket/views.py:197
 msgid "Order step is not provided"
 msgstr "Шаг заказа не предоставлен"
 
-#: basket/views.py:253
+#: basket/views.py:258
 msgid "No promo products in the basket."
 msgstr "В корзине нет продуктов, на которые действует промокод."
 
-#: basket/views.py:256
+#: basket/views.py:261
 msgid "Promocode is not valid."
 msgstr "Неверный промокод"
 
-#: basket/views.py:329
+#: basket/views.py:334
 msgid "Order already has a linked delivery info model"
 msgstr "Для заказа уже есть связанная модель данных о доставке"
 
-#: basket/views.py:388
+#: basket/views.py:393
 msgid "Order already has a linked payment info model"
 msgstr "Для заказа уже есть связанная модель данных об оплате"
 
-#: basket/views.py:439
+#: basket/views.py:474
 msgid "Order already has a linked private info model"
 msgstr "Для заказа уже есть связанная модель персональных данных"
 
@@ -605,17 +660,17 @@ msgid "Contacts App"
 msgstr "Контакты"
 
 #: contacts/models.py:11 contacts/models.py:68 general/models.py:78
-#: general/models.py:107 general/models.py:131 general/models.py:167
-#: general/models.py:259 products/models.py:19 products/models.py:44
-#: products/models.py:131 products/models.py:348 products/models.py:454
-#: products/models.py:468 sale/models.py:22 tags/models.py:6
+#: general/models.py:106 general/models.py:130 general/models.py:166
+#: general/models.py:258 products/models.py:19 products/models.py:44
+#: products/models.py:131 products/models.py:351 products/models.py:457
+#: products/models.py:471 sale/models.py:22 tags/models.py:6
 msgid "name"
 msgstr "наименование"
 
-#: contacts/models.py:12 general/models.py:34 general/models.py:168
-#: general/models.py:219 general/models.py:260 products/models.py:20
-#: products/models.py:45 products/models.py:132 products/models.py:349
-#: products/models.py:455 sale/models.py:23
+#: contacts/models.py:12 general/models.py:34 general/models.py:167
+#: general/models.py:218 general/models.py:259 products/models.py:20
+#: products/models.py:45 products/models.py:132 products/models.py:352
+#: products/models.py:458 sale/models.py:23
 msgid "slug"
 msgstr "ссылка"
 
@@ -640,9 +695,9 @@ msgid "map"
 msgstr "карта"
 
 #: contacts/models.py:19 contacts/models.py:36 contacts/models.py:71
-#: contacts/models.py:87 general/models.py:83 general/models.py:173
+#: contacts/models.py:87 general/models.py:82 general/models.py:172
 #: products/models.py:23 products/models.py:51 products/models.py:190
-#: products/models.py:328 users/models.py:59
+#: products/models.py:331 users/models.py:59
 msgid "order"
 msgstr "порядок"
 
@@ -691,7 +746,7 @@ msgstr "Рабочий"
 msgid "Enter the phone in the format +7(XXX)XXX-XX-XX"
 msgstr "Введите телефон в формате +7(XXX)XXX-XX-XX"
 
-#: contacts/models.py:55 contacts/models.py:84 products/models.py:327
+#: contacts/models.py:55 contacts/models.py:84 products/models.py:330
 msgid "label"
 msgstr "наименование / бирка"
 
@@ -704,7 +759,7 @@ msgid "Phones"
 msgstr "Телефоны"
 
 #: contacts/models.py:69 general/models.py:36 general/models.py:79
-#: general/models.py:221 products/models.py:49 products/models.py:324
+#: general/models.py:220 products/models.py:49 products/models.py:327
 #: sale/models.py:34
 msgid "image"
 msgstr "изображение"
@@ -733,29 +788,29 @@ msgstr "Панель администратора сайта КЛИО"
 msgid "General Info App"
 msgstr "Основные и статичные данные"
 
-#: general/models.py:18 general/models.py:203 general/models.py:253
+#: general/models.py:18 general/models.py:202 general/models.py:252
 #: products/models.py:38 products/models.py:125 sale/models.py:19
 msgid "meta title"
 msgstr "SEO заголовок"
 
-#: general/models.py:19 general/models.py:21 general/models.py:204
-#: general/models.py:206 general/models.py:254 general/models.py:256
+#: general/models.py:19 general/models.py:21 general/models.py:203
+#: general/models.py:205 general/models.py:253 general/models.py:255
 #: products/models.py:39 products/models.py:41 products/models.py:126
 #: products/models.py:128
 msgid "Leave blank to fill automatically with name."
 msgstr "Оставьте пустым для автоматического заполнения на основе наименования"
 
-#: general/models.py:20 general/models.py:205 general/models.py:255
+#: general/models.py:20 general/models.py:204 general/models.py:254
 #: products/models.py:40 products/models.py:127 sale/models.py:20
 msgid "meta description"
 msgstr "SEO описание"
 
-#: general/models.py:22 general/models.py:207 general/models.py:257
+#: general/models.py:22 general/models.py:206 general/models.py:256
 #: products/models.py:42 products/models.py:129 sale/models.py:21
 msgid "meta keywords"
 msgstr "SEO ключевые слова"
 
-#: general/models.py:23 general/models.py:208 general/models.py:258
+#: general/models.py:23 general/models.py:207 general/models.py:257
 #: products/models.py:43 products/models.py:130
 msgid "Leave blank to fill automatically with words taken from name."
 msgstr ""
@@ -931,7 +986,7 @@ msgstr ""
 msgid "Root object"
 msgstr "Базовый объект"
 
-#: general/models.py:158 products/models.py:59
+#: general/models.py:157 products/models.py:59
 msgid "Category"
 msgstr "Категория"
 
@@ -955,7 +1010,7 @@ msgstr "Акция"
 msgid "External link"
 msgstr "Ссылка на внешний ресурс"
 
-#: general/models.py:170 products/models.py:47
+#: general/models.py:169 products/models.py:47
 msgid "parent"
 msgstr "родитель"
 
@@ -1059,7 +1114,7 @@ msgstr "Страница"
 msgid "Pages"
 msgstr "Страницы"
 
-#: general/models.py:284 products/models.py:22 products/models.py:50
+#: general/models.py:283 products/models.py:22 products/models.py:50
 #: products/models.py:133
 msgid "description"
 msgstr "описание"
@@ -1226,7 +1281,7 @@ msgid "If not provided for child product, tags will be inherited from parent."
 msgstr ""
 "Оставьте пустым для дочернего элемента, чтобы унаследовать теги родителя."
 
-#: products/models.py:165 products/models.py:456
+#: products/models.py:165 products/models.py:459
 msgid "properties"
 msgstr "свойства"
 
@@ -1246,7 +1301,7 @@ msgstr "Для родительских товаров будет рассчит
 msgid "In_stock"
 msgstr "Наличие на складе"
 
-#: products/models.py:173 products/models.py:353
+#: products/models.py:173 products/models.py:356
 msgid "units"
 msgstr "единицы измерения"
 
@@ -1384,44 +1439,44 @@ msgstr "Дочерний товар должен иметь цену"
 msgid "Child product must have an article number"
 msgstr "Дочерний товар должен иметь артикул"
 
-#: products/models.py:299 products/models.py:463
+#: products/models.py:299 products/models.py:466
 msgid "Product type"
 msgstr "Тип товара"
 
-#: products/models.py:333
+#: products/models.py:336
 msgid "Product image"
 msgstr "Изображение товара"
 
-#: products/models.py:334
+#: products/models.py:337
 msgid "Product images"
 msgstr "Изображения товара"
 
-#: products/models.py:341 products/models.py:410
+#: products/models.py:344 products/models.py:413
 msgid "Text"
 msgstr "Текст"
 
-#: products/models.py:342 products/models.py:411
+#: products/models.py:345 products/models.py:414
 msgid "Integer"
 msgstr "Целое число"
 
-#: products/models.py:343
+#: products/models.py:346
 msgid "True / False"
 msgstr "Да / Нет"
 
-#: products/models.py:344 products/models.py:413
+#: products/models.py:347 products/models.py:416
 msgid "Float"
 msgstr "Число с плавающей точкой"
 
-#: products/models.py:350
+#: products/models.py:353
 msgid "Slug is used for filtration purposes. Use only symbols [a-z,0-9,-]"
 msgstr ""
 "Ссылка используется для целей фильтрования. Используйте символы [a-z,0-9,-]."
 
-#: products/models.py:354
+#: products/models.py:357
 msgid "property interval"
 msgstr "Интервал значений"
 
-#: products/models.py:356
+#: products/models.py:359
 msgid ""
 "Accuracy between two neighbour values during searching. Used for integer or "
 "float types only."
@@ -1429,75 +1484,75 @@ msgstr ""
 "Точность в значениях для фильтров. Используется только для целых и дробных "
 "чисел."
 
-#: products/models.py:358
+#: products/models.py:361
 msgid "required"
 msgstr "обязательное поле"
 
-#: products/models.py:366
+#: products/models.py:369
 msgid "Property"
 msgstr "Свойство"
 
-#: products/models.py:367
+#: products/models.py:370
 msgid "Properties"
 msgstr "Свойства"
 
-#: products/models.py:371
+#: products/models.py:374
 msgid "Integer and float properties should have interval."
 msgstr "Целые и дробные числа должны иметь определенный интервал значений."
 
-#: products/models.py:373
+#: products/models.py:376
 msgid "Slug can not contain _ symbol."
 msgstr "Ссылка не может содержать символ '_'"
 
-#: products/models.py:381
+#: products/models.py:384
 msgid "Must be str"
 msgstr "Должно быть строкой"
 
-#: products/models.py:387
+#: products/models.py:390
 msgid "Must be a float"
 msgstr "Должно быть числом с плавающей точкой"
 
-#: products/models.py:393
+#: products/models.py:396
 msgid "Must be an integer"
 msgstr "Должно быть целым числом"
 
-#: products/models.py:401
+#: products/models.py:404
 msgid "Must be a boolean"
 msgstr "Должно быть булевым значением"
 
-#: products/models.py:405
+#: products/models.py:408
 msgid "property"
 msgstr "свойство"
 
-#: products/models.py:412
+#: products/models.py:415
 msgid "Boolean"
 msgstr "Булево значение"
 
-#: products/models.py:418
+#: products/models.py:421
 msgid "Product property value"
 msgstr "Значение свойства товара"
 
-#: products/models.py:419
+#: products/models.py:422
 msgid "Product property values"
 msgstr "Значения свойств товара"
 
-#: products/models.py:448
+#: products/models.py:451
 msgid "Value"
 msgstr "Значение"
 
-#: products/models.py:448
+#: products/models.py:451
 msgid "is required"
 msgstr "обязательно"
 
-#: products/models.py:464
+#: products/models.py:467
 msgid "Product types"
 msgstr "Типы товаров"
 
-#: products/models.py:471
+#: products/models.py:474
 msgid "Unit"
 msgstr "единица измерения"
 
-#: products/models.py:472
+#: products/models.py:475
 msgid "Units"
 msgstr "единицы измерения"
 
@@ -1618,7 +1673,7 @@ msgstr "аватар"
 msgid "Users"
 msgstr "Пользователи"
 
-#: users/models.py:52 users/views.py:34
+#: users/models.py:52 users/views.py:33
 msgid "Username can not be empty."
 msgstr "Логин пользователя не может быть пустым."
 

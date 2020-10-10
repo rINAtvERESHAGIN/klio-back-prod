@@ -463,6 +463,7 @@ class SearchProductListView(ListAPIView):
         direction = self.request.query_params.get('direction')
         tags = self.request.query_params.get('tags')
         text = self.request.query_params.get('text')
+        article = self.request.query_params.get('article')
         sort_by = self.request.query_params.get('sortby')
 
         # Get all active categories with only active parents ids
@@ -494,6 +495,10 @@ class SearchProductListView(ListAPIView):
         if tags:
             tags_list = tags.split(',')
             queryset = queryset.filter(tags__name__in=tags_list)
+        if article:
+            queryset = queryset.annotate(
+                similarity=TrigramSimilarity(Cast('art', CharField()), article)
+            ).filter(similarity__gt=0.7).order_by('-similarity')
         if sort_by == 'name':
             if direction == 'asc':
                 queryset = queryset.order_by('name')

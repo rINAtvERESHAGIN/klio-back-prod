@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказ №{{ order.id }} от {{ order.created|date:'d.m.Y' }} </title>
+</head>
+<body>
+<p>
+    Информационное сообщение сайта <a href="www.kliogem.ru" style="font-weight: bold;">www.kliogem.ru</a>
+</p>
+<p>
+    Уважаемый покупатель,  {{ order.private_info.last_name }} {{ order.private_info.first_name }} {{ order.private_info.middle_name }},
+</p>
+<p>
+    Ваш заказ номер <span style="font-weight: bold;">{{ order.id }}</span> от {{ order.created|date:'d.m.Y' }} принят.
+</p>
+<p>
+    Стоимость заказа: <span style="font-weight: bold;">{{ order.price }} руб. ({{ order.price_2_words }})</span>.
+</p>
+<p>
+    <span style="font-weight: bold;">Состав заказа:</span>
+</p>
+{% for bproduct in order.basket.inside.all %}
+    <p>
+        {{ bproduct.product.art }} -
+        {% if bproduct.product.parent %}
+            {{ bproduct.product.parent.name }}:{{ bproduct.product.name }}
+        {% else %}
+            {{ bproduct.product.name }}
+        {% endif %}
+        - {{ bproduct.quantity }} x
+        {% if bproduct.promo_price %}
+            {{ bproduct.promo_price }} руб
+        {% else %}
+            {{ bproduct.price }} руб
+        {% endif %}
+    </p>
+{% endfor %}
+<p>
+    Вы можете следить за выполнением своего заказа (на какой стадии выполнения он находится), войдя в Ваш персональный
+    раздел сайта <a href="www.kliogem.ru" style="font-weight: bold;">www.kliogem.ru</a>. Обратите внимание, что для входа
+    в этот раздел Вам необходимо будет ввести логин и пароль пользователя сайта
+    <a href="www.kliogem.ru" style="font-weight: bold;">www.kliogem.ru</a>.
+</p>
+<p>
+    Пожалуйста, при обращении к администрации сайта
+    <a href="www.kliogem.ru" style="font-weight: bold;">www.kliogem.ru</a>
+    ОБЯЗАТЕЛЬНО указывайте номер Вашего заказа - {{ order.id }}.
+</p>
+</body>
+</html>

@@ -94,6 +94,7 @@ class SearchListView(ViewSet):
 
     def list(self, request):
         tags = self.request.query_params.get('tags')
+        article = self.request.query_params.get('article')
         text = self.request.query_params.get('text')
         obj_type = self.request.query_params.get('type')
         sort_by = self.request.query_params.get('sortby')
@@ -153,6 +154,14 @@ class SearchListView(ViewSet):
             products = products.filter(tags__name__in=tags_list)
             articles = articles.filter(tags__name__in=tags_list)
             news = news.filter(tags__name__in=tags_list)
+
+        if article:
+            categories = categories.none()
+            products = products.annotate(
+                similarity=TrigramSimilarity(Cast('art', CharField()), article)
+            ).filter(similarity__gt=0.5).order_by('-similarity', 'art')
+            articles = articles.none()
+            news = news.none()
 
         categories_count = categories.count()
         products_count = products.count()

@@ -1,11 +1,15 @@
 import requests
+from num2words import num2words
 from xml.etree import ElementTree
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage
 from django.db import models
 from django.utils.translation import gettext, gettext_lazy as _
+from django.template.loader import render_to_string
 from cities_light.models import City, Country
+from django.conf import settings
 
 from config.b2p_utils import get_sector, generate_signature, get_authorize_url, get_register_url, get_fail_url, get_success_url
 from contacts.models import Contact
@@ -63,6 +67,12 @@ class BasketProduct(models.Model):
         verbose_name_plural = _('Basket products')
         unique_together = ('basket', 'product')
 
+    def full_price(self):
+        if self.promo_price:
+            return self.promo_price * self.quantity
+        else:
+            return self.price * self.quantity
+
 
 class Order(models.Model):
     ACTIVE, PENDING, DELIVERY, COMPLETED, DENIED = 'active', 'pending', 'delivery', 'completed', 'denied'
@@ -102,6 +112,32 @@ class Order(models.Model):
     def __str__(self):
         return _('Order') + '#{0}'.format(self.id)
 
+    def price_2_words(self):
+        return f"{num2words(int(self.price), lang='ru')} руб. {int((self.price - int(self.price)) * 100)} коп."
+
+    def send_notification_to_customer(self):
+        html_content = render_to_string('messages/user_order_notif.html', {'order': self})
+        from_email, to = settings.DEFAULT_FROM_EMAIL, [self.private_info.email]
+        msg = EmailMessage(
+            f'Заказ {self.id} от {self.created.strftime("%d.%m.%Y")} на сайте kliogem.ru',
+            html_content,
+            from_email,
+            to
+        )
+        msg.content_subtype = "html"
+        msg.send()
+
+    def send_notification_to_admins(self):
+        html_content = render_to_string('admin/basket/print_form.html', {'order': self})
+        from_email, to = settings.DEFAULT_FROM_EMAIL, settings.NOTIFIABLE_ADMIN_EMAIL_WHEN_ORDER_CREATED
+        msg = EmailMessage(
+            f'Заказ {self.id} от {self.created.strftime("%d.%m.%Y")} на сайте kliogem.ru',
+            html_content,
+            from_email,
+            to
+        )
+        msg.content_subtype = "html"
+        msg.send()
 
 class OrderDeliveryInfo(models.Model):
     PICKUP, COURIER, COMPANY = 'pickup', 'courier', 'company'
@@ -206,7 +242,7 @@ class OrderPaymentB2PInfo(models.Model):
             'phone': payment_info.order.private_info.phone,
             'signature': generate_signature([int(payment_info.order.price * 100), 643]),
             'first_name': payment_info.order.private_info.first_name,
-            'last_name': payment_info.order.private_info.last_name
+            'last_name': payment_info.order.private_info.last_name,
         }
 
     @staticmethod
