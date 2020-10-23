@@ -69,6 +69,7 @@
             <thead>
                 <tr>
                     <td>№</td>
+                    <td>Артикул</td>
                     <td>Предмет счета</td>
                     <td>Кол-во</td>
                     <td>Цена, руб</td>
@@ -79,6 +80,7 @@
                 {% for bproduct in order.basket.inside.all %}
                     <tr>
                         <td style="width: 5%">{{ forloop.counter }}</td>
+                        <td style="width: 10%">{{ bproduct.product.art }}</td>
                         <td style="width: 50%">
                             {% if bproduct.product.parent %}
                                 {{ bproduct.product.parent.name }}:{{ bproduct.product.name }}
@@ -86,8 +88,8 @@
                                 {{ bproduct.product.name }}
                             {% endif %}
                         </td>
-                        <td style="width: 15%">{{ bproduct.quantity }}</td>
-                        <td style="width: 15%">
+                        <td style="width: 10%">{{ bproduct.quantity }}</td>
+                        <td style="width: 10%">
                             {% if bproduct.promo_price %}
                                 {{ bproduct.promo_price }} руб
                             {% else %}
