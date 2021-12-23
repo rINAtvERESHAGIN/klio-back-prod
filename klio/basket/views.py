@@ -301,7 +301,7 @@ class OrderActiveUpdateView(UpdateAPIView):
                 if delivery.to_city.name == 'Moscow':
                     for basket_product in order.basket.inside.all():
                         order_price += basket_product.price * basket_product.quantity
-                    delivery_price = 350 if order_price < 3000 else 0
+                    delivery_price = 500 if order_price < 3000 else 0
 
                 if delivery.to_city.name == 'Saint Petersburg':
                     for basket_product in order.basket.inside.all():
