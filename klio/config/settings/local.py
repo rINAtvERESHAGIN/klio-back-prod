@@ -14,7 +14,7 @@ class Local(Base):
     # CSRF_COOKIE_SAMESITE = 'None'
     # SESSION_COOKIE_SAMESITE = 'None'
 
-    DEBUG = values.BooleanValue(True)
+    DEBUG = values.BooleanValue(False)
 
     # ALLOWED_HOSTS = values.ListValue(['localhost', '127.0.0.1', 'web'])
     ALLOWED_HOSTS = ['127.0.0.1', 'klio.local.com']
