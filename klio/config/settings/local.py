@@ -9,7 +9,7 @@ class Local(Base):
 
     SECRET_KEY = 'no_secret'
 
-    DEBUG = values.BooleanValue(True)
+    DEBUG = values.BooleanValue(False)
 
     ALLOWED_HOSTS = values.ListValue(['localhost', '127.0.0.1', 'web'])
 
