@@ -617,7 +617,7 @@ msgstr "Подтвердите согласие с условиями доста
 #: basket/serializers.py:42
 msgid ""
 "You must agree that you are informed that the order is packaged in Moscow."
-msgstr "Подтвердите информированность о том, что заказ формируется в Москве."
+msgstr "Подтвердите информирование о формировании заказа в г. Москве!"
 
 #: basket/serializers.py:68
 msgid "You cant change status when order is paid."

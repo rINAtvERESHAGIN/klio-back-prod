@@ -10,9 +10,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.exceptions import ValidationError
-
+from django.http import HttpResponse
 from products.models import Product
-from .models import Basket, BasketProduct, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPaymentB2PInfo, OrderPrivateInfo, PromoCode
+from .models import Basket, BasketProduct, Order, OrderDeliveryInfo, OrderPaymentInfo, OrderPaymentB2PInfo, \
+    OrderPrivateInfo, PromoCode
 from .serializers import (BasketDetailSerializer, OrderDeliveryInfoSerializer, OrderDetailSerializer,
                           OrderDetailShortSerializer, OrderListSerializer, OrderPaymentInfoSerializer,
                           OrderPrivateInfoSerializer, OrderPaymentInfoB2PSerializer)
@@ -152,6 +153,18 @@ class OrderActiveRetrieveView(RetrieveAPIView):
         else:
             current_session = Session.objects.get(session_key=self.request.session.session_key)
             return get_object_or_404(Order, session=current_session, status=Order.ACTIVE)
+            # return get_object_or_404(Order, session=current_session, status=Order.PENDING)
+
+
+class OrderPendingRetrieveView(RetrieveAPIView):
+    serializer_class = OrderDetailSerializer
+
+    def get_object(self):
+        if not self.request.user.is_anonymous:
+            return get_object_or_404(Order, user=self.request.user, status=Order.ACTIVE)
+        else:
+            current_session = Session.objects.get(session_key=self.request.session.session_key)
+            return get_object_or_404(Order, session=current_session, status=Order.PENDING)
 
 
 class OrderActiveToPendingView(UpdateAPIView):
@@ -171,17 +184,24 @@ class OrderActiveToPendingView(UpdateAPIView):
                 sum_price += (basket_product.quantity * basket_product.price)
             order.price = sum_price
 
+        if order.payment_info.type == order.payment_info.CARD:
+            try:
+                OrderPaymentB2PInfo.make_register_request(payment_info=order.payment_info)
+            except Exception as exception:
+                print(exception)
+                return HttpResponse(status=400)
+
         order.status = Order.PENDING
         order.received = timezone.localtime()
         order.save()
-        if order.payment_info.type == order.payment_info.CARD:
-            OrderPaymentB2PInfo.make_register_request(payment_info=order.payment_info)
+
         order.send_notification_to_admins()
         order.send_notification_to_customer()
         serializer = self.serializer_class(order, context={'request': self.request})
         return Response(serializer.data)
 
 
+# order/active/update
 class OrderActiveUpdateView(UpdateAPIView):
     permission_classes = [AllowAny]
     serializer_class = OrderDetailSerializer
@@ -423,7 +443,6 @@ class OrderPaymentInfoUpdateView(UpdateAPIView):
             serializer.save()
             order_serializer = self.serializer_class(order, context={'request': self.request})
             return Response(order_serializer.data, status=HTTP_200_OK)
-
 
 
 class OrderPaymentB2PInfoGetRedirectToPayView(RetrieveAPIView):
