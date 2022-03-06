@@ -94,7 +94,9 @@ class Category(models.Model):
         return self.parent.name
 
     def has_children(self):
-        if self.children.count():
+	#return bool(self.children)
+        #if self.children.count():
+        if hasattr(self,'children') and self.children.count() > 0:
             return True
         return False
 

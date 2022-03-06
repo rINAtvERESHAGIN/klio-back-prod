@@ -13,7 +13,11 @@ class Production(Base):
 
     ALLOWED_HOSTS = [
         '45.80.71.10',
-        'kliogem.ru'
+        'kliogem.ru',
+        'localhost:8080',
+        'localhost:3000',
+        '127.0.0.1:3000',
+        'r.kliogem.ru:3000'
     ]
 
     DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
@@ -39,6 +43,10 @@ class Production(Base):
         "http://45.80.71.10:8081",
         "http://kliogem.ru",
         "https://kliogem.ru",
-    ]
+        'http://localhost:8080',
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://r.kliogem.ru:3000"
+         ]
 
     CSRF_TRUSTED_ORIGINS = ['kliogem.ru']

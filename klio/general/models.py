@@ -90,6 +90,7 @@ class Banner(models.Model):
     deadline = models.DateTimeField(help_text=_('When banner should disappear from a site?'),
                                     verbose_name=_('deadline'))
     activity = models.BooleanField(default=True, verbose_name=_('activity'))
+    mobile = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-activity', 'order']
